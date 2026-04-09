@@ -186,6 +186,15 @@ Typical entries:
 - structure reorganized
 - lint pass completed
 
+## Version control guidance
+
+When the agent makes a meaningful vault update, it should usually:
+- stage the relevant changes
+- create a clear git commit
+- push the update to the configured remote
+
+This is the default behavior after successful knowledge-base updates unless the user asks otherwise.
+
 ## Index guidance
 
 `90 System/index.md` should be content-oriented, not chronological.

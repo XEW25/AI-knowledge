@@ -131,11 +131,12 @@ If a claim is uncertain, disputed, incomplete, or source-dependent, say so in th
 ### Ingest workflow
 When processing a new source, the agent should usually:
 1. inspect the raw material or inbox capture
-2. create or update a note in `02 Sources/`
-3. update relevant pages in `03 Wiki/`
-4. update relevant navigation in `04 Maps/`
-5. append a brief entry to `90 System/log.md`
-6. update `90 System/index.md` if new durable pages were created
+2. discuss key takeaways with the user when the material is important, interpretive, strategic, or likely to shape the vault's direction
+3. create or update a note in `02 Sources/`
+4. update relevant pages in `03 Wiki/`
+5. update relevant navigation in `04 Maps/`
+6. append a brief entry to `90 System/log.md`
+7. update `90 System/index.md` if new durable pages were created
 
 ### Query workflow
 When answering a substantive question, the agent should usually:

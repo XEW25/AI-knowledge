@@ -11,3 +11,15 @@
 - Added concept page `LLM Wiki`
 - Added map page `Home`
 - Updated `90 System/index.md`
+
+## [2026-04-11] ingest | Alex Zhang - The Mismanaged Geniuses Hypothesis
+- Added raw capture for the X article in `01 Raw/`
+- Added source note `Alex Zhang - The Mismanaged Geniuses Hypothesis`
+- Added concept pages `Task decomposition`, `Agent orchestration`, and `Recursive Language Models`
+- Added synthesis page `Self-managing memory as an in-distribution control problem`
+- Added synthesis page `Meta-skills for memory orchestration`
+- Added topic page `Open questions in agent memory and decomposition`
+- Added map page `Agent systems, decomposition, and memory`
+- Added entity pages `Alex Zhang`, `Andrej Karpathy`, `Claude Code`, `OpenClaw`, and `Hermes Agent`
+- Updated cross-links among source, concept, synthesis, topic, map, and entity pages
+- Updated `90 System/index.md`

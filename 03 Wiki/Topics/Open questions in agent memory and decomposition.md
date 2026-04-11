@@ -14,6 +14,8 @@ This page collects unresolved questions, tensions, and possible research directi
 - Which memory operations should be first-class: write, consolidate, revise, merge, archive, discard?
 - How should episodic, semantic, and working memory interact?
 - What is the right balance between explicit memory control and latent model behavior?
+- Can `memory as action / policy` scale beyond summarization into richer memory lifecycles?
+- How can memory usefulness be supervised without relying on gold answers?
 
 ### Meta-skills
 - What is the minimal useful ontology of meta-skills for memory orchestration?

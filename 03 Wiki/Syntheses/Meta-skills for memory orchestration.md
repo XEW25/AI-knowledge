@@ -96,3 +96,5 @@ If memory is managed through meta-skills, then a strong memory architecture may 
 - [[Task decomposition]]
 - [[Agent orchestration]]
 - [[Alex Zhang - The Mismanaged Geniuses Hypothesis]]
+- [[Memory Policy]]
+- [[MemPO: Self-Memory Policy Optimization for Long-Horizon Agents]]

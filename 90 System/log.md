@@ -17,6 +17,17 @@
 - Linked the existing source note back to the raw note
 - Updated `90 System/index.md`
 
+## [2026-04-11] ingest | MemPO: Self-Memory Policy Optimization for Long-Horizon Agents
+- Added raw capture and source note for the MemPO arXiv paper
+- Added concept page `Memory Policy`
+- Updated memory-related syntheses and open questions pages
+- Updated `90 System/index.md`
+
+## [2026-04-11] maintenance | MemPO arXiv backfill
+- Downloaded the paper PDF into `01 Raw/` as the raw anchor artifact
+- Added local PDF links to the raw note and source note
+- Brought the paper closer to the current PDF-first arXiv ingest standard
+
 ## [2026-04-11] ingest | Alex Zhang - The Mismanaged Geniuses Hypothesis
 - Added raw capture for the X article in `01 Raw/`
 - Added source note `Alex Zhang - The Mismanaged Geniuses Hypothesis`

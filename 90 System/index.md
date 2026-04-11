@@ -11,6 +11,7 @@
 - [[02 Sources]]
 - [[Andrej Karpathy - LLM Wiki]] — source note on the LLM Wiki pattern proposed by Andrej Karpathy
 - [[Alex Zhang - The Mismanaged Geniuses Hypothesis]] — source note on learned decomposition, orchestration, and the claim that frontier LMs are underutilized by brittle scaffolds
+- [[MemPO: Self-Memory Policy Optimization for Long-Horizon Agents]] — source note on training memory as an explicit agent action and policy for long-horizon tasks
 
 ## Wiki
 
@@ -19,6 +20,7 @@
 - [[Task decomposition]] — breaking large problems into solvable subtasks for LM systems
 - [[Agent orchestration]] — how LM calls, tools, and subagents are coordinated
 - [[Recursive Language Models]] — recursive structures for richer LM composition
+- [[Memory Policy]] — framing memory management as part of agent behavior and control
 
 ### Entities
 - [[Alex Zhang]] — author associated with the Mismanaged Geniuses Hypothesis

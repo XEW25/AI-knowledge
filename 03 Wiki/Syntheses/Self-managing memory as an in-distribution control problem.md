@@ -110,3 +110,5 @@ A useful memory system may need explicit support for:
 - [[Recursive Language Models]]
 - [[Meta-skills for memory orchestration]]
 - [[Open questions in agent memory and decomposition]]
+- [[Memory Policy]]
+- [[MemPO: Self-Memory Policy Optimization for Long-Horizon Agents]]

@@ -5,6 +5,7 @@
 
 ## Raw
 - [[01 Raw]]
+- [[2026-04-11 - Andrej Karpathy - LLM Wiki]] — raw capture of the original `llm-wiki.md` idea document
 
 ## Sources
 - [[02 Sources]]

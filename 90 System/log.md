@@ -12,6 +12,11 @@
 - Added map page `Home`
 - Updated `90 System/index.md`
 
+## [2026-04-11] maintenance | Andrej Karpathy - LLM Wiki raw backfill
+- Added raw capture `2026-04-11 - Andrej Karpathy - LLM Wiki`
+- Linked the existing source note back to the raw note
+- Updated `90 System/index.md`
+
 ## [2026-04-11] ingest | Alex Zhang - The Mismanaged Geniuses Hypothesis
 - Added raw capture for the X article in `01 Raw/`
 - Added source note `Alex Zhang - The Mismanaged Geniuses Hypothesis`

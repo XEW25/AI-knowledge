@@ -1,6 +1,7 @@
 # LLM Wiki
 
 Related entity: [[Andrej Karpathy]]
+- Raw note: [[2026-04-11 - Andrej Karpathy - LLM Wiki]]
 
 ## Summary
 LLM Wiki is a pattern for building a personal or team knowledge base in which an LLM incrementally maintains a persistent, interlinked markdown wiki rather than answering solely by retrieving raw files at query time. The central claim is that knowledge should be compiled into durable notes, cross-links, syntheses, and indexes that improve over time instead of being rediscovered from scratch for every question.

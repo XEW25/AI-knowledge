@@ -12,6 +12,7 @@
 - [[Andrej Karpathy - LLM Wiki]] — source note on the LLM Wiki pattern proposed by Andrej Karpathy
 - [[Alex Zhang - The Mismanaged Geniuses Hypothesis]] — source note on learned decomposition, orchestration, and the claim that frontier LMs are underutilized by brittle scaffolds
 - [[MemPO: Self-Memory Policy Optimization for Long-Horizon Agents]] — source note on training memory as an explicit agent action and policy for long-horizon tasks
+- [[Harness design for long-running application development]] — source note on multi-agent harness design, evaluator separation, and long-running application builds
 
 ## Wiki
 
@@ -21,10 +22,13 @@
 - [[Agent orchestration]] — how LM calls, tools, and subagents are coordinated
 - [[Recursive Language Models]] — recursive structures for richer LM composition
 - [[Memory Policy]] — framing memory management as part of agent behavior and control
+- [[Harness design]] — system scaffolding for long-running and structured agent work
 
 ### Entities
 - [[Alex Zhang]] — author associated with the Mismanaged Geniuses Hypothesis
 - [[Andrej Karpathy]] — researcher associated with the LLM Wiki framing
+- [[Anthropic]] — organization associated with Claude, harness design, and agent engineering work
+- [[Prithvi Rajasekaran]] — author associated with long-running application harness design
 - [[Claude Code]] — coding-agent style orchestrator-subagent system
 - [[OpenClaw]] — agent orchestration environment and referenced scaffold
 - [[Hermes Agent]] — agent scaffold referenced in discussion of longer-horizon decomposition

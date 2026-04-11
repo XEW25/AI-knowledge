@@ -28,6 +28,13 @@
 - Added local PDF links to the raw note and source note
 - Brought the paper closer to the current PDF-first arXiv ingest standard
 
+## [2026-04-12] ingest | Harness design for long-running application development
+- Added raw capture and source note for the Anthropic engineering article
+- Added concept page `Harness design`
+- Added entity pages `Anthropic` and `Prithvi Rajasekaran`
+- Updated `Agent orchestration` and the main agent/decomposition/memory map
+- Updated `90 System/index.md`
+
 ## [2026-04-11] ingest | Alex Zhang - The Mismanaged Geniuses Hypothesis
 - Added raw capture for the X article in `01 Raw/`
 - Added source note `Alex Zhang - The Mismanaged Geniuses Hypothesis`

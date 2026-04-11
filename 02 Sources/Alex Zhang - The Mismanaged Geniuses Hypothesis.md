@@ -47,7 +47,14 @@ RLMs are presented as a stronger decomposition scaffold because they let plans b
 The article cites a result where an RLM built from Qwen3-4B-Instruct goes from nearly 0% to 100% on a harder long-context benchmark after RL training on a simpler setting. The intended takeaway is that the hard part may be learning the right decomposition policy, not directly learning the entire solution behavior end-to-end.
 
 ## Figures
+Assets:
+- [[2026-04-11 - Alex Zhang - The Mismanaged Geniuses Hypothesis#Assets]]
+- [[Alex Zhang - The Mismanaged Geniuses Hypothesis assets/figure-1.jpg]]
+- [[Alex Zhang - The Mismanaged Geniuses Hypothesis assets/figure-2.jpg]]
+
 ### Figure 1
+![[Alex Zhang - The Mismanaged Geniuses Hypothesis assets/figure-1.jpg]]
+
 A conceptual figure contrasting two paths:
 - continued scaling of current frontier LMs
 - improved capability through better “management” and decomposition
@@ -55,6 +62,8 @@ A conceptual figure contrasting two paths:
 The figure suggests that training better managers may unlock tasks like open scientific problem solving, long-horizon autonomous agents, and self-improving systems.
 
 ### Figure 2
+![[Alex Zhang - The Mismanaged Geniuses Hypothesis assets/figure-2.jpg]]
+
 An experimental figure arguing:
 1. decomposition can be easier than direct solving
 2. models may already be capable of generating the correct compositions but do not reliably do so without the right training or scaffold

@@ -6,6 +6,10 @@
 - Authors: Alex Zhang, Zhening (Zed) Li, Omar Khattab
 - Original title: alex zhang on X: "The \"Mismanaged Geniuses\" Hypothesis" / X
 
+## Assets
+- [[Alex Zhang - The Mismanaged Geniuses Hypothesis assets/figure-1.jpg]]
+- [[Alex Zhang - The Mismanaged Geniuses Hypothesis assets/figure-2.jpg]]
+
 ## Raw capture
 
 tldr; AI models are already good enough for the next leap in capabilities.
@@ -19,6 +23,8 @@ We have an alternate hypothesis on what will take us to the next inflection poin
 It can be said that frontier language models (LMs) are “geniuses” at solving the broad range of tasks they’ve been trained on. Nowadays, this represents virtually all the advanced subjects and content we learn throughout higher education to prepare ourselves for researching unsolved problems. Yet despite the fact that these models outperform even the brightest humans on the hardest exams like IMO and IOI and are super-human at general software engineering, they oddly also struggle to reliably tackle long-horizon and iterative reasoning problems that may seem “easy” to us. It is an interesting thought experiment to consider whether this is an inherent limitation of the LM, or the way in which we use them.
 
 The mismanaged geniuses hypothesis (MGH) posits that existing frontier language models are severely underutilized due to sub-optimal use of individual language model calls. We believe that the next leap in "language model” capabilities will come not from continued scaling of existing LMs, but from enabling language models to “manage” themselves, i.e. natively decompose tasks and act on these decompositions. In particular, we believe that existing systems that let LMs decompose tasks are the limiting bottleneck, and the first step would be to define the space of decompositions the LM has access to. Upon figuring out this space of decompositions, the “bitter-lesson”-pilled allocation of compute would go towards training models to perform the correct decompositions.
+
+![[Alex Zhang - The Mismanaged Geniuses Hypothesis assets/figure-1.jpg]]
 
 Figure 1 caption: The “mismanaged geniuses” hypothesis posits that current ways of using LMs (“geniuses”) remain far from unlocking their full potential because current systems built to “manage” them (e.g. human-engineered agents) are suboptimal. We propose that instead of continuing to scale frontier LMs using current methods (in red), we should focus on the “management” or decomposition aspect itself. We believe that training LMs to learn to decompose is a significantly more efficient path towards expanding LM capabilities (in blue) and could potentially unlock solutions to many tasks we care about (in purple, e.g. open scientific problems, long-horizon autonomous agents, self-improvement, etc.). In particular, a key determining factor of the success of this approach is the space of decompositions that “manager” LMs have access to and the language in which they are expressed.
 
@@ -45,6 +51,8 @@ Assuming the MGH is actually true, we believe there are two main research / engi
 1. Defining “decomposition”. Defining the space of decompositions the LM is allowed to express is important for ensuring the individual LM calls stay “in-distribution”. How we define “decomposition” has an exponentially large impact (with respect to depth) on the tasks solvable via decomposition. In long-context tasks, for example, tool-call-style subagents prevent the root LM from decomposing the context into arbitrarily many chunks, inhibiting its ability to scale. In RLMs, the space of decompositions is expanded so as to allow an efficient representation of decomposition into arbitrarily many subtasks (e.g. using a for loop), which suddenly enables the system to handle near-infinite context. Similarly, simple expansions to the space of decompositions, compounded by the effect of recursion, may suddenly unlock generalization to near-infinite long-horizon tasks, self-improvement through near-infinite in-context learning, and more.
 
 2. Training and scaling the ability to compose. LMs need to be trained to correctly decompose tasks under any scaffold, but the correct decompositions are likely already within the distribution of what LMs can generate. To provide an example, we examine MRCRv2 1M context with 8 needles, a commonly reported long-context benchmark for frontier models. We find that while RLM(Qwen3-4B-Instruct) solves nearly 0% of the tasks, it gets 100% after only RL training on a significantly simpler setting (32k context, 1 needle). Despite being a small model, it learns purely through its own rollouts the correct decomposition that generalizes.
+
+![[Alex Zhang - The Mismanaged Geniuses Hypothesis assets/figure-2.jpg]]
 
 Figure 2 caption: We provide evidence for two points: 1) decomposition for a task is not as difficult as directly solving the task; 2) LMs are often capable of writing the correct compositions, but do not always natively do so. To show (1), we show that a 4B parameter RLM is perfectly capable of one-shotting a task commonly reported as a “long-context benchmark” in many frontier model reports. To show (2), we show that the original model struggles to perform the task as an RLM. However, after RL-training only on a smaller, simpler version of the benchmark (i.e. 32k context, 1 needle), the model bootstraps the correct decomposition behavior to solve the bigger task.
 

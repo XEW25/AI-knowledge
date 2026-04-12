@@ -22,6 +22,16 @@ Common harness components include:
 ## Load-bearing harnesses
 A useful way to think about harness design is that each component encodes an assumption about what the base model cannot yet do reliably on its own. As models improve, some harness components may stop being load-bearing and should be simplified or removed.
 
+## From harness design to meta-harness design
+A further extension of this idea is that if harness assumptions are perishable, then the surrounding system should not be too tightly coupled to today’s harness. This points toward a higher-level design problem: building stable interfaces around future harnesses.
+
+One useful framing is to separate:
+- the **session** as the durable event/state layer
+- the **harness** as the orchestration or reasoning loop
+- the **sandbox / tools** as the execution layer
+
+This kind of abstraction allows harness implementations to evolve while keeping the broader system architecture stable. In that sense, harness design can grow into a broader concern with platform abstractions or meta-harness design.
+
 ## Relevance to long-horizon agent systems
 Harness design is especially important for:
 - long-running coding agents
@@ -36,8 +46,9 @@ Harness design is closely connected to:
 - [[Claude Code]]
 - [[OpenClaw]]
 - [[Harness design for long-running application development]]
+- [[Scaling Managed Agents Decoupling the brain from the hands]]
 
-It is a useful concept for understanding when capability gains come from better scaffolding rather than only from better base models.
+It is a useful concept for understanding when capability gains come from better scaffolding rather than only from better base models, and when platform abstractions should be designed to outlast any single harness implementation.
 
 ## Open questions
 - Which harness components generalize across domains?
@@ -49,5 +60,7 @@ It is a useful concept for understanding when capability gains come from better 
 - [[Agent orchestration]]
 - [[Task decomposition]]
 - [[Harness design for long-running application development]]
+- [[Scaling Managed Agents Decoupling the brain from the hands]]
 - [[Claude Code]]
 - [[OpenClaw]]
+- [[Anthropic]]

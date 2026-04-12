@@ -29,3 +29,4 @@ A major open question is whether orchestration should remain primarily an engine
 - [[Open questions in agent memory and decomposition]]
 - [[Harness design]]
 - [[Harness design for long-running application development]]
+- [[Scaling Managed Agents Decoupling the brain from the hands]]

@@ -13,6 +13,7 @@
 - [[Alex Zhang - The Mismanaged Geniuses Hypothesis]] — source note on learned decomposition, orchestration, and the claim that frontier LMs are underutilized by brittle scaffolds
 - [[MemPO: Self-Memory Policy Optimization for Long-Horizon Agents]] — source note on training memory as an explicit agent action and policy for long-horizon tasks
 - [[Harness design for long-running application development]] — source note on multi-agent harness design, evaluator separation, and long-running application builds
+- [[Scaling Managed Agents Decoupling the brain from the hands]] — source note on managed-agent architecture, decoupled sessions/harnesses/sandboxes, and stable platform abstractions
 
 ## Wiki
 
@@ -22,7 +23,7 @@
 - [[Agent orchestration]] — how LM calls, tools, and subagents are coordinated
 - [[Recursive Language Models]] — recursive structures for richer LM composition
 - [[Memory Policy]] — framing memory management as part of agent behavior and control
-- [[Harness design]] — system scaffolding for long-running and structured agent work
+- [[Harness design]] — system scaffolding for long-running and structured agent work, extending upward toward meta-harness/platform abstractions
 
 ### Entities
 - [[Alex Zhang]] — author associated with the Mismanaged Geniuses Hypothesis

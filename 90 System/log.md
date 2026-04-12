@@ -35,6 +35,11 @@
 - Updated `Agent orchestration` and the main agent/decomposition/memory map
 - Updated `90 System/index.md`
 
+## [2026-04-12] ingest | Scaling Managed Agents: Decoupling the brain from the hands
+- Added raw capture and source note for the Anthropic managed-agents article
+- Extended `Harness design` upward toward meta-harness / platform-abstraction framing
+- Updated `Agent orchestration`, the main agent/decomposition/memory map, and `90 System/index.md`
+
 ## [2026-04-11] ingest | Alex Zhang - The Mismanaged Geniuses Hypothesis
 - Added raw capture for the X article in `01 Raw/`
 - Added source note `Alex Zhang - The Mismanaged Geniuses Hypothesis`

@@ -28,6 +28,9 @@ This page collects unresolved questions, tensions, and possible research directi
 - What kinds of intermediate supervision help models learn better memory-control behavior?
 - Can simpler toy environments bootstrap to open-ended long-horizon tasks?
 - How should test-time compute and training-time structure interact?
+- Can trajectory-based RL turn individual memory operations into trainable skills?
+- Which operations are easiest to train first: write/compress, retrieve/rank, merge/consolidate, or archive/discard?
+- How do we move from training local memory actions to training the correct higher-level decomposition policy?
 
 ### Evaluation
 - How do we measure memory-control quality rather than just raw retrieval quality?

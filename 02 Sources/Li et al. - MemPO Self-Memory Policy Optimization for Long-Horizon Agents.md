@@ -51,11 +51,17 @@ The most valuable framing from this paper is `memory as action / policy`, more t
 
 MemPO appears to be an early but concrete example of that shift.
 
+A further implication is that MemPO may be less important as a complete memory-management solution than as a proof of trainability for one memory subproblem: **write/compress**. It suggests that if one memory operation can be actionized, rewarded, and trained from trajectory data, then other memory operations may also become trainable under the right decomposition and reward design.
+
+This also links naturally to [[Alex Zhang - The Mismanaged Geniuses Hypothesis]]. Memory management may seem OOD when treated as a single faculty, but could become tractable if decomposed into the right set of in-distribution subproblems. On this view, the deeper challenge is not only to expose memory operations, but to teach the model the correct decomposition policy over them.
+
 ## Questions worth following up
 1. How far can the `memory as action` framing be extended beyond summarization into revise / merge / discard / retrieval control?
 2. What is the right general action space for memory policy?
 3. Can memory usefulness be supervised without gold answers?
 4. How should explicit memory policy interact with meta-skills for memory orchestration?
+5. Which memory operations are easiest to make trainable first: write, retrieve, merge, revise, or discard?
+6. How should trajectory signals be designed so that models learn not just local memory actions, but the correct decomposition policy over memory work?
 
 ## Possible downstream vault work
 - Create or expand [[Memory Policy]]

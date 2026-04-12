@@ -62,6 +62,10 @@ Advanced memory behavior often appears out-of-distribution when framed as a sing
 
 This suggests that meta-skills could be a practical mechanism for implementing the broader idea in [[Self-managing memory as an in-distribution control problem]].
 
+A useful extension of this idea is that memory management may look OOD only when treated as a monolithic faculty. If it is decomposed into explicit operations, many of those operations may already be close to in-distribution for strong models. The harder problem then becomes not whether the model can perform any one operation, but whether it can learn the correct **decomposition policy** over those operations.
+
+This creates a strong connection to [[Alex Zhang - The Mismanaged Geniuses Hypothesis]]: just as broader agent capability may be bottlenecked by poor decomposition, memory management may be bottlenecked by the absence of a good memory-operation space and a trainable way to choose the right decomposition through time.
+
 ## Relationship to task decomposition
 Meta-skills are a specialization of [[Task decomposition]] for memory control. They do not solve the external task directly. Instead, they regulate the information substrate on which longer-horizon task solving depends.
 
@@ -83,6 +87,8 @@ If memory is managed through meta-skills, then a strong memory architecture may 
 2. Good memory systems require strong write, revise, and consolidate policies, not only good retrieval.
 3. Meta-skills can stabilize memory behavior across tasks better than ad hoc prompting.
 4. A useful path to self-managed memory may be to train meta-skills on simpler memory-control environments before scaling to open-ended tasks.
+5. The crucial bottleneck may be learning the correct **decomposition and orchestration** over memory operations, not merely possessing the local operations themselves.
+6. Some memory operations may be individually trainable with operation-specific rewards, while higher-level meta-skills learn when and how to compose them.
 
 ## Open questions
 - What is the right ontology of memory meta-skills?

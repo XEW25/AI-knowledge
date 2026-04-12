@@ -38,8 +38,8 @@
 - [[Open questions in agent memory and decomposition]] — unresolved questions and research directions around decomposition, memory control, and meta-skills
 
 ### Syntheses
-- [[Self-managing memory as an in-distribution control problem]] — synthesis on reframing memory management as decomposed control over write, retrieve, consolidate, and discard operations
-- [[Meta-skills for memory orchestration]] — synthesis on reusable higher-order skills for controlling memory operations
+- [[Self-managing memory as an in-distribution control problem]] — synthesis on reframing memory management as decomposed control over write, retrieve, consolidate, and discard operations, with emphasis on decomposition policy
+- [[Meta-skills for memory orchestration]] — synthesis on reusable higher-order skills for controlling memory operations and composing trainable memory subskills
 
 ## Maps
 - [[Home]] — top-level navigation page for the vault

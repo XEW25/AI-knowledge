@@ -43,6 +43,8 @@ Instead of asking whether a model can “manage its own memory” in one leap, a
 
 This shifts the problem from a vague emergent faculty to an explicit control loop.
 
+A key implication is that memory management may be OOD only at the global level. Locally, many memory operations may already be close to in-distribution. The research bottleneck may therefore be how to define the right operation space and how to teach the model the correct decomposition policy over that space.
+
 ## The role of meta-skills
 A promising way to implement this is through **meta-skills**.
 
@@ -86,6 +88,8 @@ This also suggests that the right question is not just “how much can the model
 3. Meta-skills can serve as reusable policies for memory control.
 4. Training models on simpler memory-management tasks may bootstrap to stronger long-horizon memory behavior.
 5. Better memory systems may require richer action spaces for writing, consolidating, and revising memory, not only better retrieval.
+6. The decisive challenge may be teaching the model the **right decomposition policy** over memory operations, not only exposing those operations.
+7. This makes memory management a memory-specific instance of the broader decomposition argument in [[Alex Zhang - The Mismanaged Geniuses Hypothesis]].
 
 ## Open questions
 - What is the right action space for memory control?

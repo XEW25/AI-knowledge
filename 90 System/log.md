@@ -40,6 +40,13 @@
 - Extended `Harness design` upward toward meta-harness / platform-abstraction framing
 - Updated `Agent orchestration`, the main agent/decomposition/memory map, and `90 System/index.md`
 
+## [2026-04-12] synthesis | Memory decomposition, MemPO, and meta-skills
+- Extended memory-related syntheses with the idea that memory management may be OOD only globally but decomposable into in-distribution subproblems
+- Added the stronger claim that the main bottleneck may be learning the correct decomposition policy over memory operations
+- Updated the MemPO source note to emphasize trajectory-trained write/compress as a proof of trainability for one memory subproblem
+- Expanded open questions around which memory operations are easiest to train and how trajectory signals can scale from local actions to higher-level memory orchestration
+- Updated `90 System/index.md`
+
 ## [2026-04-11] ingest | Alex Zhang - The Mismanaged Geniuses Hypothesis
 - Added raw capture for the X article in `01 Raw/`
 - Added source note `Alex Zhang - The Mismanaged Geniuses Hypothesis`

@@ -34,3 +34,4 @@ This concept is especially relevant when asking whether self-managed memory can 
 - [[Self-managing memory as an in-distribution control problem]]
 - [[Meta-skills for memory orchestration]]
 - [[Open questions in agent memory and decomposition]]
+- [[Agent memory]]

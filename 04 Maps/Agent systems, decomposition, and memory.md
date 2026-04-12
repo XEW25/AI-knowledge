@@ -7,6 +7,7 @@ This map collects the cluster of pages in the vault that deal with agent organiz
 ### Sources
 - [[Alex Zhang - The Mismanaged Geniuses Hypothesis]]
 - [[Andrej Karpathy - LLM Wiki]]
+- [[MemPO: Self-Memory Policy Optimization for Long-Horizon Agents]]
 - [[Harness design for long-running application development]]
 - [[Scaling Managed Agents Decoupling the brain from the hands]]
 
@@ -16,6 +17,11 @@ This map collects the cluster of pages in the vault that deal with agent organiz
 - [[Agent orchestration]]
 - [[Recursive Language Models]]
 - [[Harness design]]
+
+### Topics
+- [[Agent memory]]
+- [[Harnesses and managed agent systems]]
+- [[Open questions in agent memory and decomposition]]
 
 ### Syntheses
 - [[Self-managing memory as an in-distribution control problem]]

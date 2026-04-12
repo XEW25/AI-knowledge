@@ -64,3 +64,4 @@ It is a useful concept for understanding when capability gains come from better 
 - [[Claude Code]]
 - [[OpenClaw]]
 - [[Anthropic]]
+- [[Harnesses and managed agent systems]]

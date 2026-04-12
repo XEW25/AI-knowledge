@@ -28,6 +28,18 @@
 - Added local PDF links to the raw note and source note
 - Brought the paper closer to the current PDF-first arXiv ingest standard
 
+## [2026-04-11] ingest | Alex Zhang - The Mismanaged Geniuses Hypothesis
+- Added raw capture for the X article in `01 Raw/`
+- Added source note `Alex Zhang - The Mismanaged Geniuses Hypothesis`
+- Added concept pages `Task decomposition`, `Agent orchestration`, and `Recursive Language Models`
+- Added synthesis page `Self-managing memory as an in-distribution control problem`
+- Added synthesis page `Meta-skills for memory orchestration`
+- Added topic page `Open questions in agent memory and decomposition`
+- Added map page `Agent systems, decomposition, and memory`
+- Added entity pages `Alex Zhang`, `Andrej Karpathy`, `Claude Code`, `OpenClaw`, and `Hermes Agent`
+- Updated cross-links among source, concept, synthesis, topic, map, and entity pages
+- Updated `90 System/index.md`
+
 ## [2026-04-12] ingest | Harness design for long-running application development
 - Added raw capture and source note for the Anthropic engineering article
 - Added concept page `Harness design`
@@ -47,14 +59,8 @@
 - Expanded open questions around which memory operations are easiest to train and how trajectory signals can scale from local actions to higher-level memory orchestration
 - Updated `90 System/index.md`
 
-## [2026-04-11] ingest | Alex Zhang - The Mismanaged Geniuses Hypothesis
-- Added raw capture for the X article in `01 Raw/`
-- Added source note `Alex Zhang - The Mismanaged Geniuses Hypothesis`
-- Added concept pages `Task decomposition`, `Agent orchestration`, and `Recursive Language Models`
-- Added synthesis page `Self-managing memory as an in-distribution control problem`
-- Added synthesis page `Meta-skills for memory orchestration`
-- Added topic page `Open questions in agent memory and decomposition`
-- Added map page `Agent systems, decomposition, and memory`
-- Added entity pages `Alex Zhang`, `Andrej Karpathy`, `Claude Code`, `OpenClaw`, and `Hermes Agent`
-- Updated cross-links among source, concept, synthesis, topic, map, and entity pages
+## [2026-04-12] maintenance | Topic-layer and navigation cleanup
+- Added topic pages `Agent memory` and `Harnesses and managed agent systems`
+- Linked topic pages into related concept and map pages
+- Expanded the main agent/decomposition/memory map to include topic entry points
 - Updated `90 System/index.md`

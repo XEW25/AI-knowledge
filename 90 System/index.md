@@ -35,6 +35,8 @@
 - [[Hermes Agent]] — agent scaffold referenced in discussion of longer-horizon decomposition
 
 ### Topics
+- [[Agent memory]] — topic page for memory as policy, decomposition, and self-managed memory in agent systems
+- [[Harnesses and managed agent systems]] — topic page for harness design, managed-agent architecture, and long-running orchestration systems
 - [[Open questions in agent memory and decomposition]] — unresolved questions and research directions around decomposition, memory control, and meta-skills
 
 ### Syntheses

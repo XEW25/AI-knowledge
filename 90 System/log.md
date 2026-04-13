@@ -64,3 +64,8 @@
 - Linked topic pages into related concept and map pages
 - Expanded the main agent/decomposition/memory map to include topic entry points
 - Updated `90 System/index.md`
+
+## [2026-04-13] ingest | Ascend HiFloat8 Format for Deep Learning
+- Added raw capture and source note for the HiF8 arXiv paper
+- Added topic page `Model quantization` as the starting point for a quantization cluster
+- Updated `90 System/index.md`

@@ -14,6 +14,7 @@
 - [[MemPO: Self-Memory Policy Optimization for Long-Horizon Agents]] — source note on training memory as an explicit agent action and policy for long-horizon tasks
 - [[Harness design for long-running application development]] — source note on multi-agent harness design, evaluator separation, and long-running application builds
 - [[Scaling Managed Agents Decoupling the brain from the hands]] — source note on managed-agent architecture, decoupled sessions/harnesses/sandboxes, and stable platform abstractions
+- [[Ascend HiFloat8 Format for Deep Learning]] — source note on a proposed FP8-like tapered-precision format for low-bit training and inference
 
 ## Wiki
 
@@ -37,6 +38,7 @@
 ### Topics
 - [[Agent memory]] — topic page for memory as policy, decomposition, and self-managed memory in agent systems
 - [[Harnesses and managed agent systems]] — topic page for harness design, managed-agent architecture, and long-running orchestration systems
+- [[Model quantization]] — topic page for quantization, low-bit training, FP8-like formats, and numeric representation design
 - [[Open questions in agent memory and decomposition]] — unresolved questions and research directions around decomposition, memory control, and meta-skills
 
 ### Syntheses

@@ -15,6 +15,8 @@
 - [[Harness design for long-running application development]] — source note on multi-agent harness design, evaluator separation, and long-running application builds
 - [[Scaling Managed Agents Decoupling the brain from the hands]] — source note on managed-agent architecture, decoupled sessions/harnesses/sandboxes, and stable platform abstractions
 - [[Ascend HiFloat8 Format for Deep Learning]] — source note on a proposed FP8-like tapered-precision format for low-bit training and inference
+- [[SmoothQuant: Accurate and Efficient Post-Training Quantization for Large Language Models]] — source note on activation smoothing, difficulty migration, and hardware-friendly W8A8 PTQ for LLMs
+- [[Kerbl et al. - 3D Gaussian Splatting for Real-Time Radiance Field Rendering]] — source note on the foundational 3DGS paper (SIGGRAPH 2023)
 
 ## Wiki
 
@@ -25,6 +27,7 @@
 - [[Recursive Language Models]] — recursive structures for richer LM composition
 - [[Memory Policy]] — framing memory management as part of agent behavior and control
 - [[Harness design]] — system scaffolding for long-running and structured agent work, extending upward toward meta-harness/platform abstractions
+- [[3D Gaussian Splatting]] — explicit scene representation via 3D Gaussian blobs, real-time splatting rendering, and applications in embodied AI
 
 ### Entities
 - [[Alex Zhang]] — author associated with the Mismanaged Geniuses Hypothesis

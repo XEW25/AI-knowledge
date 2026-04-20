@@ -69,3 +69,13 @@
 - Added raw capture and source note for the HiF8 arXiv paper
 - Added topic page `Model quantization` as the starting point for a quantization cluster
 - Updated `90 System/index.md`
+
+## [2026-04-13] ingest | SmoothQuant: Accurate and Efficient Post-Training Quantization for Large Language Models
+- Added raw capture and source note for the SmoothQuant paper
+- Updated `Model quantization` to distinguish representation-design from distribution-reshaping / difficulty-migration routes
+- Updated `90 System/index.md`
+
+## [2026-04-20] ingest | Kerbl et al. - 3D Gaussian Splatting
+- Added source note for the foundational 3DGS paper (SIGGRAPH 2023)
+- Added concept page `3D Gaussian Splatting` covering core properties, splatting rendering, training, vs NeRF, vs point cloud, embodied AI input forms
+- Updated `90 System/index.md`

@@ -28,6 +28,8 @@
 - [[Memory Policy]] — framing memory management as part of agent behavior and control
 - [[Harness design]] — system scaffolding for long-running and structured agent work, extending upward toward meta-harness/platform abstractions
 - [[3D Gaussian Splatting]] — explicit scene representation via 3D Gaussian blobs, real-time splatting rendering, and applications in embodied AI
+- [[3D Spatial Representation]] — 理想 3D 空间表征的必要性、特征、语言类比，及 open research question
+- [[Object-Centric Representation]] — 以物体为基本单元的场景表示方法，支持组合泛化
 
 ### Entities
 - [[Alex Zhang]] — author associated with the Mismanaged Geniuses Hypothesis
@@ -43,6 +45,7 @@
 - [[Harnesses and managed agent systems]] — topic page for harness design, managed-agent architecture, and long-running orchestration systems
 - [[Model quantization]] — topic page for quantization, low-bit training, FP8-like formats, and numeric representation design
 - [[Open questions in agent memory and decomposition]] — unresolved questions and research directions around decomposition, memory control, and meta-skills
+- [[Spatial Intelligence for Embodied AI]] — 3D 空间表征、object-centric 表示、spatial modality 的研究方向汇总
 
 ### Syntheses
 - [[Self-managing memory as an in-distribution control problem]] — synthesis on reframing memory management as decomposed control over write, retrieve, consolidate, and discard operations, with emphasis on decomposition policy

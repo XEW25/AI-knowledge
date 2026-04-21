@@ -79,3 +79,10 @@
 - Added source note for the foundational 3DGS paper (SIGGRAPH 2023)
 - Added concept page `3D Gaussian Splatting` covering core properties, splatting rendering, training, vs NeRF, vs point cloud, embodied AI input forms
 - Updated `90 System/index.md`
+
+## [2026-04-21] synthesis | 3D Spatial Representation for Embodied AI
+- Added concept page `3D Spatial Representation` — necessity of spatial modality, language analogy, ideal properties, physical invariance, compositional structure, open questions
+- Added concept page `Object-Centric Representation` — object as basic unit, compositional generalization, key approaches
+- Added topic page `Spatial Intelligence for Embodied AI` — research directions, key papers (SPA, UniSplat, GROOT, Object-Centric 3DGS), open questions
+- Updated `3D Gaussian Splatting` with cross-links to new pages
+- Updated `90 System/index.md`

@@ -82,11 +82,17 @@ $$C = \sum_i c_i \alpha_i \prod_{j=1}^{i-1}(1 - \alpha_j)$$
 - **GNFactor** — 3DGS 用于机器人 manipulation
 - **SplatSim** — 3DGS + 物理引擎 sim-to-real
 
+## 作为 3D 空间表征的起点
+
+3DGS 满足几何精确和视角一致，但缺乏物体级语义结构和组合性。它可能是"spatial modality"的感知层底层（类比像素），上面还需要一层结构化抽象（类比 token）。详见 [[3D Spatial Representation]]。
+
 ## Related
 
+- [[3D Spatial Representation]] — 理想 3D 空间表征的特征与设计原则
+- [[Object-Centric Representation]] — 在 3DGS 上加物体中心的结构化抽象
+- [[Spatial Intelligence for Embodied AI]] — 相关研究主题
 - [[Task decomposition]] — 3DGS 感知与物理规划是具身任务分解的两种核心能力
 - [[Agent memory]] — 3DGS 在线建图是空间记忆的一种实现方式
-- [[Scene representation]] — 3DGS 是最新的显式场景表示范式
 
 ## tags
 

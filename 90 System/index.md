@@ -18,6 +18,7 @@
 - [[SmoothQuant: Accurate and Efficient Post-Training Quantization for Large Language Models]] — source note on activation smoothing, difficulty migration, and hardware-friendly W8A8 PTQ for LLMs
 - [[Kerbl et al. - 3D Gaussian Splatting for Real-Time Radiance Field Rendering]] — source note on the foundational 3DGS paper (SIGGRAPH 2023)
 - [[Huang et al. - ReKep Spatiotemporal Reasoning Keypoint Constraints for Robotic Manipulation]] — source note on keypoint-constraint-based manipulation via task decomposition (Li Fei-Fei group, Stanford)
+- [[GigaWorld Team - GigaWorld-Policy An Efficient Action-Centered World-Action Model]] — source note on action-centered WAM with causal mask architecture, "训繁推简" paradigm
 
 ## Wiki
 
@@ -31,6 +32,7 @@
 - [[3D Gaussian Splatting]] — explicit scene representation via 3D Gaussian blobs, real-time splatting rendering, and applications in embodied AI
 - [[3D Spatial Representation]] — 理想 3D 空间表征的必要性、特征、语言类比，及 open research question
 - [[Object-Centric Representation]] — 以物体为基本单元的场景表示方法，支持组合泛化
+- [[World-Action Models]] — WAM 范式：视频生成 backbone + 动作预测，架构演进与路线对比
 
 ### Entities
 - [[Alex Zhang]] — author associated with the Mismanaged Geniuses Hypothesis

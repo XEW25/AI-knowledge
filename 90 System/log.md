@@ -94,3 +94,10 @@
   - Updated [[Task decomposition]] — added embodied manipulation section, ReKep vs VLA comparison
   - Updated [[Spatial Intelligence for Embodied AI]] — added constraint-based manipulation section
   - Key insight from Ethan: 任务拆解消解 OOD 问题，与知识库已有思路一致
+
+- **Ingest**: GigaWorld-Policy (GigaAI, 2026, arXiv:2603.17240) — Action-centered WAM, "训繁推简" causal mask 架构
+  - Raw: URL-only (Tier 1), 详细架构分析
+  - Source note created with method, experiments, generalization analysis, comparison with ReKep
+  - Created [[World-Action Models]] concept page — WAM 范式综述、架构演进、路线对比
+  - Updated [[Task decomposition]] — added WAM to route comparison
+  - Updated [[Spatial Intelligence for Embodied AI]] — added WAM optimization section

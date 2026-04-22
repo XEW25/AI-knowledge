@@ -17,6 +17,7 @@
 - [[Ascend HiFloat8 Format for Deep Learning]] — source note on a proposed FP8-like tapered-precision format for low-bit training and inference
 - [[SmoothQuant: Accurate and Efficient Post-Training Quantization for Large Language Models]] — source note on activation smoothing, difficulty migration, and hardware-friendly W8A8 PTQ for LLMs
 - [[Kerbl et al. - 3D Gaussian Splatting for Real-Time Radiance Field Rendering]] — source note on the foundational 3DGS paper (SIGGRAPH 2023)
+- [[Huang et al. - ReKep Spatiotemporal Reasoning Keypoint Constraints for Robotic Manipulation]] — source note on keypoint-constraint-based manipulation via task decomposition (Li Fei-Fei group, Stanford)
 
 ## Wiki
 

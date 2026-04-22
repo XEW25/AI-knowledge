@@ -86,3 +86,11 @@
 - Added topic page `Spatial Intelligence for Embodied AI` — research directions, key papers (SPA, UniSplat, GROOT, Object-Centric 3DGS), open questions
 - Updated `3D Gaussian Splatting` with cross-links to new pages
 - Updated `90 System/index.md`
+
+## 2026-04-22
+- **Ingest**: ReKep (Huang et al., 2024, arXiv:2409.01652) — Li Fei-Fei 团队的关键点约束操控范式
+  - Raw: PDF + raw note created
+  - Source note created with Ethan's perspective on task decomposition as OOD mitigation
+  - Updated [[Task decomposition]] — added embodied manipulation section, ReKep vs VLA comparison
+  - Updated [[Spatial Intelligence for Embodied AI]] — added constraint-based manipulation section
+  - Key insight from Ethan: 任务拆解消解 OOD 问题，与知识库已有思路一致

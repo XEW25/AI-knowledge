@@ -24,8 +24,16 @@ Task decomposition appears in many forms:
 - **ReKep 路线**：任务拆解 → 约束推理 → 优化求解，模块化、可解释、泛化强、zero-shot
 - **VLA 路线**：端到端感知→动作，数据饥渴但上限可能更高
 - **WAM 路线**（如 GigaWorld-Policy）：端到端世界模型，视频生成提供密集监督，靠数据覆盖泛化
+- **能力层级拆解**（如 RL Tokens）：VLA frozen + 小网络 RL 专家，把精密操作变成小网络的 in-distribution 问题
 - 目前无法定论哪条路线更有前景，但任务拆解路线在数据效率和泛化性上有明显优势
 - 端到端路线内部（如 GigaWorld-Policy vs Motus）仍有大量效率优化空间
+
+### 拆解维度的光谱
+任务拆解不只有一种形式：
+- **ReKep**：任务步骤拆解（高层 LLM → 底层优化器）
+- **RL Tokens**：能力层级拆解（通用 VLA → 精密 RL 专家）
+- **传统 hierarchical RL**：时间尺度拆解（macro-action → micro-action）
+内核一致：把 OOD 问题分解为 in-distribution 的子问题
 
 ## Design questions
 Important design questions include:
@@ -48,3 +56,4 @@ The Mismanaged Geniuses Hypothesis argues that progress may depend less on scali
 - [[Open questions in agent memory and decomposition]]
 - [[Huang et al. - ReKep Spatiotemporal Reasoning Keypoint Constraints for Robotic Manipulation]]
 - [[Spatial Intelligence for Embodied AI]]
+- [[Physical Intelligence - RL Tokens Precise Manipulation with Efficient Online RL]]

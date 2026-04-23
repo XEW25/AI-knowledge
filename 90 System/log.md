@@ -101,3 +101,8 @@
   - Created [[World-Action Models]] concept page — WAM 范式综述、架构演进、路线对比
   - Updated [[Task decomposition]] — added WAM to route comparison
   - Updated [[Spatial Intelligence for Embodied AI]] — added WAM optimization section
+
+- **Ingest**: RL Tokens (Physical Intelligence, 2026) — RL token 作为 VLA 与轻量 RL 专家的接口
+  - Raw: URL-only (Tier 1)
+  - Source note created with Ethan's insight on capability-level decomposition
+  - Updated [[Task decomposition]] — added 拆解维度光谱：任务步骤拆解 (ReKep) vs 能力层级拆解 (RLT) vs 时间尺度拆解

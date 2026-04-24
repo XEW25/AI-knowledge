@@ -63,7 +63,14 @@ GigaWorld-Policy introduces an **action-centered WAM** that:
 2. Stage 3：在 GigaWorld-0.5 基础上加入具身动作数据训练 GigaWorld-Policy
 
 ### Key Results
-- **10× faster** than Motus / Cosmos Policy（0.36s/inference）
+- **10× faster** than Motus / Cosmos Policy（0.36s/inference on A100）
 - **35% higher** task success rates vs baselines（real-world robot）
 - **95% improvement** over π0.5 on RoboTwin 2.0
-- 支持实时高频闭环控制
+- 推理频率 ~2.8 Hz（action-only 模式）
+- Action chunk length = 48 步，future-observation stride Δ = 12
+- Loss weights: λ_action = 5, λ_video = 1
+
+### Model Size
+- Backbone: **Wan 2.2 5B**（diffusion Transformer，阿里通义万相视频生成模型）
+- 初始化自大规模 web-video foundation model，非从零训练
+- 5B 参数量在 VLA/WAM 领域属于中等偏大（对比 π0.5 未公开、Motus 未公开）

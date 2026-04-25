@@ -18,6 +18,7 @@
 - [[SmoothQuant: Accurate and Efficient Post-Training Quantization for Large Language Models]] — source note on activation smoothing, difficulty migration, and hardware-friendly W8A8 PTQ for LLMs
 - [[Kerbl et al. - 3D Gaussian Splatting for Real-Time Radiance Field Rendering]] — source note on the foundational 3DGS paper (SIGGRAPH 2023)
 - [[Huang et al. - ReKep Spatiotemporal Reasoning Keypoint Constraints for Robotic Manipulation]] — source note on keypoint-constraint-based manipulation via task decomposition (Li Fei-Fei group, Stanford)
+- [[Huang et al. - ChemBot Long-Term Memory for VLA-based Agents]] — source note on Agent-as-Planner + VLA-as-Skill with dual-layer memory for chemical lab automation
 - [[GigaWorld Team - GigaWorld-Policy An Efficient Action-Centered World-Action Model]] — source note on action-centered WAM with causal mask architecture, "训繁推简" paradigm
 - [[Physical Intelligence - RL Tokens Precise Manipulation with Efficient Online RL]] — source note on RL tokens: lightweight RL expert on top of frozen VLA for precise manipulation
 

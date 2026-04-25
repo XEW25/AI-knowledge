@@ -30,10 +30,13 @@ Task decomposition appears in many forms:
 
 ### 拆解维度的光谱
 任务拆解不只有一种形式：
-- **ReKep**：任务步骤拆解（高层 LLM → 底层优化器）
-- **RL Tokens**：能力层级拆解（通用 VLA → 精密 RL 专家）
+- **ReKep**：任务步骤拆解（高层 LLM → 底层优化器），接口 = 约束函数
+- **RL Tokens**：能力层级拆解（通用 VLA → 精密 RL 专家），接口 = RL token
+- **ChemBot**：Agent-as-Planner + VLA-as-Skill（高层 agent → 底层 Skill-VLA），接口 = 子任务指令
 - **传统 hierarchical RL**：时间尺度拆解（macro-action → micro-action）
 内核一致：把 OOD 问题分解为 in-distribution 的子问题
+
+接口形式的光谱：约束函数（ReKep）←→ 紧凑 token（RL Tokens）←→ 自然语言子任务指令（ChemBot）
 
 ## Design questions
 Important design questions include:
@@ -57,3 +60,4 @@ The Mismanaged Geniuses Hypothesis argues that progress may depend less on scali
 - [[Huang et al. - ReKep Spatiotemporal Reasoning Keypoint Constraints for Robotic Manipulation]]
 - [[Spatial Intelligence for Embodied AI]]
 - [[Physical Intelligence - RL Tokens Precise Manipulation with Efficient Online RL]]
+- [[Huang et al. - ChemBot Long-Term Memory for VLA-based Agents]]

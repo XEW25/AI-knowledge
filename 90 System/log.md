@@ -106,3 +106,10 @@
   - Raw: URL-only (Tier 1)
   - Source note created with Ethan's insight on capability-level decomposition
   - Updated [[Task decomposition]] — added 拆解维度光谱：任务步骤拆解 (ReKep) vs 能力层级拆解 (RLT) vs 时间尺度拆解
+
+- **Ingest**: ChemBot (Huang et al., 2026, arXiv:2604.15671) — Agent-as-Planner + VLA-as-Skill 框架
+  - Raw: URL-only (Tier 1), 详细架构和记忆机制分析
+  - Source note with Ethan's insight on memory asymmetry (上层有记忆，底层无记忆)
+  - Updated [[Task decomposition]] — added ChemBot to interface spectrum (约束/token/子任务指令)
+  - Updated [[Agent memory]] — added 具身智能中的记忆 section, memory asymmetry discussion
+  - Key insight: 理想情况下两层都应有记忆——上层记策略经验，下层记操作经验

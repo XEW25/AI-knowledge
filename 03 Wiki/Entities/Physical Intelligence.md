@@ -16,14 +16,17 @@
 - Physical Intelligence 的第一个 VLA 模型
 - Flow matching for action generation
 - 基于 VLM backbone
+- ✅ **开源**：[openpi](https://github.com/Physical-Intelligence/openpi)（权重 + finetune 代码，JAX + PyTorch）
 - Paper: "π₀: A Vision-Language-Action Flow Model for General Robot Control"
 
 ### π₀.5 (2025)
 - Open-world generalization，多机器人平台
+- ✅ **开源**：同 openpi 仓库
 - Paper: "π₀.5: A Vision-Language-Action Model with Open-World Generalization"
 
 ### π₀.6 (2025)
 - 更大 backbone + 更多样化 conditioning
+- ❌ 未开源
 - Blog: https://pi.website/blog/pistar06
 
 ### π₀.7 (2026)

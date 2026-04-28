@@ -15,14 +15,52 @@
 
 Recap (RL with Experience and Corrections via Advantage-conditioned Policies)：让 VLA 通过真实世界部署的 RL 自我改进。融合异构数据：demonstrations + on-policy data + 专家干预。预训练通用 VLA (π*₀.6) → 下游任务特化 → 自主数据收集 → 多轮迭代。
 
-### Core Method: Recap
+### Core Method: Recap（详细）
 
-1. **Offline RL pre-training**：在多任务多机器人数据集上训练通用 VLA π*₀.6
-2. **Value function training**：分布值函数评估任务完成进度
-3. **Advantage conditioning**：策略以二值化 advantage 为条件，从经验数据中提取改进策略
-4. **Iterative deployment**：finetune → 自主收集 → RL 训练 → 循环
+**三步循环**：① 数据收集 → ② 训练值函数 → ③ Advantage-conditioned 策略训练 → 重复
 
-关键创新：advantage-conditioned policy extraction，避免了 policy gradient 目标在大 VLA 上的复杂性。
+**① 数据收集**
+- VLA 自主执行任务，每条 episode 打标签（成功/失败 → reward）
+- 可选人类干预纠错（human-gated DAgger），提供正确动作示范
+
+**② 训练分布值函数 V^π_ref**
+- 用所有数据（演示 + 自主尝试 + 人类干预）训练多任务值函数
+- 判断"当前离任务完成多远" + "是否已失败"
+- 分布值函数（非单点估计），捕捉回报不确定性
+
+**③ Advantage-conditioned 策略训练（核心）**
+
+数学直觉：把 policy improvement 转化为 classifier-free guidance (CFG) 式条件生成。
+
+1. 计算每个 (o,a) 的 advantage A(o,a) = n-step return - V(o)
+2. 标记二值 indicator I = 1(A(o,a) > ε_ℓ)，ε_ℓ 是任务相关阈值
+3. 训练目标：min -log π(a|o,ℓ) - α·log π(a|I,o,ℓ)
+   - 第一项：正常模仿学习（学行为策略）
+   - 第二项：额外学"给定好/坏标签时的策略"
+4. 人类干预数据强制标 I=1（假设专家总是对的）
+5. 推理时：直接设 I=1，策略偏向高质量动作
+
+**训练目标公式**：
+```
+min_θ E[-log π_θ(a_t|o_t,ℓ) - α·log π_θ(a_t|I_t,o_t,ℓ)]
+where I_t = 1(A^{π_ref}(o_t,a_t,ℓ) > ε_ℓ)
+```
+
+连续动作用 flow matching，离散用 log-likelihood，组合训练。
+
+**阈值 ε vs CFG 权重 β**
+- 之前 CFGRL 用 ε=0 + 调 β（类似 diffusion CFG weight），但高 CFG weight → 动作分布极端/激进
+- π*₀.6 改用任务相关阈值 ε 控制什么算"好动作"，更稳定
+
+**为什么比 PPO 好？**
+- PPO：在线采样 → 计算梯度 → 更新，大 VLA 不稳定
+- Recap：完全离线，标记数据后像条件生成模型一样训练
+- 训练与推理解耦：推理时不需要值函数，只需设 I=1
+
+**Pre-training phase**：在数万小时多任务多机器人演示数据上做步骤②③
+**Finetuning phase**：下游任务 demonstrations → finetune → 自主收集 → 多轮迭代
+
+**关键创新**：把 RL 问题转成 conditional generation 问题。不要直接用 RL 优化策略，而是用值函数给数据打标签（好/坏），训练策略在推理时"选择好的"。
 
 ### Model Details
 

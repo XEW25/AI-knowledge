@@ -12,27 +12,53 @@
 
 π*₀.6 提出了 Recap（RL with Experience and Corrections via Advantage-conditioned Policies），一个让 VLA 模型通过真实世界部署自主改进的通用框架。核心思想：用 advantage conditioning 替代 policy gradient，让整个 flow matching VLA 端到端地融入 demonstrations、自主经验和专家干预等异构数据。
 
-## Method: Recap
+## Method: Recap（详细）
+
+**三步循环**：① 数据收集 → ② 训练值函数 → ③ Advantage-conditioned 策略训练 → 可重复迭代
 
 ```
-Phase 1: Offline RL pre-training
-  多任务多机器人数据 → 训练分布值函数 + advantage-conditioned π*₀.6
+Phase 1: Offline RL pre-training (数万小时多任务数据)
+  步骤②③ → 训练分布值函数 + advantage-conditioned π*₀.6
 
 Phase 2: Task-specific finetuning
   下游任务 demonstrations → finetune π*₀.6
 
-Phase 3: Iterative self-improvement
-  自主执行 → 稀疏 reward + 专家干预 → value function 评估
-  → advantage conditioning → 改进策略 → 下一轮部署
+Phase 3: Iterative self-improvement (每轮重复①②③)
+  ① VLA 自主执行 → 稀疏 reward + 可选人类干预
+  ② 所有数据训练分布值函数 → advantage 评估
+  ③ Advantage conditioning → 改进策略 → 下一轮
 ```
 
 ### Advantage Conditioning（核心创新）
 
-- 训练分布值函数评估"离任务完成有多远"
-- 计算 advantage = "这个动作比平均好还是差"
-- 二值化 advantage 作为策略的额外条件输入
-- 推理时设 advantage=1（好的），策略自动偏向高质量动作
-- 好处：避免了 PPO 等 policy gradient 在大 VLA 上的不稳定性
+把 policy improvement 转化为 **classifier-free guidance (CFG) 式条件生成**：
+
+1. 值函数算每个 (o,a) 的 advantage A(o,a) = n-step return - V(o)
+2. 二值 indicator I = 1(A > ε_ℓ)，ε_ℓ 任务相关阈值
+3. 训练目标：min -log π(a|o,ℓ) - α·log π(a|I,o,ℓ)
+   - 第一项：正常模仿学习
+   - 第二项：学"给定好/坏标签时的策略"
+4. 人类干预数据强制 I=1
+5. 推理时设 I=1 → 自动偏向高质量动作
+
+**连续动作 flow matching + 离散 log-likelihood 组合训练。**
+
+### 与 PPO 等 Policy Gradient 的区别
+
+| | Recap | PPO |
+|---|---|---|
+| 训练方式 | 离线，标记数据后条件生成 | 在线采样+梯度更新 |
+| 大 VLA 稳定性 | 稳定 | 不稳定 |
+| 推理时需求 | 只需设 I=1 | 需要值函数或旧策略 |
+| 训练推理解耦 | 是 | 否 |
+
+### 阈值 ε vs CFG 权重 β
+
+之前 CFGRL 用 ε=0 + 调 β，高 CFG weight → 动作分布极端。π*₀.6 改用任务相关阈值 ε，更稳定。
+
+### 一句话精髓
+
+不要直接用 RL 优化策略，用值函数给数据打标签（好/坏），训练策略推理时"选择好的"。RL 问题 → conditional generation 问题。
 
 ### 与其他 RL-for-VLA 方法的区别
 

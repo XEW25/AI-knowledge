@@ -26,6 +26,7 @@ This topic covers:
 - [[MemPO: Self-Memory Policy Optimization for Long-Horizon Agents]]
 - [[Alex Zhang - The Mismanaged Geniuses Hypothesis]]
 - [[Huang et al. - ChemBot Long-Term Memory for VLA-based Agents]]
+- [[Physical Intelligence - pi0.6 a VLA That Learns From Experience]]
 
 ## 具身智能中的记忆
 
@@ -39,6 +40,7 @@ ChemBot 提出了一个双层记忆架构用于化学实验室机器人：
 不同工作的记忆分配：
 - **ChemBot**：只有上层记忆（RAG 检索历史经验）
 - **RL Tokens**：底层隐式记忆（RL 策略更新 = 肌肉记忆）
+- **π*₀.6 (Recap)**：全模型 RL 隐式记忆（部署经验融入权重）——不同于显式记忆，但也是从经验积累
 - **MemPO**：显式 memory as policy
 - **Voyager**：技能库作为长期记忆（上层）
 

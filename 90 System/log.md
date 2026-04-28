@@ -113,3 +113,10 @@
   - Updated [[Task decomposition]] — added ChemBot to interface spectrum (约束/token/子任务指令)
   - Updated [[Agent memory]] — added 具身智能中的记忆 section, memory asymmetry discussion
   - Key insight: 理想情况下两层都应有记忆——上层记策略经验，下层记操作经验
+
+- **Ingest**: π*₀.6 (Physical Intelligence, 2025, arXiv:2511.14759) — Recap: advantage-conditioned offline RL for VLA self-improvement
+  - Raw: URL-only (Tier 1)
+  - Source note with PI 双路线分析 (π*₀.6 全模型 RL vs RL Tokens 轻量插件)
+  - Updated [[Agent memory]] — added π*₀.6 as implicit memory, explicit+implicit combination insight
+  - Updated [[Spatial Intelligence for Embodied AI]] — cross-link
+  - Key relation: 隐式记忆(π*₀.6) + 显式记忆(ChemBot) = 理想双层记忆

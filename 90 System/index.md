@@ -21,6 +21,7 @@
 - [[Huang et al. - ChemBot Long-Term Memory for VLA-based Agents]] — source note on Agent-as-Planner + VLA-as-Skill with dual-layer memory for chemical lab automation
 - [[GigaWorld Team - GigaWorld-Policy An Efficient Action-Centered World-Action Model]] — source note on action-centered WAM with causal mask architecture, "训繁推简" paradigm
 - [[Physical Intelligence - RL Tokens Precise Manipulation with Efficient Online RL]] — source note on RL tokens: lightweight RL expert on top of frozen VLA for precise manipulation
+- [[Physical Intelligence - pi0.6 a VLA That Learns From Experience]] — source note on Recap: advantage-conditioned offline RL for end-to-end VLA self-improvement from deployment experience
 
 ## Wiki
 

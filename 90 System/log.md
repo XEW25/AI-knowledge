@@ -120,3 +120,10 @@
   - Updated [[Agent memory]] — added π*₀.6 as implicit memory, explicit+implicit combination insight
   - Updated [[Spatial Intelligence for Embodied AI]] — cross-link
   - Key relation: 隐式记忆(π*₀.6) + 显式记忆(ChemBot) = 理想双层记忆
+
+- **Ingest**: π₀.5 (Physical Intelligence, 2025, arXiv:2504.16054) — open-world generalization VLA
+  - Raw: URL-only (Tier 1), 详细架构和训练配方
+  - Source note: 两层推理详解（半共享架构）、co-training 配方、vs ChemBot 对比
+  - Key insight: 子任务 token 不 round-trip，在 embedding 空间内传递；97.6% 训练数据非目标场景
+  - Updated [[Task decomposition]] — added π₀.5 as single-model decomposition example
+  - Three architecture paradigms: 完全分离(ChemBot) / 半共享(π₀.5) / 完全端到端

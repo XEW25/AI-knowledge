@@ -4,9 +4,11 @@
 - **Website**: https://pi.website
 - **Founded**: 2024
 - **Headquarters**: San Francisco, CA
-- **Founders**: Karol Hausman, Brian Ichter, Sergey Levine (advisor)
+- **Founders**: Karol Hausman (CEO, ex-Google DeepMind), Sergey Levine (Chief Scientist, UC Berkeley), Chelsea Finn (Research Lead, Stanford), Brian Ichter (ex-Google Research), Adnan Esmail
 - **Focus**: General-purpose robot foundation models (VLA)
 - **Flagship product**: π series VLA models
+- **Funding**: 累计超 $1B（三轮），2026年3月传拟再融 $1B，估值 $11B
+- **Key investors**: Thrive Capital, Lux Capital, Jeff Bezos, NVIDIA (NVentures), Index Ventures, Founders Fund, Lightspeed
 
 ## 产品线
 
@@ -17,14 +19,17 @@
 - Paper: "π₀: A Vision-Language-Action Flow Model for General Robot Control"
 
 ### π₀.5 (2025)
-- π₀ 的升级版，open-world generalization
-- 多机器人平台
+- Open-world generalization，多机器人平台
 - Paper: "π₀.5: A Vision-Language-Action Model with Open-World Generalization"
 
 ### π₀.6 (2025)
 - 更大 backbone + 更多样化 conditioning
-- 基础 VLA 模型（非 RL 版本）
 - Blog: https://pi.website/blog/pistar06
+
+### π₀.7 (2026)
+- 可执行未经训练的任务（zero-shot generalization）
+- 由 Sergey Levine 主导
+- 目前尚不能单条高层指令完成复杂多步任务
 
 ### π*₀.6 (2025)
 - π₀.6 + advantage conditioning（RL 版本）
@@ -49,10 +54,11 @@ PI 同时探索了互补的两条 RL 路线：
 
 ## 核心团队（论文作者）
 
-- **Karol Hausman** — Co-founder/CEO
-- **Sergey Levine** — Co-founder/Advisor (UC Berkeley)
-- **Brian Ichter** — Co-founder
-- **Chelsea Finn** — Stanford, 频繁合作者
+- **Karol Hausman** — Co-founder/CEO (ex-Google DeepMind)
+- **Sergey Levine** — Co-founder/Chief Scientist (UC Berkeley)
+- **Chelsea Finn** — Co-founder/Research Lead (Stanford)
+- **Brian Ichter** — Co-founder (ex-Google Research)
+- **Adnan Esmail** — Co-founder
 - **Kevin Black**, **Danny Driess**, **Karl Pertsch**, **Allen Z. Ren**, **Lucy Xiaoyang Shi** 等
 
 ## 与知识库主题的关联

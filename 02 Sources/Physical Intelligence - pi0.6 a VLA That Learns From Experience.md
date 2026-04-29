@@ -5,8 +5,23 @@
 - **arXiv**: [2511.14759](https://arxiv.org/abs/2511.14759)
 - **Blog**: https://pi.website/blog/pistar06
 - **Year**: 2025
+- **Open-source**: ❌ 未开源
 - **Accessed**: 2026-04-28
 - **Raw note**: [[2026-04-28 - Physical Intelligence - pi0.6 a VLA That Learns From Experience]]
+
+## Model Paper Checklist
+
+| # | 维度 | 信息 |
+|---|------|------|
+| 1 | 模型架构 | π₀.6 VLA + advantage conditioning；Transformer backbone (Gemma 3 4B) + action expert (860M, flow matching) + 值函数 backbone (670M)；子任务预测 + 动作生成两层推理 |
+| 2 | 模型规模 | VLM backbone: Gemma 3 **4B**，action expert: **860M**，值函数 VLM: **670M**；总策略参数 ~**4.86B**，值函数 ~**670M** |
+| 3 | 训练数据 | Pre-training: **数万小时**多任务多机器人演示；下游：演示 + 自主收集 + 人类干预（具体小时数未披露） |
+| 4 | 训练方法 | Recap: offline RL pre-training → SFT finetune → iterative self-improvement（分布值函数 + advantage conditioning + CFG 式条件生成） |
+| 5 | 推理性能 | 50Hz 控制，action chunk 50 步，5 步去噪；**推理延迟未披露，硬件未披露** |
+| 6 | 开源状态 | ❌ 未开源（权重、代码均未公开） |
+| 7 | Benchmark | 折衣物(2h+ 连续)、组装箱子(工厂)、浓缩咖啡(13h 连续)；throughput >2x，failure rate ~50% 降低；**具体成功率以图表呈现** |
+| 8 | 与已有工作关系 | π₀.6 > π₀.5（更大 backbone Gemma 3 4B + 更多数据）；π*₀.6 = π₀.6 + advantage conditioning；vs RL Tokens（全模型 RL vs 轻量插件） |
+| 9 | 记忆机制 | **隐式记忆**：部署经验通过 RL 融入权重（procedural memory），无显式经验检索 |
 
 ## Summary
 

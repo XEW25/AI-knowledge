@@ -9,6 +9,20 @@
 - **Accessed**: 2026-04-28
 - **Raw note**: [[2026-04-28 - Physical Intelligence - pi0.5 a VLA with Open-World Generalization]]
 
+## Model Paper Checklist
+
+| # | 维度 | 信息 |
+|---|------|------|
+| 1 | 模型架构 | Transformer backbone + action expert (MoE 风格独立 FFN)，共享 attention，双向注意力 |
+| 2 | 模型规模 | **总参数量未披露**，action expert 860M，backbone 初始化自 VLM（未指明具体模型） |
+| 3 | 训练数据 | MM(~400h, ~100 家庭) + ME(非移动机器人) + CE(跨embodiment) + HL(语义标注) + WD(web)，97.6% 非目标场景 |
+| 4 | 训练方法 | Pre-training 280k steps (全离散 FAST token) + Post-training 80k steps (flow matching + next-token, α=10.0) |
+| 5 | 推理性能 | 50Hz 控制，10 步 flow matching 去噪，action chunk 50 步，**推理延迟未披露，硬件需求未披露** |
+| 6 | 开源状态 | ✅ 开源（openpi），权重+代码+finetune |
+| 7 | Benchmark | 4 评测任务(dishes/laundry/drawer/make bed)，104 场景≈直接训练，比 π₀ 显著更强，**具体成功率以图表呈现** |
+| 8 | 与已有工作关系 | π₀ 升级版（加 co-training + 两层推理），vs ChemBot（单模型半共享 vs 完全分离） |
+| 9 | 记忆机制 | **无显式记忆**，无 experience accumulation |
+
 ## Summary
 
 π₀.5 基于 π₀，核心贡献不是架构创新而是**训练配方**——证明异构数据 co-training 能让 VLA 在全新环境中执行长 horizon 任务（10-15 分钟清理厨房/卧室）。第一个在全新家庭中完成 end-to-end 长 horizon 精细操作的 VLA 系统。
@@ -79,8 +93,11 @@
 - 在**全新家庭**中完成清理厨房/卧室（10-15 分钟长 horizon）
 - Co-training 每个成分都有贡献，去掉任何一个都掉性能
 - 比 π₀ 显著更强（尤其是泛化能力）
+- 104 个训练场景的模型与在测试环境上直接训练的 control 性能相当（关键结果）
 - 高层推理组件至关重要，去掉后长 horizon 任务崩溃
 - Scene 数量越多泛化越好，但有边际递减
+- 评测任务：dishes in sink, items in drawer, laundry basket, make bed
+- **具体成功率**：论文以图表呈现（Figure 8, 12），未给出精确数字
 
 ## Why It Matters
 

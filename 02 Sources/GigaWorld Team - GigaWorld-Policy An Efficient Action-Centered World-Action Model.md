@@ -9,6 +9,20 @@
 - **Accessed**: 2026-04-22
 - **Raw note**: [[2026-04-22 - GigaWorld Team - GigaWorld-Policy An Efficient Action-Centered World-Action Model]]
 
+## Model Paper Checklist
+
+| # | 维度 | 信息 |
+|---|------|------|
+| 1 | 模型架构 | Causal mask WAM：action tokens + future-visual tokens 共享 Wan 2.2 5B backbone；训繁推简（训练时双分支，推理时丢弃视频分支）；action chunk 48 步 |
+| 2 | 模型规模 | **5B** 参数（Wan 2.2 diffusion Transformer backbone） |
+| 3 | 训练数据 | 三阶段：互联网视频（海量）→ 千小时级多源操作视频（第一人称+真机+仿真）→ 少量真机 action-labeled 数据；**具体数据量未披露** |
+| 4 | 训练方法 | 双 loss 联合训练（λ_action=5, λ_video=1）；三阶段 pipeline（世界模型预训练→具身适配→策略对齐）；future-observation stride Δ=12 |
+| 5 | 推理性能 | 0.36s/inference on A100，~2.8Hz（action-only）；10× 快于 Motus/Cosmos Policy；**控制频率 ~2.8Hz** |
+| 6 | 开源状态 | ❌ 未开源 |
+| 7 | Benchmark | 真机 ~85% 成功率（Cosmos Policy ~55%）；RoboTwin 2.0 比 π0.5 高 95%；4 类任务（抓取/装配/整理等） |
+| 8 | 与已有工作关系 | WAM 路线（vs VLA 路线）；端到端（vs 任务拆解）；与 π₀.5 推理速度持平但泛化靠数据覆盖 |
+| 9 | 记忆机制 | ❌ **无记忆**——无经验积累、无历史状态编码 |
+
 ## Summary
 
 GigaWorld-Policy 是一个以动作为中心的世界-动作模型（WAM），通过"训繁推简"的 causal mask 架构解决了 WAM 的推理瓶颈和视觉-动作耦合问题。训练时利用视频生成提供密集监督，推理时丢弃视频分支只输出动作，实现 10× 推理加速。

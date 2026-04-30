@@ -49,6 +49,7 @@
 | RL Tokens | ✅ 小网络 RL | ❌ | 精密操作"肌肉记忆" |
 | ChemBot | ❌ | ✅ 双层 RAG | 只有上层规划有记忆 |
 | π₀.7 | ✅ | ✅ MEM | PI 第一个双记忆 VLA，subgoal image conditioning |
+| GigaWorld-Policy | ❌ | ❌ | 无记忆机制 |
 | Voyager | ❌ | ✅ 技能库 | 上层技能积累 |
 
 ## 开放问题

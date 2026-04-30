@@ -127,3 +127,11 @@
   - Key insight: 子任务 token 不 round-trip，在 embedding 空间内传递；97.6% 训练数据非目标场景
   - Updated [[Task decomposition]] — added π₀.5 as single-model decomposition example
   - Three architecture paradigms: 完全分离(ChemBot) / 半共享(π₀.5) / 完全端到端
+
+- **Ingest**: π₀.7 (Physical Intelligence, 2026, arXiv:2604.15483) — steerable generalist VLA with emergent capabilities
+  - Raw: URL-only (Tier 1), 9 维 model checklist
+  - Source note: diversified prompt conditioning, subgoal images (BAGEL 14B), MEM 双记忆, verbal coaching
+  - Key insights: subgoal image = VLA+WAM 融合桥梁; metadata conditioning = Recap 的泛化版本; verbal coaching = 教模型拆任务
+  - Updated [[Memory in Embodied AI]] — π₀.7 为 PI 第一个双记忆 VLA
+  - Updated [[Task decomposition]] — verbal coaching + subgoal as task decomposition
+  - Updated [[Physical Intelligence]] — π₀.7 详情, RL 路线统一

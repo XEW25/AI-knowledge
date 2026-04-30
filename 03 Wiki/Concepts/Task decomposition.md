@@ -62,4 +62,5 @@ The Mismanaged Geniuses Hypothesis argues that progress may depend less on scali
 - [[Physical Intelligence - RL Tokens Precise Manipulation with Efficient Online RL]]
 - [[Huang et al. - ChemBot Long-Term Memory for VLA-based Agents]]
 - [[Physical Intelligence - pi0.5 a VLA with Open-World Generalization]]
+- [[Physical Intelligence - pi0.7 a Steerable Generalist Robotic Foundation Model]]
 - [[Memory in Embodied AI]]

@@ -31,8 +31,12 @@
 
 ### π₀.7 (2026)
 - 可执行未经训练的任务（zero-shot generalization）
-- 由 Sergey Levine 主导
-- 目前尚不能单条高层指令完成复杂多步任务
+- 多样化上下文条件化（subgoal images + episode metadata）
+- BAGEL 14B world model 生成 subgoal images
+- MEM 记忆系统（显式+隐式双记忆）
+- ❌ 未开源
+- 论文: arXiv:2604.15483
+- Source note: [[Physical Intelligence - pi0.7 a Steerable Generalist Robotic Foundation Model]]
 
 ### π*₀.6 (2025)
 - π₀.6 + advantage conditioning（RL 版本）
@@ -47,13 +51,13 @@
 - 精密操作特化
 - Source note: [[Physical Intelligence - RL Tokens Precise Manipulation with Efficient Online RL]]
 
-## 两条 RL 路线
+## 两条 RL 路线 → π₀.7 统一
 
-PI 同时探索了互补的两条 RL 路线：
+PI 在 π₀.6 时代探索了两条互补 RL 路线：
 - **π*₀.6 (Recap)**：全模型 RL，端到端改进整个 VLA → 通用能力提升
 - **RL Tokens**：轻量级 RL 插件，冻结 backbone → 精密操作特化
 
-这呼应了能力层级拆解的思路：不同粒度的改进可能需要不同策略。
+π₀.7 通过多样化上下文条件化 + metadata，**单一通用模型就能匹配 RL specialist 的性能**，统一了这两条路线。
 
 ## 核心团队（论文作者）
 

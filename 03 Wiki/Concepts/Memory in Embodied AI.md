@@ -48,7 +48,7 @@
 | π*₀.6 (Recap) | ✅ RL 权重更新 | ❌ | 部署经验融入参数 |
 | RL Tokens | ✅ 小网络 RL | ❌ | 精密操作"肌肉记忆" |
 | ChemBot | ❌ | ✅ 双层 RAG | 只有上层规划有记忆 |
-| π₀.7 | ✅ | ✅ MEM | 可能是第一个双记忆 VLA |
+| π₀.7 | ✅ | ✅ MEM | PI 第一个双记忆 VLA，subgoal image conditioning |
 | Voyager | ❌ | ✅ 技能库 | 上层技能积累 |
 
 ## 开放问题

@@ -5,7 +5,7 @@
 - **arXiv**: [2604.15483](https://arxiv.org/abs/2604.15483)
 - **Blog**: https://pi.website/pi07
 - **Year**: 2026
-- **Open-source**: ❌ 未开源（大概率）
+- **Open-source**: ❌ 未开源（已核实：openpi 仅开源 π₀ / π₀-FAST / π₀.5，π₀.7 不在其中）
 - **Accessed**: 2026-04-29
 - **Raw note**: [[2026-04-29 - Physical Intelligence - pi0.7 a Steerable Generalist Robotic Foundation Model.md]]
 
@@ -22,6 +22,15 @@
 | 7 | Benchmark | 匹配/超越 π*₀.6 RL specialist；14 指令跟随场景（4 未见厨房 + 2 卧室）；zero-shot UR5e 折衬衫；**具体成功率以图表呈现** |
 | 8 | 与已有工作关系 | π₀.6 + MEM + 多模态条件化；能蒸馏 π*₀.6 specialist 能力到通用模型；PI 产品线目前最强 |
 | 9 | 记忆机制 | ✅ **显式 + 隐式**：MEM 视频历史编码器（显式）+ RL 数据蒸馏（隐式）；PI 第一个双记忆 VLA |
+
+## 架构耦合核实（2026-05-30）
+
+- **基座 VLA = 范式 A（延续 π₀.6，已核实）**：Gemma3 4B backbone + 860M flow matching action expert；论文 "builds on the existing VLA architecture from π₀.6"
+- **block-causal 明确**：原文 "We employ a block-causal masking scheme, such that the observation tokens and the subgoal image tokens use bidirectional attention within themselves, and goal-image tokens can additionally attend the observations"
+- **BAGEL 世界模型 = 独立外挂模型**：off-the-shelf 图像生成模型，输入子任务指令生成 subgoal images，作为 input token 喂入主模型——带**范式 B 式"独立模型→token 接口"**特征
+- **MEM = 视频历史编码器**：历史帧过 vision encoder 压缩到与单帧相同的 token 数，喂入 backbone
+- **单一模型同时体现两种耦合哲学**：内部范式 A（joint-attention MoE），外挂 BAGEL 带范式 B 特征
+- canonical 耦合机制见 [[Physical Intelligence - pi0 a Vision-Language-Action Flow Model for General Robot Control]]；范式 A/B 对比见 [[Embodied Brain Models]]
 
 ## Summary
 

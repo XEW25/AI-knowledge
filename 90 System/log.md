@@ -135,3 +135,59 @@
   - Updated [[Memory in Embodied AI]] — π₀.7 为 PI 第一个双记忆 VLA
   - Updated [[Task decomposition]] — verbal coaching + subgoal as task decomposition
   - Updated [[Physical Intelligence]] — π₀.7 详情, RL 路线统一
+
+## [2026-05-30] synthesis | Embodied Brain Models concept skeleton
+- Established deployment-driven framework distinguishing brain (cloud) vs cerebellum (edge) models in embodied AI
+- Defined three brain model schools via iterative discussion with Ethan:
+  - LLM/VLM-as-brain (with Talker / Coder / Constraint / Affordance interface sub-branches; MCP-Toolkit retired as transitional)
+  - Predictive Spatial Models (merged World Model and representation streams — prediction and representation as two sides of one problem)
+  - VLA assigned special "transitional/being-fragmented" positioning instead of being a parallel school
+- Identified interface dimension (NL / code / subgoal image / embedding / affordance / action token) and methodology dimension (scaling / sim2real / self-improvement / distillation / co-training / multi-embodiment) as orthogonal to school axis
+- Mapped existing vault works onto school × interface matrix (π series, ChemBot, ReKep, RL Tokens, GigaWorld-Policy)
+- Added per-school forward predictions across three layers: 2-3 yr (high certainty) / 5 yr+ (speculative) / reverse hypothesis (if wrong)
+- Recorded Ethan's three core positions:
+  - Monolithic VLA won't be cloud-brain mainstream
+  - VLM-as-brain has best cloud-edge fit
+  - World Model + Representation form a unified school (Predictive Spatial Models)
+- Recorded deeper meta-observation: the real divide between schools is "how to acquire world understanding," not "what to output"
+- Created skeleton page `Embodied Brain Models` intended for incremental fill-in as new materials are ingested
+- Updated `Spatial Intelligence for Embodied AI` cross-link
+- Updated `90 System/index.md`
+- TODO: future companion page `Embodied Cerebellum Models` once cerebellum schools crystallize
+
+## [2026-05-30] research + verification | VLA landscape and architecture coupling
+- Ran background research on the global VLA landscape (US + Chinese players) feeding the brain-model survey
+- Verified PhysBrain 1.0 (DeepCybo + Zhongguancun, arXiv:2512.16793): egocentric-video-only pretraining (E2E-3M, zero real-robot trajectories), Qwen3-VL backbone + FM DiT
+  - Confirmed PhysBrain has NO open-source code/weights — the `ZGC-EmbodyAI/PhysBrain` repo is only the HTML project page (index.html/styles.css/imgs/videos)
+  - Corrected secondary-source errors: backbone is Qwen3-VL (not Qwen2.5-VL); "PhysGR00T/PhysPI/TwinBrainVLA/LangForce" not in paper (some are separate real repos in the org, not paper content)
+- Code-level verification of VLA VLM↔action coupling (key finding): two distinct paradigms
+  - Paradigm A (Joint Attention / MoE-style): π series — separate weights per expert, KV concatenation, layer-wise lockstep, block-causal; NOT a true MoE (no router). Verified via openpi pi0_pytorch.py, lucidrains, open-pi-zero
+  - Paradigm B (Cross-Attention / Encoder-Decoder): GR00T, PhysVLA — VLM runs once → embedding injected as per-layer K/V into DiT, cross/self interleaved. Verified via Isaac-GR00T dit.py
+  - Cloud-edge implication: Paradigm A interface = per-layer KV cache (heavy); Paradigm B interface = single embedding tensor (light) → explains deployment-oriented players (NVIDIA, DeepCybo) choosing B, research-oriented (PI) choosing A
+- Corrected earlier overstatement "dual-system is industry consensus" → "functional layering is consensus; physical split still diverging, deployment-oriented work tends to split"
+- Corrected π₀.5 source note attention description (earlier wrongly said "shared attention layer" / "bidirectional"): actual is MoE two-expert + block-causal joint attention, code-verified
+- Added "VLA 内部的两种耦合范式" subsection to `Embodied Brain Models`
+- Updated `Physical Intelligence - pi0.5` source note with code-level coupling-paradigm verification
+- Method note: every accurate coupling-mechanism conclusion required primary source / code reading; no secondary summary got it right
+
+## [2026-05-30] verification + reorg | Full π series coupling verification and per-model notes
+- Verified VLM↔action coupling for the ENTIRE π series from primary sources (previously only π₀ code + π₀.5 paper were verified):
+  - π*₀.6 (arXiv:2511.14759): Paradigm A inherited ("otherwise the same"); action expert "can attend to the activations in the rest of the model"; value function is a SEPARATE 670M VLM, training-only, discarded at inference
+  - π₀.7 (arXiv:2604.15483): Paradigm A base (Gemma3 4B + 860M FM expert); block-causal explicitly quoted; BAGEL world model is a SEPARATE external model feeding subgoal-image tokens (Paradigm-B-like interface); MEM is a video-history encoder feeding tokens
+  - RL Tokens: freezes π₀ VLA (internal Paradigm A unchanged) + separate RL adapter (capability-level decomposition, not a coupling change)
+  - Conclusion: the whole π series keeps Paradigm A (joint-attention MoE) unchanged 2024→2026; capability growth comes from bolt-on modules (value fn / BAGEL+MEM / RL adapter)
+- Created the MISSING canonical note `Physical Intelligence - pi0 a Vision-Language-Action Flow Model for General Robot Control` (the most-verified model previously had no source note); holds the code-verified Paradigm A mechanism
+- Reorganized: moved cross-cutting Paradigm A/B comparison + GR00T + PhysVLA details OUT of the π₀.5 note (they belong in the concept page / π₀ canonical note); π₀.5 note trimmed to π₀.5-specific facts (two-step subtask→action decomposition) + pointers
+- Added concise verified coupling sections to π₀.6, π₀.7, RL Tokens notes, each pointing to the canonical π₀ note
+- Backfilled index Sources (π₀, π₀.5, π₀.7 were missing) and updated `Physical Intelligence` entity page (π₀ source note link, Paradigm A annotation, full Related list)
+
+## [2026-05-30] verification | π₀.5 code-level architecture confirmation + open-source boundary
+- Confirmed open-source status: openpi releases ONLY π₀ / π₀-FAST / π₀.5; π*₀.6 / π₀.7 / RL Tokens are all closed (open-source ends at π₀.5 = PI's commercialization line)
+- Code-verified π₀.5 architecture against openpi JAX source (src/openpi/models/pi0.py + pi0_config.py):
+  - π₀.5 shares the SAME model class as π₀ (no separate pi05.py; only a `pi05: bool` flag in Pi0Config) — strongest possible evidence of architectural consistency
+  - pi0_config.py documents exactly TWO differences from π₀, neither touching the VLM↔action coupling:
+    1. state input moved to discrete language tokens in the prefix (vs continuous state token in the suffix)
+    2. action expert uses adaRMSNorm to inject the flow-matching timestep
+  - Same make_attn_mask (block-causal), same joint two-expert forward (PaliGemma.llm([prefix, suffix], mask)), same prefix-KV-cache-then-suffix-attends inference path
+  - Upgraded π₀.5 note from "paper-verified inheritance" to "code-verified same model class"
+- Firmed up π₀.7 open-source field from "未开源（大概率）" to definitive (openpi only to π₀.5)

@@ -23,6 +23,13 @@
 | 8 | 与已有工作关系 | π₀.6 > π₀.5（更大 backbone Gemma 3 4B + 更多数据）；π*₀.6 = π₀.6 + advantage conditioning；vs RL Tokens（全模型 RL vs 轻量插件） |
 | 9 | 记忆机制 | **隐式记忆**：部署经验通过 RL 融入权重（procedural memory），无显式经验检索 |
 
+## 架构耦合核实（2026-05-30）
+
+- **VLM↔action 耦合 = 范式 A（延续 π₀，已核实）**：论文 "The model is otherwise the same as described in Section V-A"；action expert "can attend to the activations in the rest of the model" → 确认 joint-attention MoE（非真 MoE）
+- **值函数是独立网络**：670M VLM backbone（Gemma 3 初始化），与策略同架构设计但更小；**仅训练时用**（给数据打 advantage 标签），**推理时丢弃**
+- 推理时架构 = π₀.6 + 一个 advantage 文本 token（"Advantage: positive"），无其他架构改动
+- canonical 耦合机制见 [[Physical Intelligence - pi0 a Vision-Language-Action Flow Model for General Robot Control]]；范式 A/B 对比见 [[Embodied Brain Models]]
+
 ## Summary
 
 π*₀.6 提出了 Recap（RL with Experience and Corrections via Advantage-conditioned Policies），一个让 VLA 模型通过真实世界部署自主改进的通用框架。核心思想：用 advantage conditioning 替代 policy gradient，让整个 flow matching VLA 端到端地融入 demonstrations、自主经验和专家干预等异构数据。

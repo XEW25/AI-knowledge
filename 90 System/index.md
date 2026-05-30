@@ -21,7 +21,10 @@
 - [[Huang et al. - ChemBot Long-Term Memory for VLA-based Agents]] — source note on Agent-as-Planner + VLA-as-Skill with dual-layer memory for chemical lab automation
 - [[GigaWorld Team - GigaWorld-Policy An Efficient Action-Centered World-Action Model]] — source note on action-centered WAM with causal mask architecture, "训繁推简" paradigm
 - [[Physical Intelligence - RL Tokens Precise Manipulation with Efficient Online RL]] — source note on RL tokens: lightweight RL expert on top of frozen VLA for precise manipulation
+- [[Physical Intelligence - pi0 a Vision-Language-Action Flow Model for General Robot Control]] — **canonical π series note**; code-verified Paradigm A (joint-attention MoE, block-causal); PaliGemma 3B + 300M flow-matching action expert; open-source (openpi)
+- [[Physical Intelligence - pi0.5 a VLA with Open-World Generalization]] — co-training recipe for open-world generalization; two-step subtask→action inference; inherits π₀ Paradigm A
 - [[Physical Intelligence - pi0.6 a VLA That Learns From Experience]] — source note on Recap: advantage-conditioned offline RL for end-to-end VLA self-improvement from deployment experience
+- [[Physical Intelligence - pi0.7 a Steerable Generalist Robotic Foundation Model]] — diversified prompt conditioning; BAGEL world model (subgoal images) + MEM dual memory; inherits π₀ Paradigm A
 
 ## Wiki
 
@@ -36,6 +39,7 @@
 - [[3D Spatial Representation]] — 理想 3D 空间表征的必要性、特征、语言类比，及 open research question
 - [[Object-Centric Representation]] — 以物体为基本单元的场景表示方法，支持组合泛化
 - [[World-Action Models]] — WAM 范式：视频生成 backbone + 动作预测，架构演进与路线对比
+- [[Embodied Brain Models]] — 大脑模型的部署驱动定义（云=大脑、端=小脑）、三个主流流派（LLM/VLM-as-brain, Predictive Spatial Models, VLA 特殊定位）、接口/方法学正交维度、前瞻预判（骨架页）
 
 ### Entities
 - [[Alex Zhang]] — author associated with the Mismanaged Geniuses Hypothesis

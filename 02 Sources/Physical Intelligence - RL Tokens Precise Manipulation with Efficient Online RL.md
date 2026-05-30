@@ -11,6 +11,13 @@
 
 RL Tokens (RLT) 解决 VLA 的"最后一公里"问题：π0 能做通用操控，但精密操作（螺丝对准、插入网线）不行。方法是在 VLA 输出一个紧凑的 RL token，让轻量级 actor-critic 在 token 空间做实时 RL，15 分钟数据即可显著提升。
 
+## 架构耦合核实（2026-05-30）
+
+- **冻结 π₀ VLA**：内部 VLM↔action 耦合仍是**范式 A**（不变，因为 backbone 冻结不参与训练/推理梯度）
+- RL Tokens **不改变耦合范式**，而是在冻结 VLA 之上加一个**能力层级拆解 adapter**：encoder-decoder bottleneck → RL token → 小 actor-critic
+- 这是"能力层级拆解"（capability-level decomposition）而非"VLM↔action 耦合"的创新；与 ReKep 的任务步骤拆解对比见 [[Task decomposition]]
+- canonical 耦合机制见 [[Physical Intelligence - pi0 a Vision-Language-Action Flow Model for General Robot Control]]
+
 ## Key Method
 
 1. VLA frozen，加 encoder-decoder transformer 压缩内部表征 → RL token

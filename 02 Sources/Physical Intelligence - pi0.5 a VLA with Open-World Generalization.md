@@ -13,7 +13,7 @@
 
 | # | 维度 | 信息 |
 |---|------|------|
-| 1 | 模型架构 | Transformer backbone + action expert (MoE 风格独立 FFN)，共享 attention，双向注意力 |
+| 1 | 模型架构 | Transformer backbone + action expert (MoE 风格独立完整 attention + FFN)，**block-causal joint attention**（范式 A，延续 π₀，论文声明 "Following π₀"，已核实） |
 | 2 | 模型规模 | **总参数量未披露**，action expert 860M，backbone 初始化自 VLM（未指明具体模型） |
 | 3 | 训练数据 | MM(~400h, ~100 家庭) + ME(非移动机器人) + CE(跨embodiment) + HL(语义标注) + WD(web)，97.6% 非目标场景 |
 | 4 | 训练方法 | Pre-training 280k steps (全离散 FAST token) + Post-training 80k steps (flow matching + next-token, α=10.0) |
@@ -51,11 +51,39 @@
 4. 一次 flow matching 去噪生成整个 action chunk
 5. 子任务切换低频，动作生成 50Hz 高频
 
-### 共享表示的粒度（半共享）
+### 架构精度：与 π₀ 同一模型类（代码级核实）
 
-- **共享**：attention 层（action expert 能 attend to 所有 token：图像、文本、子任务）
-- **不共享**：action expert 的 FFN 权重（860M 参数，专门做 flow matching）
-- 比完全独立（ChemBot）更紧密，比完全端到端更模块化
+**更正历史**：早期本笔记误写"共享 attention 层 / 双向注意力"，经核实修正。
+
+**openpi 代码级核实**（π₀.5 开源）：π₀.5 与 π₀ **共用同一个模型类** `src/openpi/models/pi0.py`——**没有单独的 pi05.py**，只在 `Pi0Config` 用 `pi05: bool` 开关区分。这是架构一致性的最强证据。
+
+`pi0_config.py` 注释明确 π₀.5 相对 π₀ **只有两处差异**（均不改变 VLM↔action 耦合范式）：
+1. **state 输入位置**：π₀.5 把机器人 state 作为**离散语言 token 放进 prefix**（用 VLM 权重，进入双向注意力区），而非 π₀ 的"连续 state token 放 suffix（用 action expert 权重）"
+2. **timestep 注入**：π₀.5 用 **adaRMSNorm** 把 flow matching timestep 注入 action expert
+
+核心耦合完全一致（代码确认）：
+- 同一 `make_attn_mask` 实现 block-causal（docstring："causal attention between blocks. Tokens of a block can attend all previous blocks and all tokens on the same block"）
+- 同一句 `self.PaliGemma.llm([prefix_tokens, suffix_tokens], mask=attn_mask, adarms_cond=[None, adarms_cond])` 两专家联合前向（joint attention）
+- 推理先 prefix 前向填 VLM KV cache（`llm([prefix_tokens, None], ...)`），再 suffix attend prefix → 确认 block-causal 单向流
+
+**结论：π₀.5 = π₀ 的范式 A（joint-attention MoE + block-causal），代码级确认一致**；差异仅在 state 表示与 timestep 注入，不涉及耦合。完整机制见 canonical [[Physical Intelligence - pi0 a Vision-Language-Action Flow Model for General Robot Control]]；范式 A/B 跨工作对比见 [[Embodied Brain Models]]。
+
+### 开源边界（已核实）
+
+openpi 仓库**只开源 π₀ / π₀-FAST / π₀.5**（权重 + 代码）。π*₀.6 / π₀.7 / RL Tokens **均未开源**——开源止于 π₀.5，恰为 PI 商业化起点。
+
+### π₀.5 自身的架构贡献：两步分解
+
+π₀.5 的特有点是**单模型内的两层推理**（不是架构耦合的改动，而是推理流程）：
+
+```
+πθ(a_{t:t+H}, ℓ̂ | o_t, ℓ) = πθ(a_{t:t+H} | o_t, ℓ̂) · πθ(ℓ̂ | o_t, ℓ)
+```
+
+1. 高层：自回归生成子任务文本 ℓ̂（"pick up the plate"），停留在 embedding 空间不 round-trip
+2. 低层：action expert 条件化于 ℓ̂，flow matching 生成 action chunk
+
+规模：Gemma/PaliGemma 系 backbone + action expert 860M。
 
 ### 与 ChemBot 的架构对比
 

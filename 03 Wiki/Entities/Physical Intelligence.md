@@ -17,7 +17,9 @@
 - Flow matching for action generation
 - 基于 VLM backbone
 - ✅ **开源**：[openpi](https://github.com/Physical-Intelligence/openpi)（权重 + finetune 代码，JAX + PyTorch）
+- 架构：PaliGemma 3B + 300M flow matching action expert；**范式 A（joint-attention MoE，block-causal）的源头，代码级核实**
 - Paper: "π₀: A Vision-Language-Action Flow Model for General Robot Control"
+- Source note: [[Physical Intelligence - pi0 a Vision-Language-Action Flow Model for General Robot Control]]
 
 ### π₀.5 (2025)
 - Open-world generalization，多机器人平台
@@ -78,5 +80,9 @@ PI 在 π₀.6 时代探索了两条互补 RL 路线：
 
 ## Related
 
+- [[Physical Intelligence - pi0 a Vision-Language-Action Flow Model for General Robot Control]] — canonical 范式 A 笔记
+- [[Physical Intelligence - pi0.5 a VLA with Open-World Generalization]]
 - [[Physical Intelligence - pi0.6 a VLA That Learns From Experience]]
+- [[Physical Intelligence - pi0.7 a Steerable Generalist Robotic Foundation Model]]
 - [[Physical Intelligence - RL Tokens Precise Manipulation with Efficient Online RL]]
+- [[Embodied Brain Models]] — π 系列全部属于范式 A；范式 A/B 跨工作对比

@@ -191,3 +191,16 @@
   - Same make_attn_mask (block-causal), same joint two-expert forward (PaliGemma.llm([prefix, suffix], mask)), same prefix-KV-cache-then-suffix-attends inference path
   - Upgraded π₀.5 note from "paper-verified inheritance" to "code-verified same model class"
 - Firmed up π₀.7 open-source field from "未开源（大概率）" to definitive (openpi only to π₀.5)
+
+## [2026-05-30] ingest | GR00T and PhysBrain source notes (Paradigm B representatives)
+- Created `NVIDIA - GR00T N1 An Open Foundation Model for Generalist Humanoid Robots`:
+  - Paradigm B (cross-attention encoder-decoder), code-verified via gr00t/model/modules/dit.py
+  - Frozen VLM + diffusion DiT; N1 2B / N1.5+ 3B; N1.5 key changes (frozen VLM, simplified adapter+LayerNorm, FLARE loss 0.2, DreamGen synthetic data)
+  - backbone evolution Eagle → Eagle 2.5 → Eagle → Cosmos-Reason2-2B (Qwen3-VL) at N1.7 — World Model × VLA fusion
+  - Open-source: code Apache 2.0, weights NVIDIA Open Model License
+  - Verified benchmarks (DreamGen 13.1→38.3, Language Table 52.8→93.2, etc.)
+- Created `DeepCybo - PhysBrain Human Egocentric Data as a Bridge from VLMs to Physical Intelligence`:
+  - VLM-as-brain school; PhysBrain = fine-tuned Qwen3-VL brain, PhysVLA = brain + FM DiT (Paradigm B)
+  - Headline: zero-real-robot-trajectory pretraining on human egocentric video; E2E-3M (3M VQA, 7 modes, Ego4D/EgoDex/BuildAI)
+  - Recorded corrections vs secondary sources: Qwen3-VL not Qwen2.5-VL; "PhysGR00T/PhysPI/TwinBrainVLA/LangForce" are marketing/separate-repo names not in paper; benchmark number v1/v2 discrepancies; NOT open-source (repo is just project HTML page)
+- Updated index Sources + `Embodied Brain Models` (linked both notes in Paradigm B section, moved them from todo to done)

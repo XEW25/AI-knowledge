@@ -27,6 +27,9 @@
 - [[Physical Intelligence - pi0.7 a Steerable Generalist Robotic Foundation Model]] — diversified prompt conditioning; BAGEL world model (subgoal images) + MEM dual memory; inherits π₀ Paradigm A
 - [[NVIDIA - GR00T N1 An Open Foundation Model for Generalist Humanoid Robots]] — open-source humanoid VLA series; **Paradigm B (cross-attention encoder-decoder, code-verified)**; frozen VLM + diffusion DiT; N1.7 switches backbone to Cosmos-Reason2
 - [[DeepCybo - PhysBrain Human Egocentric Data as a Bridge from VLMs to Physical Intelligence]] — VLM-as-brain; zero-real-robot-trajectory pretraining on human egocentric video (E2E-3M); Qwen3-VL + FM DiT (Paradigm B); not open-source
+- [[Figure AI - Helix a VLA for Generalist Humanoid Control]] — dual-system S2(7B VLM)+S1(80M); system interface = single continuous latent vector; both onboard; closed
+- [[AgiBot - GO-1 ViLLA Generalist Embodied Foundation Model]] — ViLLA 3-stage; discrete latent-action-token interface (VQ-VAE from video); latent planner is Paradigm A; AgiBot World 1M+ trajectories; open
+- [[Galaxea - G0 Dual-System VLA Model]] — dual-system; language-subtask interface (ChemBot-like); G0-VLA internally Paradigm A (PaliGemma + flow matching); open
 
 ## Wiki
 

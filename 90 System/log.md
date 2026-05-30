@@ -204,3 +204,14 @@
   - Headline: zero-real-robot-trajectory pretraining on human egocentric video; E2E-3M (3M VQA, 7 modes, Ego4D/EgoDex/BuildAI)
   - Recorded corrections vs secondary sources: Qwen3-VL not Qwen2.5-VL; "PhysGR00T/PhysPI/TwinBrainVLA/LangForce" are marketing/separate-repo names not in paper; benchmark number v1/v2 discrepancies; NOT open-source (repo is just project HTML page)
 - Updated index Sources + `Embodied Brain Models` (linked both notes in Paradigm B section, moved them from todo to done)
+
+## [2026-05-30] research + synthesis | Player landscape: two-level coupling framework
+- Verified VLM↔action coupling for Helix / AgiBot GO-1 / Galaxea G0 from primary sources (Figure blog, AgiBot World arXiv:2503.06669, Galaxea G0 arXiv:2509.00576)
+- KEY FINDING: "coupling" has TWO orthogonal levels, previously conflated:
+  - Level 1 (system interface, high-level brain → low-level executor): single latent vector (Helix) / discrete latent-action tokens via VQ-VAE (GO-1) / natural-language sub-tasks (G0, ChemBot) / subgoal images (π₀.7)
+  - Level 2 (within-VLA VLM↔action coupling): Paradigm A (joint MoE) vs Paradigm B (cross-attention)
+- The two levels are orthogonal: G0 decouples at system level (language sub-tasks) but G0-VLA is internally Paradigm A (PaliGemma + flow matching); GO-1 latent planner is also Paradigm A
+- FALSIFIED the over-simple "deployment-oriented → Paradigm B" hypothesis; replaced with: deployment players pursue system-level decoupling + compressed interface via TWO routes — (1) single model with clean internal split (Paradigm B: GR00T, PhysVLA), or (2) explicit multi-system with compressed interface (Helix, GO-1, G0, ChemBot). Both avoid the tightly-coupled single-model joint-MoE (π's Paradigm A, hardest to split)
+- Added a decoupling-degree spectrum (research→deployment) and a verified player landscape table to `Embodied Brain Models`
+- Created 3 source notes: `Figure AI - Helix`, `AgiBot - GO-1 ViLLA`, `Galaxea - G0`
+- Updated index Sources and concept-page source-note list

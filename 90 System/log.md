@@ -215,3 +215,11 @@
 - Added a decoupling-degree spectrum (research→deployment) and a verified player landscape table to `Embodied Brain Models`
 - Created 3 source notes: `Figure AI - Helix`, `AgiBot - GO-1 ViLLA`, `Galaxea - G0`
 - Updated index Sources and concept-page source-note list
+
+## [2026-05-30] deepen | GO-1 Latent Planner mechanism + latent-action synthesis candidate
+- Re-verified GO-1 Latent Planner I/O from AgiBot World arXiv:2503.06669 and expanded the source note:
+  - LAM = "question-setter": inverse-dynamics encoder I(z|I_t, I_{t+H}) + forward-dynamics decoder, VQ-VAE codebook (k=4), learnable from frame pairs alone (no action labels) → web/human video
+  - Latent Planner = "answerer": inputs = multiview images + instruction + layer-wise VLM features (24 layers, Paradigm A joint); outputs = k=4 discrete latent-action tokens P(z_t|...)
+  - Train vs inference crux: targets supervised by LAM from FUTURE frames (z_t := I(I_t^h, I_{t+H}^h)); at inference the planner predicts z_t from current obs+instruction only — the actual "planning"
+  - Action Expert = "decoder": diffusion conditioned on latent tokens; planner=what-should-happen (embodiment-agnostic), expert=how-to-actuate (embodiment-specific) → cross-embodiment transfer
+- Added a Synthesis candidate to `Embodied Brain Models`: "learn action/semantics from unlabeled video" trend line (GO-1 latent action, PhysBrain egocentric, LAPA, Genie)

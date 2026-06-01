@@ -66,3 +66,4 @@
 - [[Physical Intelligence - pi0.6 a VLA That Learns From Experience]] — 隐式记忆代表
 - [[Huang et al. - ChemBot Long-Term Memory for VLA-based Agents]] — 显式记忆代表
 - [[Memory Policy]] — memory as policy
+- [[Home robot architecture - a hierarchical embodied agent]] — 双记忆（显式云端 + 隐式端侧程序性技能）的具体架构落地

@@ -223,3 +223,13 @@
   - Train vs inference crux: targets supervised by LAM from FUTURE frames (z_t := I(I_t^h, I_{t+H}^h)); at inference the planner predicts z_t from current obs+instruction only — the actual "planning"
   - Action Expert = "decoder": diffusion conditioned on latent tokens; planner=what-should-happen (embodiment-agnostic), expert=how-to-actuate (embodiment-specific) → cross-embodiment transfer
 - Added a Synthesis candidate to `Embodied Brain Models`: "learn action/semantics from unlabeled video" trend line (GO-1 latent action, PhysBrain egocentric, LAPA, Genie)
+
+## [2026-05-30] synthesis | Home robot architecture as a hierarchical embodied agent
+- Created synthesis page `Home robot architecture - a hierarchical embodied agent` — the culmination of a multi-turn discussion arc (architecture verification → deployment reality → factory needs → home needs → architecture proposal)
+- Core thesis: home general-purpose robot = hierarchical embodied agent, NOT a bigger VLA; the convergence point of the vault's two lines (embodied control + persistent agent cognition)
+- Captured: four-axis deployment framework; capability-vs-dependability gap (with industry corroboration: Levine, Tedrake, Jang); dependability scaffolding with verified research lines (KnowNo, Sentinel, CBF/SHIELD, World Action Verifier); capability→architecture mapping; the refined hierarchical architecture (cloud reasoner+world-model+memory / edge expert+safety+procedural-skills+distilled-small-brain)
+- Recorded critical refinements to Ethan's proposed architecture: (1) reasoner ≠ world model (propose-then-verify); (2) edge safety/monitoring layer is mandatory and must work offline; (3) edge expert needs local autonomy, not passive decoding; (4) interface is plan-level not action-level; (5) cloud-only intelligence → disconnection fragility, suggest distilled edge brain; (6) privacy vs cloud-memory tension → split/federated memory
+- World-model multi-level necessity judgment: prediction is (very likely) necessary for the un-trainable long tail, but not necessarily a single decision-time generative MPC — more likely heavy world model in slow cloud + light/implicit prediction on edge + training-time use
+- Dual-memory mapping (cloud explicit + edge procedural) maps to Memory in Embodied AI's ideal and to the biological cerebellum's skill-consolidation function
+- Confidence markers throughout (established vs Ethan+Ada forward judgment)
+- Updated index Syntheses; backlinks from Embodied Brain Models and Memory in Embodied AI

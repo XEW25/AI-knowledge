@@ -65,6 +65,7 @@
 ### Syntheses
 - [[Self-managing memory as an in-distribution control problem]] — synthesis on reframing memory management as decomposed control over write, retrieve, consolidate, and discard operations, with emphasis on decomposition policy
 - [[Meta-skills for memory orchestration]] — synthesis on reusable higher-order skills for controlling memory operations and composing trainable memory subskills
+- [[Home robot architecture - a hierarchical embodied agent]] — synthesis on the home general-purpose robot as a hierarchical embodied agent (cloud reasoner+world-model+memory over edge expert+safety+procedural skills); capability-vs-dependability gap, multi-level world-model necessity, key cloud/edge/privacy/disconnection tensions; where the vault's embodied and agent-memory lines converge
 
 ## Maps
 - [[Home]] — top-level navigation page for the vault

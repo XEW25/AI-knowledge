@@ -30,6 +30,7 @@
 - [[Figure AI - Helix a VLA for Generalist Humanoid Control]] — dual-system S2(7B VLM)+S1(80M); system interface = single continuous latent vector; both onboard; closed
 - [[AgiBot - GO-1 ViLLA Generalist Embodied Foundation Model]] — ViLLA 3-stage; discrete latent-action-token interface (VQ-VAE from video); latent planner is Paradigm A; AgiBot World 1M+ trajectories; open
 - [[Galaxea - G0 Dual-System VLA Model]] — dual-system; language-subtask interface (ChemBot-like); G0-VLA internally Paradigm A (PaliGemma + flow matching); open
+- [[Galaxea - G0.5 Autoregressive VLM-as-Actor VLA]] — **architectural reversal of G0**: unified autoregressive VLM-as-actor (single decoder/weights/objective) vs the VLM-as-encoder mainstream; cross-embodiment VQ ActionCodec + in-stream CoT + visual memory; introduces the more fundamental actor-vs-encoder axis above Paradigm A/B; Qwen3.5-2B backbone; backbone released
 
 ## Wiki
 

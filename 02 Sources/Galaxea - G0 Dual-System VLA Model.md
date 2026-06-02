@@ -10,6 +10,8 @@
 - **Raw**: URL-only（Tier 1，无本地捕获）
 
 > **定位**：Galaxea 的双系统 VLA。系统级接口是**自然语言子任务指令**（类 ChemBot）；G0-VLA 执行器内部是**范式 A（PaliGemma + flow matching，joint attention）**。两系统异步运行。
+>
+> ⚠️ **架构已被后继反转**：[[Galaxea - G0.5 Autoregressive VLM-as-Actor VLA|G0.5]] 放弃了 G0 的"双系统 + flow-matching 执行器（VLM-as-encoder）"，转向**统一自回归 VLM-as-actor**（单 decoder、单权重、单目标）。同一家公司的一次架构大转向。
 
 ## Model Paper Checklist
 

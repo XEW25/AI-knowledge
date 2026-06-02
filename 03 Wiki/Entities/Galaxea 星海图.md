@@ -5,7 +5,7 @@
 - **Headquarters**: 北京（China）
 - **Founders**: 清华 + 斯坦福背景科学家团队；联合创始人/Co-CSO **许华哲（Xu Huazhe）**（斯坦福训练、清华机器人教授）
 - **Focus**: 具身智能基础模型 + 机器人本体（移动操作）
-- **Flagship**: **G0 / G0Plus** 双系统 VLA；R1 系列机器人（R1 / R1 Pro / R1 Lite，双 6-DoF 臂 + 4-DoF 躯干 + 向量转向移动底盘）
+- **Flagship**: **G0 / G0Plus** 双系统 VLA → **G0.5** 统一自回归 VLA（架构转向）；R1 系列机器人（R1 / R1 Pro / R1 Lite，双 6-DoF 臂 + 4-DoF 躯干 + 向量转向移动底盘）
 - **Funding**: 累计融资 ~$210M；估值约 $700M+（部分报道称近百亿人民币"独角兽"）
 
 > **命名注意**：中文名 **星海图**（Crunchbase/CB Insights 收录为 Xinghaitu）。⚠️ 不要与"跨维智能（Dexmal）"混淆——那是另一家公司。

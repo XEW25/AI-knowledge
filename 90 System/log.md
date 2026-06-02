@@ -245,3 +245,14 @@
 - Verified company facts from primary/secondary sources before writing (founders, founding year, HQ, Chinese names)
 - CORRECTED an error introduced earlier: Galaxea's Chinese name is 星海图 (Xinghaitu), NOT 跨维智能 (that is a different company, Dexmal). Fixed the G0 source note (author metadata + entity wikilink)
 - Backfilled index Entities (Physical Intelligence was also missing) + added the 6 new entities
+
+## [2026-05-30] ingest | Galaxea G0.5 (autoregressive VLM-as-actor) — framework-reshaping
+- Downloaded PDF to `01 Raw/2026 - Galaxea - G0.5.pdf`; read via pdftotext (Read-tool poppler unavailable)
+- Created source note `Galaxea - G0.5 Autoregressive VLM-as-Actor VLA`
+- KEY FINDING (direction-shaping): G0.5 introduces a MORE FUNDAMENTAL architectural axis than our Paradigm A/B — **VLM-as-actor (unified autoregressive, VLM produces actions) vs VLM-as-encoder (VLM conditions a separate flow/diffusion expert)**. Our Paradigm A (π joint MoE) and B (GR00T cross-attn) are BOTH sub-types of VLM-as-encoder; G0.5 is VLM-as-actor (RT-2/OpenVLA/π0-FAST lineage, scaled up)
+- G0.5 architecture: single transformer decoder (Qwen3.5-2B init), single next-token objective, reasoning+action in one stream; 3 components — learnable cross-embodiment VQ ActionCodec (active-DoF, no padding, no new params per embodiment), native in-stream CoT (bbox + subtask text + 2D trace + action hint, prompt-switchable), visual memory; optional flow-matching head only as inference accelerator
+- Galaxea PIVOTED: G0 (dual-system, VLM-as-encoder) → G0.5 (unified AR, VLM-as-actor) — strong signal the actor-vs-encoder debate is unsettled
+- Argument: KI (π0.5) reintroducing AR action prediction implicitly concedes AR is the protective signal; VLA-0 shows plain-AR beats π0.5-KI/OpenVLA-OFT/SmolVLA on LIBERO
+- Results: LIBERO 98.9 / RoboTwin2.0 93.3 / SimplerEnv-Bridge 87.3 / DROID zero-shot 82.5 / R1 real 76.7 (vs π0.5 53.3, GR00T-N1.7 24.4) / BEHAVIOR-1K 31.4
+- Updated G0 source note (successor + pivot), Galaxea entity (pivot), index Sources
+- TODO (proposed, pending user): restructure `Embodied Brain Models` coupling section around actor-vs-encoder as the top-level axis, with Paradigm A/B as encoder sub-types and unified-AR as a third class

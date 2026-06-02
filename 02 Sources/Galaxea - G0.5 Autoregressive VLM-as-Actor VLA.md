@@ -6,7 +6,7 @@
 - **Year**: 2026（技术报告；提取文本中未见精确日期）
 - **Open-source**: ✅ 释放预训练 backbone
 - **Accessed**: 2026-05-30
-- **Raw**: [[2026 - Galaxea - G0.5.pdf]]（本地 PDF 已存 `01 Raw/`）
+- **Raw**: URL-only（Tier 1）——原文见上方 PDF 链接；未保留本地副本（文件 ~27MB，体积过大，按 vault 实践对大文件采用 URL-only）
 
 > **定位（重要）**：G0.5 是一次**架构大转向**——从 G0 的双系统（VLM-as-encoder + flow-matching 执行器）转向**统一自回归 VLM-as-actor**：单 transformer decoder、单套权重、单一目标，在一个 token 流里同时生成推理与动作。它**直接挑战了知识库的"范式 A/B"分类**（见下方"对框架的影响"）。
 
@@ -55,17 +55,18 @@
 
 ## 对知识库框架的影响（需讨论）
 
-G0.5 表明我们的**"范式 A vs B"其实是更上层"VLM-as-encoder"内部的子区分**。更根本的轴应是：
+G0.5 表明我们的**"范式 A vs B"其实是 VLA 内部更上层"VLM-as-encoder"的子区分**。**VLA 流派内部**的上层轴（非跨流派顶层、非"最根本"）应是：
 
 ```
-VLM-as-actor（统一 AR，VLM 自己产动作）
-   └─ RT-2 → OpenVLA → π0-FAST → G0.5
-VLM-as-encoder（VLM 编码 + 独立专家产动作）
-   ├─ 范式 A：joint MoE（π 系列）
-   └─ 范式 B：cross-attention（GR00T、PhysVLA）
+VLA 流派内部（World Model / Predictive Spatial 相对正交）：
+  VLM-as-actor（统一 AR，VLM 自己产动作）
+     └─ RT-2 → OpenVLA → π0-FAST → G0.5
+  VLM-as-encoder（VLM 编码 + 独立专家产动作）
+     ├─ 范式 A：joint MoE（π 系列）
+     └─ 范式 B：cross-attention（GR00T、PhysVLA）
 ```
 
-建议把 [[Embodied Brain Models]] 的耦合讨论重构为"actor vs encoder"为顶层轴、A/B 为 encoder 子型，并把统一 AR 列为第三大类。
+已据此重构 [[Embodied Brain Models]] 的 VLA 节：actor vs encoder 为 VLA 内部上层轴，A/B 归为 encoder 子型，统一 AR 为 actor 分支。
 
 **云-端含义**：统一 AR 单模型更难按"脑/小脑"切分（无独立专家边界），但 **VQ action token 提供了一个天然的离散接口**；可选 FM head 又给低延迟部署留了口子。
 
@@ -79,7 +80,7 @@ VLM-as-encoder（VLM 编码 + 独立专家产动作）
 
 - [[Galaxea - G0 Dual-System VLA Model]] — **前代**，双系统 VLM-as-encoder；G0.5 是对它的架构反转
 - [[Galaxea 星海图]] — 出品方（注意 G0→G0.5 的架构掉头）
-- [[Embodied Brain Models]] — actor vs encoder 顶层轴；范式 A/B 重定位
+- [[Embodied Brain Models]] — actor vs encoder（VLA 流派内部上层轴）；范式 A/B 重定位为 encoder 子型
 - [[Physical Intelligence - pi0 a Vision-Language-Action Flow Model for General Robot Control]] — VLM-as-encoder 范式 A 对照（被 G0.5 批评对象）
 - [[NVIDIA - GR00T N1 An Open Foundation Model for Generalist Humanoid Robots]] — 范式 B 对照（被批评对象）
 - [[Home robot architecture - a hierarchical embodied agent]] — 统一 AR 对"脑/小脑"拆分的挑战

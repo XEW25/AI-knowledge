@@ -256,3 +256,13 @@
 - Results: LIBERO 98.9 / RoboTwin2.0 93.3 / SimplerEnv-Bridge 87.3 / DROID zero-shot 82.5 / R1 real 76.7 (vs π0.5 53.3, GR00T-N1.7 24.4) / BEHAVIOR-1K 31.4
 - Updated G0 source note (successor + pivot), Galaxea entity (pivot), index Sources
 - TODO (proposed, pending user): restructure `Embodied Brain Models` coupling section around actor-vs-encoder as the top-level axis, with Paradigm A/B as encoder sub-types and unified-AR as a third class
+
+## [2026-05-30] refine | Restructure VLA coupling axis (actor vs encoder) + raw-artifact policy
+- Restructured `Embodied Brain Models` VLA section around **VLM-as-actor vs VLM-as-encoder** (per Ethan's scoping corrections):
+  - SCOPED as a VLA-school-internal axis, explicitly NOT a cross-school top-level axis (World Model / Predictive Spatial noted as orthogonal)
+  - TONED DOWN: "important, currently-unsettled architectural divergence", not "most fundamental"
+  - VLM-as-encoder now contains Paradigm A (π joint MoE) + Paradigm B (GR00T/PhysVLA cross-attn); VLM-as-actor (unified AR: RT-2→OpenVLA→π0-FAST→G0.5) added as the other branch with both sides' arguments (unsettled)
+  - Toned down the same wording in the G0.5 source note
+- Raw-artifact policy: removed the 27MB G0.5 PDF from the repo (working tree + index); switched the note to URL-only (Tier 1), consistent with prior URL-only ingests (GigaWorld, RL Tokens)
+  - Note: the blob remains in git history (commit 2b61d04); a full history purge would need a force-push — not done (non-destructive removal only)
+  - Codified the practice in `90 System/AGENTS.md` 01 Raw section: large binaries (PDFs > a few MB) prefer URL-only; preserve local copies only when small/important

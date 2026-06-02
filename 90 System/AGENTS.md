@@ -40,6 +40,7 @@ Use this for:
 Rule:
 - Prefer preserving original content.
 - Avoid modifying raw files unless there is a strong operational reason.
+- For large binaries (e.g., PDFs more than a few MB), prefer **URL-only (Tier 1)** capture: record the source URL in the note instead of committing the file. Preserve a local copy only when the artifact is small and important, or hard to re-access. (Not every paper needs its raw PDF in the repo.)
 
 The agent should:
 - read from Raw freely

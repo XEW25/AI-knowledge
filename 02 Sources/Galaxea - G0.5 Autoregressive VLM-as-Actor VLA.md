@@ -4,7 +4,7 @@
 - **Org**: [[Galaxea 星海图]]（Galaxea AI / Xinghaitu）
 - **URL**: https://opengalaxea.github.io/G05/ · PDF: https://opengalaxea.github.io/G05/Galaxea_G0_5.pdf
 - **Year**: 2026（技术报告；提取文本中未见精确日期）
-- **Open-source**: ✅ 释放预训练 backbone
+- **Open-source**: ⚠️ 论文声称释放预训练 backbone，但**未找到公开代码/权重仓库**（GitHub `OpenGalaxea/G05` 仅项目页 TypeScript/Vite；HF 仅第三方微调）；实际开源状态待确认，**无模型/训练代码可参考**
 - **Accessed**: 2026-05-30
 - **Raw**: URL-only（Tier 1）——原文见上方 PDF 链接；未保留本地副本（文件 ~27MB，体积过大，按 vault 实践对大文件采用 URL-only）
 
@@ -19,7 +19,7 @@
 | 3 | 训练数据 | 机器人数据集 + ~100M 视觉-语言混合（50M web VQA + 50M 具身 VQA + 5M 自标注），VQA:action=1:4；bbox/trace/subtask/hint 由 autolabeling pipeline（Gemini 3 / Doubao + SAM3 + 正运动学投影）自动补齐 |
 | 4 | 训练方法 | 自回归 next-token 预测（CE loss 覆盖生成段每个 token）；三组件：跨本体 VQ ActionCodec + native in-stream CoT + visual memory |
 | 5 | 推理性能 | AR 生成，action 按 chunk 发出、闭环 re-plan；低延迟/连续噪声探索场景可挂可选 FM head |
-| 6 | 开源状态 | ✅ 释放预训练 backbone |
+| 6 | 开源状态 | ⚠️ 论文称释放预训练 backbone，但**未找到公开代码/权重**（GitHub `OpenGalaxea/G05` 仅项目页；HF 仅第三方微调）；无可参考的模型/训练代码 |
 | 7 | Benchmark | 共 7 个 regime：LIBERO **98.9** / RoboTwin 2.0 **93.3** / SimplerEnv-Bridge **87.3** / DROID zero-shot **82.5** / R1-Lite·R1-Pro 真机 **76.7**（vs π0.5 53.3、GR00T-N1.7 24.4）/ BEHAVIOR-1K Challenge **31.4**（vs π0.5 26.3、赛事冠军 26.1）/ **Pick-and-Place (PP Bench)** 语言跟随基准（分别报 language-following rate 与 task success，跨 in/out-of-distribution 物体类别，大幅超 VLM-as-encoder 基线，无单一 headline 数）；1 个 post-train epoch 超过 π0.5 四个 epoch |
 | 8 | 与已有工作关系 | 否定 VLM-as-encoder（π0/π0.5/GR00T-N1.x/SmolVLA），回归 VLM-as-actor（RT-2/OpenVLA/π0-FAST 谱系）；in-stream CoT 扩展 ECoT |
 | 9 | 记忆机制 | **visual memory**：多秒历史经 vision encoder 注入 |
@@ -93,6 +93,27 @@
 | 2D 末端轨迹 | 关节位姿正运动学算 3D 轨迹 → 投影到头相机像面 |
 
 **含义**：action hint 等自然语言标注由大模型 API 生成 → G0.5 的"推理能力"部分是**数据层蒸馏**（从 Gemini/Doubao 的标注，而非模型层蒸馏）。这条流水线是"从已有机器人数据廉价造 CoT 监督"的关键。
+
+## CoT × 解码接口 ablation（AR vs FM，§5.6）
+
+单一预训练 checkpoint，仅在推理时切换 (i) 解码接口（AR token vs 额外 FM head）和 (ii) CoT（开/关），不微调任何参数。任务：PP Bench（单阶段）+ Air Fryer / Cook Bacon（各 5 阶段长程、zero-shot、household 未见于预训练）。**关键控制**：CoT 开时两 head 都从 **post-CoT hidden state** 出发，所以隔离的是"解码接口"而非"条件输入"。
+
+**Finding 1 — CoT 只在多阶段长程任务上明显有用**：
+- 单阶段 PP Bench：CoT 对两 head 几乎无变化（AR 65.6→67.2、FM 59.4→60.9，≤1.6pp）——单次 grounding，无 per-stage 推理发挥空间
+- 五阶段：AR progress 2.4→3.8（Air Fryer）、1.5→3.4（Bacon）——有 per-stage 子目标时 CoT 才显著帮 grounding+执行
+
+**Finding 2 — AR 比 FM 更"跟得上"CoT**（匹配 CoT 下）：
+- Air Fryer：AR 2.4→3.8 vs FM 2.1→2.7；language-following **72(AR) vs 48(FM)**
+- Bacon：AR 1.5→3.4 vs FM 1.2→2.0；**64(AR) vs 44(FM)**
+- 论文 hypothesis：差距源自**解码接口而非推理内容**——AR 动作 token 与 CoT 同序列、**可直接 attend**；**FM head 只 condition on 隐藏态的 pooled summary**
+
+**CoT 质量两 head 相同**：手工评分 subtask/bbox 正确率 ~90%/85%/80%，无系统性 AR–FM 差异 → 支持"差在接口、不在推理质量"。
+
+### 关键澄清与局限（核实后）
+- **FM head 条件化 = pooled summary（池化摘要）**：**不是**完整逐 token embedding 序列，**也不是** cross-attention（范式 B）——**池化比 B 更压缩**。具体池化机制（mean/attention/几个 summary token、取哪层）论文**未说明**，且**无开源代码可查**，属 underspecification
+- **对 encoder 派不完全公平**：G0.5 的 FM 基线用了池化条件化（较弱）；一个 cross-attention 的 FM head 未必丢这么多 CoT 细节——"AR > FM" 部分可能是**基线选择**所致，不纯是 AR 范式优越
+- **证据偏弱**：长程任务 **n=5 rollouts/cell**（小样本）；作者明说机制"**未直接验证，留待 future work**"
+- 主结果评测用**固定 no-CoT**
 
 ## 对知识库框架的影响（需讨论）
 

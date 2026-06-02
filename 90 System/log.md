@@ -277,3 +277,11 @@
   - Training: single next-token CE on generative segment only, no aux/distillation; ~100M VL co-training (50M web + 50M embodied + 5M in-house VQA), VQA:action 1:4; AdamW lr 1e-5
   - Autolabeling pipeline (key data trick): language (subtask/action-hint/instruction) via temporal segmentation + Gemini 3 / Doubao Seed 2.0 Pro API; bbox/masks via multimodal FM + SAM3 tracking; 2D traces via forward kinematics projected to head-camera plane → so the "reasoning" labels are partly DATA-LEVEL distillation from large multimodal models
 - Updated checklist training-data row accordingly
+
+## [2026-05-30] correct + deepen | G0.5 open-source status + AR-vs-FM CoT ablation
+- CORRECTED over-optimistic open-source field: verified GitHub `OpenGalaxea/G05` is only the project webpage (TypeScript/Vite), `OpenGalaxea/G0` likewise (HTML); HF search finds only third-party fine-tunes — no official code/weights repo located. Softened metadata + checklist row 6 to "claimed but unverified; no code to reference"
+- Added the §5.6 CoT × decoder-interface ablation (single checkpoint, inference-time toggle of AR-vs-FM head and CoT on/off):
+  - Finding 1: CoT helps only on multi-stage long-horizon tasks (PP Bench single-stage ≤1.6pp; Air Fryer/Bacon clear gains)
+  - Finding 2: AR follows CoT more closely than FM (Air Fryer 72 vs 48, Bacon 64 vs 44 language-following under matched CoT); hypothesis = decoding interface (AR attends CoT directly vs FM conditions on a pooled summary)
+  - CoT quality equal across heads (~90/85/80%), supporting "interface not reasoning content"
+- Recorded key clarification + limitations (resolving Ethan's questions): FM head conditions on a POOLED SUMMARY of the hidden state — NOT the full per-token embedding sequence, NOT cross-attention (Paradigm B); pooling is MORE compressed than B; exact pooling mechanism is underspecified and no code exists to check. Also flagged that the pooled FM baseline is not fully fair to the encoder camp, n=5 small samples, and the mechanism is an unverified hypothesis

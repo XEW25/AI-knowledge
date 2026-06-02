@@ -266,3 +266,14 @@
 - Raw-artifact policy: removed the 27MB G0.5 PDF from the repo (working tree + index); switched the note to URL-only (Tier 1), consistent with prior URL-only ingests (GigaWorld, RL Tokens)
   - Note: the blob remains in git history (commit 2b61d04); a full history purge would need a force-push — not done (non-destructive removal only)
   - Codified the practice in `90 System/AGENTS.md` 01 Raw section: large binaries (PDFs > a few MB) prefer URL-only; preserve local copies only when small/important
+
+## [2026-05-30] deepen | G0.5 architecture + training details (from PDF)
+- Re-read G0.5 PDF (cached text) to answer Ethan's precise questions; expanded the source note:
+  - VLM: initialized from Qwen3.5-2B; core decoder essentially unchanged (no separate expert / MoE / cross-attn). Additions are minimal: vocabulary extension (action codes + DoF-group/noop special tokens), visual memory, external ActionCodec, optional FM head
+  - Vocabulary unification: one AR stream holds three "sub-languages" sharing the vocab — text (Qwen native), spatial coords (`<loc####>` location tokens for bbox/trace), actions (`<action####>` RVQ codes + structural markers); one CE loss, one decoder
+  - CoT = 4 self-describing primitives in fixed coarse-to-fine order: Subtask → BBox → Trace → ActionHint → Action; `<EOV>` marks reasoning→action boundary
+  - ActionHint defined: frame-level natural-language gripper/motion directive (e.g., "close the left gripper while moving forward")
+  - "When to reason vs act" is NOT free model choice — controlled by (1) self-describing labels + fixed order, (2) prompt directive selecting targets, (3) training over 8 CoT formats (incl. no-CoT); eval uses fixed no-CoT
+  - Training: single next-token CE on generative segment only, no aux/distillation; ~100M VL co-training (50M web + 50M embodied + 5M in-house VQA), VQA:action 1:4; AdamW lr 1e-5
+  - Autolabeling pipeline (key data trick): language (subtask/action-hint/instruction) via temporal segmentation + Gemini 3 / Doubao Seed 2.0 Pro API; bbox/masks via multimodal FM + SAM3 tracking; 2D traces via forward kinematics projected to head-camera plane → so the "reasoning" labels are partly DATA-LEVEL distillation from large multimodal models
+- Updated checklist training-data row accordingly

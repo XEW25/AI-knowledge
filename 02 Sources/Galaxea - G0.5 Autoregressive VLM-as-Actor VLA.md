@@ -16,7 +16,7 @@
 |---|------|------|
 | 1 | 模型架构 | **统一自回归 VLA（VLM-as-actor）**：单 transformer decoder（Qwen3.5 2B 初始化）在一个 AR token 流里生成 reasoning + action token，单一 next-token 目标；**可选 flow-matching head 仅作推理加速器** |
 | 2 | 模型规模 | backbone **Qwen3.5 2B** |
-| 3 | 训练数据 | 大量机器人数据集 + VQA samples 联合预训练；跨 embodiment |
+| 3 | 训练数据 | 机器人数据集 + ~100M 视觉-语言混合（50M web VQA + 50M 具身 VQA + 5M 自标注），VQA:action=1:4；bbox/trace/subtask/hint 由 autolabeling pipeline（Gemini 3 / Doubao + SAM3 + 正运动学投影）自动补齐 |
 | 4 | 训练方法 | 自回归 next-token 预测（CE loss 覆盖生成段每个 token）；三组件：跨本体 VQ ActionCodec + native in-stream CoT + visual memory |
 | 5 | 推理性能 | AR 生成，action 按 chunk 发出、闭环 re-plan；低延迟/连续噪声探索场景可挂可选 FM head |
 | 6 | 开源状态 | ✅ 释放预训练 backbone |
@@ -45,13 +45,54 @@
 - action span = R 个 residual round × {active DoF groups} × 每组 8 codes
 
 ### ② Native in-stream CoT（推理与动作同流）
-- 三个推理原语共享一套 token vocab：**物体 bounding box + 原子子任务文本 + 2D 末端轨迹（TraceVLA 启发）**，外加 ActionHint
-- coarse-to-fine 顺序：subtask → bbox → trace → action hint → action
-- **prompt 条件模板**：CoT 模式推理时可切换、无需重训（每步从含 no-CoT 的 8 种组合采样）
+**四个自描述推理原语**（标签字面写在序列里），coarse-to-fine 固定顺序：
+1. `Subtask:` 原子子任务文本 —— 如 "pick up the towel"
+2. `BBox:` 关键物体定位 —— 如 `towel <loc0418><loc0312><loc0680><loc0556>; plate <loc...>`
+3. `Trace:` 2D 末端落点轨迹（TraceVLA 启发）—— 如 `Left <loc0543><loc0436>; Right None`
+4. **`ActionHint:` 帧级、自然语言的即时动作提示** —— 如 "close the left gripper while moving forward"
+
+之后才是 `Action: <EOV> <action_codes>`。`<EOV>` 标记"推理→动作"边界。
+
+- **prompt 条件模板**：CoT 模式推理时可切换、无需重训
 - 对比 ECoT（同享 AR decoder，但 G0.5 多了 3 原语 + prompt 可切换）；对比"bolt-on CoT"（HAMSTER / Fast-in-Slow System2→System1，推理只是模块间接口）
+
+### 词表如何统一（三种子语言共享一条 AR 流）
+
+一切序列化进**同一条自回归 token 流**，词表里并存三种"子语言"，由同一 decoder、同一 CE 损失产生（"all just tokens to the decoder"）：
+
+| 内容 | token 形式 |
+|------|-----------|
+| 文本（subtask、action hint）| Qwen 原生语言 token |
+| 空间坐标（bbox、2D trace）| 量化定位 token `<loc####>`（框=4 个、轨迹点=2 个）|
+| 动作 | RVQ 码 `<action####>` + DoF 组标记 `<left_control_r>` 等 + noop token |
+
+控制 token：`<bos> <EOC>（条件段结束） <EOV>（动作开始） <eos>`。
 
 ### ③ Visual Memory
 - 多秒历史帧经 vision encoder 注入，利于长程控制与闭环 re-plan（类 MEM）
+
+## 训练与数据
+
+### 训练目标（极简）
+- **单一 next-token 交叉熵，只在生成段计算**（条件段 user 侧不算 loss）；**无辅助回归、无专家蒸馏**
+- 协同训练：~100M 视觉-语言混合（50M 通用 web VQA + 50M 具身 VQA + 5M 自标注 VQA），**VQA:action = 1:4**，同一 CE
+- AdamW，峰值 LR 1e-5；pretrain → post-train
+
+### "何时推理 vs 何时动作"——三重机制（非模型自由裁量）
+1. **自描述标签 + 固定顺序**：发完标签填值，`<EOV>` 划界
+2. **prompt 指令选发哪些**：条件段含"声明接下来预测哪些目标"的简短指令（如 "predict bbox, subtask and action"）
+3. **训练见过所有模式**：每条机器人样本随机指派**恰好一种** CoT 格式（8 候选加权采样：no-CoT / atomic / high-level / subtask / subtask+action-hint / 2D trace / bbox 等；subtask 权重更高）；评测用固定 no-CoT
+
+### Autolabeling pipeline（数据侧的关键巧思）
+原始机器人数据只有动作轨迹，bbox/trace/subtask/action-hint 由自动流水线补齐：
+
+| 标注 | 来源 |
+|------|------|
+| 语言（subtask / action hint / 指令）| 规则化时间分段 → 调 **Gemini 3 / Doubao Seed 2.0 Pro** API 生成 |
+| 视觉 grounding（bbox + mask）| 多模态基础模型 + **SAM3 tracking** 逐帧 |
+| 2D 末端轨迹 | 关节位姿正运动学算 3D 轨迹 → 投影到头相机像面 |
+
+**含义**：action hint 等自然语言标注由大模型 API 生成 → G0.5 的"推理能力"部分是**数据层蒸馏**（从 Gemini/Doubao 的标注，而非模型层蒸馏）。这条流水线是"从已有机器人数据廉价造 CoT 监督"的关键。
 
 ## 对知识库框架的影响（需讨论）
 

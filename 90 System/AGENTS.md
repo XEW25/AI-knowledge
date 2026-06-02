@@ -131,7 +131,7 @@ If a claim is uncertain, disputed, incomplete, or source-dependent, say so in th
 
 ### Ingest workflow
 When processing a new source, the agent should usually:
-1. inspect the raw material or inbox capture
+1. inspect the raw material or inbox capture — when ingesting an external file (e.g., a PDF), apply the `01 Raw/` raw-tier rule: large binaries (PDFs more than a few MB) → **URL-only (Tier 1)**, keep a local copy only when small and important or hard to re-access
 2. discuss key takeaways with the user when the material is important, interpretive, strategic, or likely to shape the vault's direction
 3. create or update a note in `02 Sources/`
 4. update relevant pages in `03 Wiki/`

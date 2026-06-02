@@ -54,6 +54,13 @@
 - [[Claude Code]] — coding-agent style orchestrator-subagent system
 - [[OpenClaw]] — agent orchestration environment and referenced scaffold
 - [[Hermes Agent]] — agent scaffold referenced in discussion of longer-horizon decomposition
+- [[Physical Intelligence (π)]] — VLA 头部实验室（π 系列；范式 A 源头）
+- [[NVIDIA]] — 具身全栈玩家（GR00T VLA + Cosmos 世界模型 + Isaac 仿真 + Jetson 硬件）
+- [[Figure AI]] — 美国人形 VLA（Helix 双系统，全端侧；闭源全栈）
+- [[AgiBot 智元]] — 中国人形 + GO-1 ViLLA（latent action）+ AgiBot World 数据集（开源）
+- [[Galaxea 星海图]] — 中国具身（G0 双系统 VLA，语言子任务接口；开源）
+- [[DeepCybo]] — 中关村孵化，PhysBrain（VLM-as-brain，人类视频路线）
+- [[LimX Dynamics]] — 深圳足式+具身（ChemBot 完全分离双层架构）
 
 ### Topics
 - [[Agent memory]] — topic page for memory as policy, decomposition, and self-managed memory in agent systems

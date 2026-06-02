@@ -1,7 +1,7 @@
 # Galaxea - G0: Dual-System VLA Model (Galaxea Open-World Dataset)
 
 - **Type**: arXiv paper (cs.RO)
-- **Authors**: Galaxea Team（跨维智能）
+- **Authors**: Galaxea Team（**星海图** / Galaxea AI / Xinghaitu；⚠️ 非"跨维智能"，那是另一家公司 Dexmal）
 - **arXiv**: [2509.00576](https://arxiv.org/abs/2509.00576)
 - **Project**: https://opengalaxea.github.io/G0/ · GitHub: https://github.com/OpenGalaxea/G0
 - **Year**: 2025-09（G0）；G0Plus 2026-01
@@ -60,7 +60,7 @@
 
 ## Related Entities
 
-- [[Galaxea 跨维智能]] — 出品方（待建实体页）
+- [[Galaxea 星海图]] — 出品方
 
 ## tags
 

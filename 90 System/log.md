@@ -233,3 +233,15 @@
 - Dual-memory mapping (cloud explicit + edge procedural) maps to Memory in Embodied AI's ideal and to the biological cerebellum's skill-consolidation function
 - Confidence markers throughout (established vs Ethan+Ada forward judgment)
 - Updated index Syntheses; backlinks from Embodied Brain Models and Memory in Embodied AI
+
+## [2026-05-30] entities | Embodied-AI company entity pages
+- Created 6 organization entity pages referenced by the embodied source notes (resolving dangling links):
+  - `NVIDIA` — full-stack player (GR00T VLA + Cosmos world model + Isaac sim + Jetson Thor); multi-school positioning
+  - `Figure AI` — Brett Adcock, 2022, Sunnyvale; Helix dual-system, fully onboard, closed full-stack
+  - `AgiBot 智元` — Deng Taihua + Peng Zhihui (稚晖君), 2023, Shanghai; GO-1 ViLLA + AgiBot World (open)
+  - `Galaxea 星海图` — Xu Huazhe (Tsinghua+Stanford), 2023, Beijing; G0 dual-system (open)
+  - `DeepCybo` — Chen Kai, Zhongguancun-incubated, Beijing; PhysBrain egocentric-video route (not open)
+  - `LimX Dynamics 逐际动力` — Wei Zhang (张巍), 2022, Shenzhen; ChemBot fully-separated dual-layer
+- Verified company facts from primary/secondary sources before writing (founders, founding year, HQ, Chinese names)
+- CORRECTED an error introduced earlier: Galaxea's Chinese name is 星海图 (Xinghaitu), NOT 跨维智能 (that is a different company, Dexmal). Fixed the G0 source note (author metadata + entity wikilink)
+- Backfilled index Entities (Physical Intelligence was also missing) + added the 6 new entities

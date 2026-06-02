@@ -20,7 +20,7 @@
 | 4 | 训练方法 | 自回归 next-token 预测（CE loss 覆盖生成段每个 token）；三组件：跨本体 VQ ActionCodec + native in-stream CoT + visual memory |
 | 5 | 推理性能 | AR 生成，action 按 chunk 发出、闭环 re-plan；低延迟/连续噪声探索场景可挂可选 FM head |
 | 6 | 开源状态 | ✅ 释放预训练 backbone |
-| 7 | Benchmark | LIBERO **98.9** / RoboTwin 2.0 **93.3** / SimplerEnv-Bridge **87.3** / DROID zero-shot **82.5** / R1-Lite·R1-Pro 真机 **76.7**（vs π0.5 53.3、GR00T-N1.7 24.4）/ BEHAVIOR-1K Challenge **31.4**（vs π0.5 26.3、赛事冠军 26.1）；1 个 post-train epoch 超过 π0.5 四个 epoch |
+| 7 | Benchmark | 共 7 个 regime：LIBERO **98.9** / RoboTwin 2.0 **93.3** / SimplerEnv-Bridge **87.3** / DROID zero-shot **82.5** / R1-Lite·R1-Pro 真机 **76.7**（vs π0.5 53.3、GR00T-N1.7 24.4）/ BEHAVIOR-1K Challenge **31.4**（vs π0.5 26.3、赛事冠军 26.1）/ **Pick-and-Place (PP Bench)** 语言跟随基准（分别报 language-following rate 与 task success，跨 in/out-of-distribution 物体类别，大幅超 VLM-as-encoder 基线，无单一 headline 数）；1 个 post-train epoch 超过 π0.5 四个 epoch |
 | 8 | 与已有工作关系 | 否定 VLM-as-encoder（π0/π0.5/GR00T-N1.x/SmolVLA），回归 VLM-as-actor（RT-2/OpenVLA/π0-FAST 谱系）；in-stream CoT 扩展 ECoT |
 | 9 | 记忆机制 | **visual memory**：多秒历史经 vision encoder 注入 |
 

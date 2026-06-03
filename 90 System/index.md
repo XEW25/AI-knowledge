@@ -32,6 +32,7 @@
 - [[Galaxea - G0 Dual-System VLA Model]] — dual-system; language-subtask interface (ChemBot-like); G0-VLA internally Paradigm A (PaliGemma + flow matching); open
 - [[Galaxea - G0.5 Autoregressive VLM-as-Actor VLA]] — **architectural reversal of G0**: unified autoregressive VLM-as-actor (single decoder/weights/objective) vs the VLM-as-encoder mainstream; cross-embodiment VQ ActionCodec + in-stream CoT + visual memory; introduces the more fundamental actor-vs-encoder axis above Paradigm A/B; Qwen3.5-2B backbone; backbone released
 - [[DyQ-VLA: Temporal-Dynamic-Aware Quantization for Embodied Vision-Language-Action Models]] — source note on runtime-adaptive (kinematic-gated) mixed-precision PTQ for VLAs; **first embodied/VLA quantization entry** and first bridge between the quantization and embodied clusters; static W4 weights + dynamic activations (W4AX), base model OpenVLA; 99.5% perf at 30.9% memory, 1.49× sim / up to 1.43× real
+- [[Ω-QVLA: Robust Quantization for Vision-Language-Action Models via Composite Rotation and Per-step Scaling]] — source note on **uniform W4A4** PTQ of VLA models *including the diffusion DiT action head*, via composite SVD·Hadamard rotation + per-step scaling; second VLA-quant source and the counterpart to DyQ-VLA (uniform-precision vs dynamic-mixed-precision); quantizes π0.5 (98.0%) & GR00T N1.5 (87.8%) ≈ FP16 at ~71% memory saved; open source (Apache-2.0)
 
 ## Wiki
 
@@ -47,6 +48,7 @@
 - [[Object-Centric Representation]] — 以物体为基本单元的场景表示方法，支持组合泛化
 - [[World-Action Models]] — WAM 范式：视频生成 backbone + 动作预测，架构演进与路线对比
 - [[Embodied Brain Models]] — 大脑模型的部署驱动定义（云=大脑、端=小脑）、三个主流流派（LLM/VLM-as-brain, Predictive Spatial Models, VLA 特殊定位）、接口/方法学正交维度、前瞻预判（骨架页）
+- [[VLA quantization]] — VLA-specific low-bit quantization sub-cluster: why it differs from LLM quant (closed-loop error compounding, action-head sensitivity), the DyQ-VLA (dynamic mixed precision) vs Ω-QVLA (uniform W4A4 rotation) contrast, route mapping, and the cited landscape
 
 ### Entities
 - [[Alex Zhang]] — author associated with the Mismanaged Geniuses Hypothesis

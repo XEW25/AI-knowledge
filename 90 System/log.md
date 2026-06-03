@@ -307,3 +307,18 @@
 - Method in one line: static W4 weights + dynamic activations (W4AX, X∈{2,4,8,BF16}) gated by a cheap real-time kinematic proxy (motion fineness + angular jerk → sensitivity score → BF16 fallback or offline-calibrated bit LUT); base model OpenVLA (VLM-as-actor lineage, cf. G0.5 note); uses the vault's existing SmoothQuant as a W4A4 baseline
 - Results (high-confidence, triangulated across abstract/search/HTML): 99.5% perf at 30.9% memory; 1.49× sim (LIBERO) / up to 1.43× real-world
 - Left light on purpose (incremental maintenance): deeper embodied-cluster integration (Embodied Brain Models cross-link, a dedicated VLA-quantization concept page) deferred pending a second source or user direction
+
+## [2026-06-03] verification | DyQ-VLA mechanism hand-verified + open-source + raw-artifact decision
+- Hand-verified mechanism/baselines/results by reading the full PDF (v2, 9 pp) directly — extracted text via `pypdf` (installed ad hoc; Read-tool poppler unavailable, as in prior ingests). The earlier automated-reader extraction proved accurate; this pass mainly added precision and caught items the secondary extraction missed
+- CONFIRMED / REFINED:
+  - Affiliations (were "unverified"): Peking University (lead — School of CS / School of EECS) + South China University of Technology + Beijing Normal University; corresponding = Xiang Chen (PKU)
+  - Base = OpenVLA (~7B, autoregressive token-by-token, chosen for homogeneity); PTQ; W4AX = INT4-frozen weights + dynamic activations {2,4,8,BF16}
+  - Proxy: Motion Fineness M=1−‖a_xyz‖/μ95 (macro, r=0.90), Angular Jerk J=‖Δa_rot‖/ν95 (micro, r=0.87) vs ground-truth s_t=D_T/e_t; fused S=max(0,λM̃+(1−λ)J̃); asymmetric hysteresis (instant upgrade, delayed downgrade via window K); offline-calibrated LUT Φ:S↦{2,4,8}; θ_fp=0.5, W_macro=10, W_micro=5
+  - "QVLA" baseline is REAL (arXiv:2602.03782, per-channel) — removed the earlier "to verify" hedge; actual VLA-quant baselines = QVLA + SmoothQuant (SQAP-VLA arXiv:2509.09090 cited as related). EaqVLA is NOT used by this paper
+  - Real-world results use QLoRA fine-tuning (rank 32, 4-bit frozen) for sim-to-real → not pure plug-in quantization (now flagged as a limitation)
+  - Table-only critical read: DyQ-VLA beats QVLA by just +0.1% avg SR and at slightly MORE memory (4.7 vs 4.3 GB) → the real contribution is the dynamic paradigm + speed, not Pareto-dominating the static SOTA
+  - Sibling work: same PKU group's KERV (kinematic-rectified speculative decoding, arXiv:2603.01581) reuses the same "kinematics as runtime signal" idea → broader thesis to watch
+- OPEN SOURCE: none located — no release claim in the paper, no GitHub/project link, no repo found via web search (2026-06-03). Recorded as "none located"
+- RAW-ARTIFACT DECISION: downloaded PDF measured 4.94 MB (> "a few MB") and is trivially re-accessible on arXiv → kept **URL-only (Tier 1), NOT committed**; matches the raw-tier rule and the G0.5 / GigaWorld / RL Tokens precedent. Temp PDF/text used only for verification, then deleted
+- Upgraded both notes: caveats changed from "automated extraction, not hand-verified" → "hand-verified against PDF (v2)"; added verified formulas, full results tables, affiliations, open-source status, and the QVLA-margin / QLoRA / KERV refinements
+- `Model quantization` topic + `index.md` left unchanged (re-checked, still accurate; avoided churn)

@@ -31,6 +31,7 @@
 - [[AgiBot - GO-1 ViLLA Generalist Embodied Foundation Model]] — ViLLA 3-stage; discrete latent-action-token interface (VQ-VAE from video); latent planner is Paradigm A; AgiBot World 1M+ trajectories; open
 - [[Galaxea - G0 Dual-System VLA Model]] — dual-system; language-subtask interface (ChemBot-like); G0-VLA internally Paradigm A (PaliGemma + flow matching); open
 - [[Galaxea - G0.5 Autoregressive VLM-as-Actor VLA]] — **architectural reversal of G0**: unified autoregressive VLM-as-actor (single decoder/weights/objective) vs the VLM-as-encoder mainstream; cross-embodiment VQ ActionCodec + in-stream CoT + visual memory; introduces the more fundamental actor-vs-encoder axis above Paradigm A/B; Qwen3.5-2B backbone; backbone released
+- [[DyQ-VLA: Temporal-Dynamic-Aware Quantization for Embodied Vision-Language-Action Models]] — source note on runtime-adaptive (kinematic-gated) mixed-precision PTQ for VLAs; **first embodied/VLA quantization entry** and first bridge between the quantization and embodied clusters; static W4 weights + dynamic activations (W4AX), base model OpenVLA; 99.5% perf at 30.9% memory, 1.49× sim / up to 1.43× real
 
 ## Wiki
 

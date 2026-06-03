@@ -291,6 +291,13 @@
 - Confirmed log↔reality consistency for the raw-tier rule: it is actually present in AGENTS.md (01 Raw section, "For large binaries... prefer URL-only"), matching the earlier log claim — verified, not just claimed
 - CORRECTION to the earlier "refine ... raw-artifact policy" entry which said the G0.5 blob "remains in git history (force-push not done)": this was SUBSEQUENTLY superseded — the 27MB blob was fully purged from history via `git filter-branch` + `--force-with-lease` push (`.git` 40M→14M; backup branch + refs/original removed + reflog expire + gc --prune=now). Any other clones would need re-clone / hard reset to `origin/master`
 
+## [2026-05-30] correct | π₀.5 action-expert size error (860M → 300M)
+- While answering "π₀.5 vs π₀ differences", caught a cross-note inconsistency: π₀.5 note listed action expert as **860M**, but openpi config.py verifies all pi05 training configs use `Pi0Config(pi05=True)` → default `action_expert_variant="gemma_300m"` (300M), same as π₀. The 860M is **π₀.6's** action expert (Gemma 3 4B + 860M), mis-copied into the π₀.5 note
+- Fixed both occurrences in `02 Sources/Physical Intelligence - pi0.5` (checklist row 2 + two-step section) with explicit note that 860M belongs to π₀.6
+- Added a correction marker (not overwrite) to the `01 Raw` π₀.5 capture, per the raw-preservation principle, also flagging its stale "shared attention layer" wording
+- Verified 860M is CORRECT for π₀.6 and π₀.7 notes (Gemma 3 4B + 860M) — left untouched
+- Net: π₀.5 = π₀'s architecture (gemma_2b 3B + gemma_300m 300M, Paradigm A) + heterogeneous co-training recipe + two-step hierarchy + KI, all for open-world generalization; the two code-verified arch tweaks (state-as-discrete-token, adaRMS timestep) remain the only structural changes
+
 ## [2026-06-03] ingest | DyQ-VLA: Temporal-Dynamic-Aware Quantization for Embodied VLA Models
 - Post-knowledge-cutoff paper (arXiv:2603.07904, submitted 2026-03-09, v2 2026-03-14) — located + verified via web search and arXiv abstract/HTML fetch; new ingest, not a backfill
 - Raw: URL-only (Tier 1); raw note records the (partial verbatim) abstract + extracted method/eval, with an explicit caveat that mechanism details came from an automated HTML reader and are NOT yet hand-verified against the PDF

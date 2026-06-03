@@ -49,6 +49,7 @@
 **共享表示的粒度**：
 - 共享：backbone 的视觉-语言理解（attention 层）
 - 不共享：action expert 的 FFN 权重（860M 参数，专门做 flow matching）
+  - ⚠️ 更正（2026-05-30）：860M 系早期误记——π₀.5 的 action expert 实为 gemma_300m（300M，与 π₀ 同，openpi 核实）；860M 是 π₀.6 的数字。此外"共享 attention 层"的表述也不准确（实为 MoE 双专家各自独立 attention + block-causal joint attention）——详见 02 Sources 笔记
 - 这是半共享——比完全独立（ChemBot）更紧密，比完全端到端更模块化
 
 ### 两阶段训练

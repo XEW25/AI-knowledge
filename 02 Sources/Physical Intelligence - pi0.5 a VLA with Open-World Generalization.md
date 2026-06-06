@@ -47,7 +47,7 @@
 
 1. Backbone 自回归生成子任务文本 token（token by token）
 2. 子任务 token **不会**变成文本再 tokenize——一直在 embedding 空间
-3. Action expert 通过**共享 attention 层**直接读子任务 embedding（不需要额外文本 encoder）
+3. Action expert 通过 **joint attention 读取 prefix（含子任务）的逐层 KV**（两专家各自独立权重；非"共享 attention 层"——精确机制见下方"Action expert 的 I/O"小节）
 4. 一次 flow matching 去噪生成整个 action chunk
 5. 子任务切换低频，动作生成 50Hz 高频
 
@@ -67,6 +67,20 @@
 - 推理先 prefix 前向填 VLM KV cache（`llm([prefix_tokens, None], ...)`），再 suffix attend prefix → 确认 block-causal 单向流
 
 **结论：π₀.5 = π₀ 的范式 A（joint-attention MoE + block-causal），代码级确认一致**；差异仅在 state 表示与 timestep 注入，不涉及耦合。完整机制见 canonical [[Physical Intelligence - pi0 a Vision-Language-Action Flow Model for General Robot Control]]；范式 A/B 跨工作对比见 [[Embodied Brain Models]]。
+
+### Action expert 的 I/O 与跨子任务记忆（精确机制，代码核实）
+
+**Q1 — action expert 的输入不含 VLM hidden states**：两专家各用自己的 `k_proj/v_proj` 从各自 hidden states 算 K/V，再拼接做 joint attention。VLM 信息**经注意力的 K/V 进入，不作为输入嵌入塞给 action expert**。
+
+**Q2 — action expert 的直接输入 = 仅 action（噪声）token；prefix 经逐层 KV 被 attend**：
+- 直接 token 输入：只有 action token（`embed_suffix`：`if self.pi05: action_expert_tokens = action_tokens`）
+- (图像 + 指令 + 子任务 + state) 是 prefix（VLM 专家处理），action expert **attend 它们的逐层 KV cache**——**per-layer / lockstep，非最后一层、非池化**（区别于 GR00T 的 cross-attn-to-final、G0.5 FM head 的 pooled summary）
+- proprio/state 在 prefix（π₀.5 默认离散 token；`discrete_state_input` 可配置，`pi05_libero` 设 False）
+
+**Q3 — 跨子任务不保留 token/KV（无记忆）**：
+- 每次推理 context 从**当前观测重建**；KV cache 只针对当前 prefix，观测/子任务更新即重建
+- 无历史子任务 token 累积；"进度感"来自**观测本身**（观测驱动），非 KV 保留
+- 这是 π₀.5 的结构性短板，正是 π₀.7 **MEM**（多秒视觉历史经 vision encoder 注入）要补的 → 见 [[Memory in Embodied AI]]
 
 ### 开源边界（已核实）
 

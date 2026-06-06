@@ -298,6 +298,13 @@
 - Verified 860M is CORRECT for π₀.6 and π₀.7 notes (Gemma 3 4B + 860M) — left untouched
 - Net: π₀.5 = π₀'s architecture (gemma_2b 3B + gemma_300m 300M, Paradigm A) + heterogeneous co-training recipe + two-step hierarchy + KI, all for open-world generalization; the two code-verified arch tweaks (state-as-discrete-token, adaRMS timestep) remain the only structural changes
 
+## [2026-05-30] deepen | π₀.5 action-expert I/O + cross-subtask memory (precise mechanism)
+- Added "Action expert 的 I/O 与跨子任务记忆" subsection to the π₀.5 source note (answering Ethan's 3 precise questions, code-verified):
+  - Q1: action expert input does NOT include VLM hidden states — each expert computes its own K/V from its own hidden states; VLM enters via concatenated joint-attention K/V, not as input embeddings
+  - Q2: action expert's direct token input = action (noise) tokens only (`if self.pi05: action_expert_tokens = action_tokens`); (image+instruction+subtask+state) are the prefix, attended via PER-LAYER KV cache (lockstep, not final-layer, not pooled — contrast GR00T cross-attn-to-final / G0.5 pooled FM head); proprio/state in prefix (default discrete; discrete_state_input configurable, pi05_libero=False)
+  - Q3: NO cross-subtask retention — context rebuilt from current observation each inference; KV cache only for current prefix; progress is observation-driven, not KV-retained. This is the structural gap π₀.7's MEM later fills (→ Memory in Embodied AI)
+- Also fixed a stale "共享 attention 层" wording in the existing 信息流详解 step 3
+
 ## [2026-06-03] ingest | DyQ-VLA: Temporal-Dynamic-Aware Quantization for Embodied VLA Models
 - Post-knowledge-cutoff paper (arXiv:2603.07904, submitted 2026-03-09, v2 2026-03-14) — located + verified via web search and arXiv abstract/HTML fetch; new ingest, not a backfill
 - Raw: URL-only (Tier 1); raw note records the (partial verbatim) abstract + extracted method/eval, with an explicit caveat that mechanism details came from an automated HTML reader and are NOT yet hand-verified against the PDF

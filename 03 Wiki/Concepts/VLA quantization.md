@@ -45,12 +45,12 @@ Three papers, three lenses on the *same* phenomenon — the DiT action head's at
 
 ## Where this sits in the Model quantization taxonomy
 VLA quantization is an **application domain cutting across the routes of [[Model quantization]]**, not a fourth method axis:
-- **Route 2 (distribution reshaping / rotation):** **QuantVLA** (DuQuant + ATM/OHB, selective) and **Ω-QVLA** (DuQuant + SVD·Hadamard + per-step, uniform). Lineage: SmoothQuant → QuaRot/DuQuant → these. (Both even share authorship/codebase roots with DuQuant.)
+- **Route 2 (distribution reshaping / rotation):** **QuantVLA** (DuQuant + ATM/OHB, selective) and **Ω-QVLA** (DuQuant + SVD·Hadamard + per-step, uniform). Lineage: SmoothQuant → QuaRot / [[DuQuant: Distributing Outliers via Dual Transformation Makes Stronger Quantized LLMs|DuQuant]] → these. (Both reparam over DuQuant — block-wise rotation + zigzag permutation + smoothing; QuantVLA even shares DuQuant's first author, Haokun Lin.)
 - **Route 3 (dynamic / runtime-adaptive precision):** DyQ-VLA.
 - (No VLA Route-1 / representation-design example yet — an FP8-for-VLA gap worth watching.)
 
 ## Cited-but-not-yet-ingested landscape
-VLA-specific: **QVLA** (Xu et al., ICLR 2026, arXiv:2602.03782 — per-channel action-aware bit allocation), **SQAP-VLA** (arXiv:2509.09090 — quant + pruning co-design). Related efficiency line by DyQ-VLA's group: **KERV** (arXiv:2603.01581 — kinematic-rectified speculative decoding). Underlying methods: SmoothQuant, GPTQ, AWQ, OmniQuant (LLM); **DuQuant** (now underpins *two* vault sources → candidate stub), QuaRot, FlatQuant, OSTQuant (rotation); SVDQuant, ViDiT-Q, PTQ4DiT (DiT).
+VLA-specific: **QVLA** (Xu et al., ICLR 2026, arXiv:2602.03782 — per-channel action-aware bit allocation), **SQAP-VLA** (arXiv:2509.09090 — quant + pruning co-design). Related efficiency line by DyQ-VLA's group: **KERV** (arXiv:2603.01581 — kinematic-rectified speculative decoding). Underlying methods: SmoothQuant, GPTQ, AWQ, OmniQuant (LLM); rotation lineage **[[DuQuant: Distributing Outliers via Dual Transformation Makes Stronger Quantized LLMs|DuQuant]]** (now ingested — the shared ancestor both QuantVLA and Ω-QVLA reparam over), QuaRot, FlatQuant, OSTQuant; SVDQuant, ViDiT-Q, PTQ4DiT (DiT).
 
 ## Open questions
 - **Latency, finally.** Two of three report none; QuantVLA even has real integer GEMMs. A head-to-head wall-clock of QuantVLA (W4A8) vs DyQ-VLA (W4AX) vs Ω-QVLA vs FP16 would settle the cluster's biggest open number.
@@ -66,5 +66,6 @@ VLA-specific: **QVLA** (Xu et al., ICLR 2026, arXiv:2602.03782 — per-channel a
 - [[QuantVLA: Scale-Calibrated Post-Training Quantization for Vision-Language-Action Models]]
 - [[Ω-QVLA: Robust Quantization for Vision-Language-Action Models via Composite Rotation and Per-step Scaling]]
 - [[SmoothQuant: Accurate and Efficient Post-Training Quantization for Large Language Models]] — ancestor of the rotation/reshaping line
+- [[DuQuant: Distributing Outliers via Dual Transformation Makes Stronger Quantized LLMs]] — the rotation-PTQ method (NeurIPS'24) both QuantVLA and Ω-QVLA build on; origin of the "massive outliers @ down_proj" finding
 - [[Embodied Brain Models]] — edge-deployment / cerebellum efficiency context
 - [[Physical Intelligence - pi0.5 a VLA with Open-World Generalization]], [[NVIDIA - GR00T N1 An Open Foundation Model for Generalist Humanoid Robots]] — backbones quantized by QuantVLA and Ω-QVLA

@@ -151,6 +151,18 @@ VLM 自己以自回归方式产动作，推理与动作**共享 decoder、上下
 
 **对云-端的含义**：统一 AR 单模型无独立专家边界，更难按"脑/小脑"切；但 VQ action token 提供了天然离散接口，可选 FM head 又留了低延迟部署口子。
 
+#### 灾难性遗忘：三种结构性解法（actor/encoder 之争的另一面）
+
+actor-vs-encoder 之争的底层动机之一是**灾难性遗忘**——VLA 微调破坏 VLM 预训练特征空间（[[DeepCybo - TwinBrainVLA Asymmetric Mixture-of-Transformers for Anti-Forgetting VLA|TwinBrainVLA]] 量化：Qwen3-VL 的 POPE 从 88.87% 崩到 **0.04%**，1:1 co-training 也救不回）。三种解法：
+
+| 解法 | 代表 | 怎么做 | 耦合归属 |
+|------|------|--------|---------|
+| Knowledge Insulation | π0.5 | 停 action expert 梯度 + AR 动作预测作辅助目标，单 VLM | encoder / 范式 A |
+| 统一自回归 | G0.5 | 不要独立专家，VLM 自己 AR 产动作 | actor |
+| 双 VLM（AsyMoT） | TwinBrainVLA | 冻结通才"左脑" + 可训专才"右脑"，右脑查左脑冻结 KV，再接 FM expert | encoder / 范式 A 变体 |
+
+TwinBrainVLA 把范式 A 的"双专家"从"VLM + 小 action expert"扩成"**两个完整 VLM（冻结通才 + 可训专才）**"。⚠️ 注意其"左脑/右脑" = 通才 vs 专才（都是语义 VLM），**≠ 本页的大脑/小脑**（部署/功能轴）——真正的控制器是另挂的 FM action expert。
+
 ### 两层耦合框架（系统级接口 vs VLA 内部耦合）
 
 核实 Helix / GO-1 / G0 后发现：**"耦合"其实有两个正交的层次**。之前的范式 A/B 只描述了第二层。
@@ -372,6 +384,8 @@ VLM 自己以自回归方式产动作，推理与动作**共享 decoder、上下
 - ✅ [[Figure AI - Helix a VLA for Generalist Humanoid Control]] — 双系统，单 latent 向量接口，全端侧
 - ✅ [[AgiBot - GO-1 ViLLA Generalist Embodied Foundation Model]] — 三段式，latent action token 接口，planner 范式 A
 - ✅ [[Galaxea - G0 Dual-System VLA Model]] — 双系统，语言子任务接口，G0-VLA 范式 A
+- ✅ [[Galaxea - G0.5 Autoregressive VLM-as-Actor VLA]] — VLM-as-actor 统一自回归（G0 的架构反转）
+- ✅ [[DeepCybo - TwinBrainVLA Asymmetric Mixture-of-Transformers for Anti-Forgetting VLA]] — 非对称双 VLM 抗遗忘（范式 A 变体）
 
 ### 学术侧（待补充）
 - **LLM/VLM-as-brain**：SayCan, Inner Monologue, Code-as-Policies, VoxPoser, MOKA, RoboGPT

@@ -305,6 +305,16 @@
   - Q3: NO cross-subtask retention — context rebuilt from current observation each inference; KV cache only for current prefix; progress is observation-driven, not KV-retained. This is the structural gap π₀.7's MEM later fills (→ Memory in Embodied AI)
 - Also fixed a stale "共享 attention 层" wording in the existing 信息流详解 step 3
 
+## [2026-06-09] ingest | TwinBrainVLA (DeepCybo) — anti-forgetting dual-VLM
+- Created source note `DeepCybo - TwinBrainVLA Asymmetric Mixture-of-Transformers for Anti-Forgetting VLA` (arXiv:2601.14133). PDF read from /tmp (URL-only per raw-tier rule, ~6.8MB not committed)
+- Same org/team as PhysBrain (DeepCybo / ZGC-EmbodyAI; authors overlap, Kai Chen corresponding)
+- Core: structural fix for catastrophic forgetting in VLA fine-tuning. Quantified the problem: Qwen3-VL POPE 88.87% → 0.04% after standard VLA training; 1:1 co-training also fails
+- Architecture: asymmetric dual-VLM — frozen "Left Brain" (generalist, preserves pretrained knowledge) + trainable "Right Brain" (specialist, +proprio, generates actions); AsyMoT (Asymmetric Mixture-of-Transformers) lets Right Brain attend joint KV [sg(K_L);K_R] (stop-grad on frozen Left) — joint attention, NOT cross-attention (paper distinguishes); fused rep conditions a flow-matching action expert. So: VLM-as-encoder, Paradigm-A (joint MoT) variant with TWO full VLMs
+- Benchmarks: SimplerEnv 64.5% (>GR00T-N1.6 57.1% +7.4%), RoboCasa 54.6% (>47.6%), LIBERO 97.6%, real-robot ≈ π0.5; ablation: unfreezing Left Brain -7%
+- Framework placement: added a "catastrophic-forgetting: three structural solutions" mini-table to `Embodied Brain Models` (KI/π0.5, unified-AR/G0.5, dual-VLM/TwinBrainVLA). Flagged naming caveat: TwinBrain's Left/Right = generalist-vs-specialist VLMs, NOT cloud-brain/edge-cerebellum
+- Updated DeepCybo entity (two complementary lines: PhysBrain=data-side, TwinBrainVLA=architecture-side), PhysBrain note (TwinBrainVLA now ingested, not just a marketing term), index Sources, concept-page source-note list
+- GitHub repo ZGC-EmbodyAI/TwinBrainVLA = README+assets only (no code), consistent with PhysBrain/G0 pattern
+
 ## [2026-06-03] ingest | DyQ-VLA: Temporal-Dynamic-Aware Quantization for Embodied VLA Models
 - Post-knowledge-cutoff paper (arXiv:2603.07904, submitted 2026-03-09, v2 2026-03-14) — located + verified via web search and arXiv abstract/HTML fetch; new ingest, not a backfill
 - Raw: URL-only (Tier 1); raw note records the (partial verbatim) abstract + extracted method/eval, with an explicit caveat that mechanism details came from an automated HTML reader and are NOT yet hand-verified against the PDF

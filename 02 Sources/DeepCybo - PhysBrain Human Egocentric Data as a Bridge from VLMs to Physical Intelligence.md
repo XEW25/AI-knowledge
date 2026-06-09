@@ -52,7 +52,8 @@ PhysBrain 是 VLA "数据稀缺四路线"里 **④ 人类视频路线**押得最
 ## 核实踩坑记录（避免二手资料误传）
 
 - ⚠️ backbone 是 **Qwen3-VL**（v2），非二手资料常说的 Qwen2.5-VL（那是 v1 的 7B 版本）
-- ⚠️ **"PhysGR00T / PhysPI / TwinBrainVLA / LangForce"** 等命名**不在论文中**——是产品页/媒体营销词。其中 TwinBrainVLA、LangForce 是 ZGC-EmbodyAI GitHub org 下的**独立 repo**（与 BayesianVLA、IntentVLA、FrameSkip 等并列），不是本论文内容
+- ⚠️ **"PhysGR00T / PhysPI"** 不在论文中——是产品页/媒体营销词
+- ℹ️ **TwinBrainVLA、LangForce** 是 ZGC-EmbodyAI/DeepCybo org 下的**独立工作**（不在本 PhysBrain 论文内）。其中 **TwinBrainVLA 已单独 ingest** → [[DeepCybo - TwinBrainVLA Asymmetric Mixture-of-Transformers for Anti-Forgetting VLA]]（非对称双 VLM 抗遗忘）；LangForce 在 TwinBrainVLA 论文中被引为"缓解 visual shortcut"的相关工作，尚未 ingest
 - ⚠️ 部分高 benchmark 数字（SimplerEnv 67.4% 等）来自项目页/产品发布，与 arXiv v1（53.9%）有出入；引用时以 arXiv 为基础事实，营销数字单独标注
 - ⚠️ **无开源代码/权重**——符合中国具身公司"PR 充分但难复现"的常见模式（类比 Figure Helix、BAAI RoboBrain）
 

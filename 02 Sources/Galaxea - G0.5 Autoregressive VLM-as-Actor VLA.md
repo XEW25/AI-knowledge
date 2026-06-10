@@ -130,6 +130,8 @@ VLA 流派内部（World Model / Predictive Spatial 相对正交）：
 
 已据此重构 [[Embodied Brain Models]] 的 VLA 节：actor vs encoder 为 VLA 内部上层轴，A/B 归为 encoder 子型，统一 AR 为 actor 分支。
 
+**与 Predictive Spatial / World Model 流派的关系：明确不用（反世界模型取向）**。G0.5 **不含任何世界模型组件**——无未来帧/状态预测、无 subgoal-image 生成（那是 π₀.7 BAGEL）、无合成数据世界模型（那是 GR00T 的 Cosmos/DreamGen）。其组件只有 VQ ActionCodec + in-stream CoT（subtask/bbox/2D trace/action hint，均**推理原语而非未来预测**）+ visual memory（**过去**历史，非未来）。"world action models" 在文中仅作为**第三类对比基线**出现（引 Fast-WAM、Motus 等于 related work）。G0.5 核心论点本就是"别在 underused VLM 上堆复杂模块"，所以它**刻意站在 World Model 路线的对立面**——与 π₀.7（BAGEL）、GR00T（Cosmos/DreamGen）在"VLA 要不要外挂世界模型"这条轴上形成鲜明对照。
+
 **云-端含义**：统一 AR 单模型更难按"脑/小脑"切分（无独立专家边界），但 **VQ action token 提供了一个天然的离散接口**；可选 FM head 又给低延迟部署留了口子。
 
 ## Why It Matters

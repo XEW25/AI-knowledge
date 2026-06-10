@@ -315,6 +315,11 @@
 - Updated DeepCybo entity (two complementary lines: PhysBrain=data-side, TwinBrainVLA=architecture-side), PhysBrain note (TwinBrainVLA now ingested, not just a marketing term), index Sources, concept-page source-note list
 - GitHub repo ZGC-EmbodyAI/TwinBrainVLA = README+assets only (no code), consistent with PhysBrain/G0 pattern
 
+## [2026-06-09] clarify | G0.5 uses NO world model (anti-world-model stance)
+- Verified from the G0.5 paper: it contains no world-model component — no future-frame/state prediction, no subgoal-image generation (that's π0.7/BAGEL), no synthetic-data world model (that's GR00T Cosmos/DreamGen). Components are only VQ ActionCodec + in-stream CoT (subtask/bbox/2D-trace/action-hint, all reasoning primitives not future prediction) + visual memory (past history, not future)
+- "world action models" appears only as the 3rd baseline family it compares against (cites Fast-WAM, Motus in related work)
+- Added a "与 Predictive Spatial / World Model 流派的关系：明确不用" paragraph to the G0.5 note — positions G0.5 as the deliberate opposite of the world-model route, contrasting π0.7 (BAGEL) / GR00T (Cosmos) on the "does a VLA bolt on a world model?" axis
+
 ## [2026-06-03] ingest | DyQ-VLA: Temporal-Dynamic-Aware Quantization for Embodied VLA Models
 - Post-knowledge-cutoff paper (arXiv:2603.07904, submitted 2026-03-09, v2 2026-03-14) — located + verified via web search and arXiv abstract/HTML fetch; new ingest, not a backfill
 - Raw: URL-only (Tier 1); raw note records the (partial verbatim) abstract + extracted method/eval, with an explicit caveat that mechanism details came from an automated HTML reader and are NOT yet hand-verified against the PDF

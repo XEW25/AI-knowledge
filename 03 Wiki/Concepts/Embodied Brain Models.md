@@ -67,7 +67,7 @@
 
 | 子分支 | 描述 | 代表 | 云-端定位 |
 |--------|------|------|----------|
-| **像素级世界模型** | 直接预测视频帧 | BAGEL, Cosmos, Genie 2/3 | 云脑 imagination，不适合下端 |
+| **像素级世界模型** | 直接预测视频帧 | BAGEL, Cosmos, Genie 2/3, [[ACE Robotics - Kairos 3.0 a Real-Time Generative Video World Model\|Kairos 3.0]] | 默认云脑 imagination；但 Kairos（4B + 25% 线性注意力 + DMD 蒸馏）正显式冲边缘实时 → "不适合下端"已被挑战，待复现 |
 | **潜在世界模型** | 预测 latent state | V-JEPA, Dreamer V3 | "内部模拟器"，可能云-端协同 |
 | **结构化世界模型** | 预测物体/关系/物理 | PIN-WM, 物理引擎嫁接 | 可解释，sim-to-real 友好 |
 

@@ -2,6 +2,8 @@
 
 World-Action Models（WAM）是一类从预训练视频生成 backbone 初始化的机器人策略学习范式。核心思想：将世界模型（视频生成能力）和动作预测统一在一个模型中，利用视频生成提供密集监督信号。
 
+> **边界澄清**：**纯视频世界模型 ≠ WAM**。WAM 的定义要求"视频 backbone **+ 动作预测**"二者合一。像 Cosmos、[[ACE Robotics - Kairos 3.0 a Real-Time Generative Video World Model|Kairos 3.0]] 这类**只有视频生成、没有动作头**的模型，只是 WAM 的"世界模型"那一半（充当神经模拟器 / 数据引擎 / 规划 substrate，动作另外处理）。WAM = 在这种 backbone 上**嫁接动作头**。
+
 ## 核心挑战
 
 1. **推理效率**：联合推理未来视觉动态 + 动作，推理开销大

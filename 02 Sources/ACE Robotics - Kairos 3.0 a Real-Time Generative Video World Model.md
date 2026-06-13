@@ -37,7 +37,37 @@
 | 边缘/加速 | **DMD（Distribution Matching Distillation）** 蒸馏变体（kairos_4b_config_DMD.py / kairos_embodied_pipeline_dmd.py）|
 | **动作 / 状态 / 策略** | ❌ **代码中完全没有**：无 action token、无本体感受输入、无 policy head。`Head` 仅输出视频 latent。**纯帧生成** |
 
-> "4B" 是模型品牌规模（生成核心 DiT）；文本编码器 Qwen2.5-VL-7B 与 Wan VAE 是外挂的条件/编解码，不计入这 4B。
+> "4B" 仅指生成核心 DiT；Qwen2.5-VL-7B 与 Wan VAE 是外挂的**冻结**条件/编解码，**不计入这 4B**。详见下两节。
+
+### 组件关系：4B 只是去噪器，Qwen-VL / Wan VAE 是借来冻结的
+
+标准潜空间视频扩散搭法（与 Stable Diffusion / Flux 同构）。四件里**只有 KairosDiT 是 Kairos 自己训练的**：
+
+```
+prompt(+图) → [Qwen2.5-VL-7B 冻结] 编成条件向量
+            → [KairosDiT = 4B] 在潜空间按 flow-matching 去噪（受文本条件 + 可选首帧指引）
+            → 视频潜变量(16ch) → [Wan2.1 VAE 解码器 冻结] → 输出像素
+```
+
+| 部件 | 角色 | 训练 | 计入 4B？ |
+|------|------|------|----------|
+| Qwen2.5-VL-7B | 文本/多模态**编码器**（"理解"前端）| 冻结借用 | ❌（自身 7B）|
+| Wan2.1 VAE | 像素↔16 通道潜空间**编解码器**（DiT 不碰像素）| 冻结借用 | ❌ |
+| **KairosDiT** | **去噪器** = 唯一训练的生成核心 | **Kairos 训练** | ✅ **就是这 4B** |
+| flow-matching | DiT 的生成数学（目标 + 采样）| — | 内生于 4B |
+
+**含义**：4B"偏小"是因为重活外包了——感知给 Qwen-VL-7B（比本体还大）、像素压缩给 Wan VAE，Kairos 只训那个去噪器。这条"**借 Wan 视频栈 + Qwen 编码器 + flow-matching**"血脉与 [[Bi et al. - Motus A Unified Latent Action World Model|Motus]]（Wan 2.2 + Qwen3-VL）同源，正成为中国具身/视频实验室的事实标配 substrate。
+
+### DMD 蒸馏：步数蒸馏（≠ 尺寸蒸馏），边缘实时的真正开关
+
+**DMD = Distribution Matching Distillation**（Yin et al., MIT/Adobe, CVPR 2024；后续 DMD2）。把"几十步去噪"压成 **1–4 步、参数大小不变**：
+
+- 不模仿老师的逐步轨迹（回归式，累积误差），而让学生**一步输出在分布上与老师高质量输出无法区分**——最小化 KL(学生分布 ‖ 数据分布)
+- 该 KL 梯度 = **两 score 之差**：真实 score（冻结老师扩散模型）− 伪 score（在线追踪学生输出的辅助扩散模型），交替更新（GAN 式）；DMD2 再加 GAN loss、去回归项
+- 对 Kairos：多步 KairosDiT（老师）→ DMD 蒸馏出少步学生（`kairos-...-distilled` 变体），**同 4B、步数砍到个位数**
+
+⚠️ 与 [[Embodied Brain Models]] methodology 轴的"Distillation 大模型→小模型"是**两种正交蒸馏**：那是**尺寸蒸馏**，DMD 是**步数蒸馏**（同参数、少步数）。Kairos 边缘加速三件套各砍一个乘法因子——**线性注意力压单步算力、DMD 压步数、4B 压参数**，缺一不可。
+ℹ️ DMD 的使用由文件名（`kairos_4b_config_DMD.py` / `..._pipeline_dmd.py`）确认；DMD1/DMD2 与具体采样步数未逐行核实。
 
 ## PR vs 代码：动作预测能力的落差（verify-don't-assume）
 

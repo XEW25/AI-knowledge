@@ -53,6 +53,8 @@
 - [[Object-Centric Representation]] — 以物体为基本单元的场景表示方法，支持组合泛化
 - [[World-Action Models]] — WAM 范式：视频生成 backbone + 动作预测，架构演进与路线对比
 - [[Embodied Brain Models]] — 大脑模型的部署驱动定义（云=大脑、端=小脑）、三个主流流派（LLM/VLM-as-brain, Predictive Spatial Models, VLA 特殊定位）、接口/方法学正交维度、前瞻预判（骨架页）
+- [[Embodied Cerebellum Models]] — **大脑页的对位页**：小脑（端侧）模型——多速率控制栈（50Hz VLA→1kHz 控制→40kHz 伺服）、小脑四种来源、边缘部署技术（量化/蒸馏/线性注意力/AOT/chunking）、可靠性"脊髓"层（骨架页）
+- [[Memory in Embodied AI]] — 隐式（程序性，端侧）vs 显式（episodic，云端）记忆的两层分工；各 VLA 工作的记忆状态表
 - [[VLA quantization]] — VLA-specific low-bit quantization sub-cluster: why it differs from LLM quant (closed-loop error compounding, action-head sensitivity), the DyQ-VLA (dynamic mixed precision) vs Ω-QVLA (uniform W4A4 rotation) contrast, route mapping, and the cited landscape
 
 ### Entities
@@ -87,6 +89,7 @@
 ## Maps
 - [[Home]] — top-level navigation page for the vault
 - [[Agent systems, decomposition, and memory]] — navigation page for the cluster around agent architecture, decomposition, and memory control
+- [[Embodied AI - VLAs, world models, and cerebellum]] — navigation hub for the embodied cluster (VLA models, world models, brain/cerebellum framework, VLA quantization); the vault's largest cluster's MOC
 
 ## System
 - [[90 System/AGENTS]]

@@ -32,6 +32,8 @@
 
 **关键判断**：学习组件的领土在持续下移（规划→轨迹→WBC 都被 RL/VLA 蚕食），但**边界至今停在 PD 环之上**——再往下没有泛化收益、只剩认证成本（PD/阻抗有 Lyapunov/无源性稳定性证书，神经网络给不出）。**kHz 伺服层是小脑的不失守底线**。
 
+> ⚠️ **反射层正被学习蚕食（待复现验证）**：[[Guo et al. - NeuroVLA Brain-inspired Neuromorphic Cortex-Cerebellum-Spinal VLA|NeuroVLA]] 把一个**学习的 SNN** 放进 <20ms 安全反射层（神经形态 FPGA 上），说明"反射"这一子层可由学习神经形态电路承担。修正后的判断：边界已从"PD 之上"下探到**反射层**；但 kHz 电机 FOC 环大概率仍是经典底线。
+
 ## 小脑模型的四种来源/形态
 
 | 形态 | 怎么来的 | 代表 |
@@ -50,6 +52,7 @@
 - **混合线性注意力**：O(n²)→O(n)（[[ACE Robotics - Kairos 3.0 a Real-Time Generative Video World Model\|Kairos]] 用 GatedDeltaNet 1-in-4 混合）压单步算力。
 - **图编译 / AOT**：端侧偏 AOT（TensorRT engine / 昇腾 .om）——把编译成本挪到构建期，端上只剩"加载+触发"；配 CUDA Graph / 整图下沉把每次推理的几百次 kernel 发射压成一次。静态形状的 FM 路线天然图编译友好；AR 路线（解码长度变化）是反例。
 - **action chunking + 实时拼接**：一次推理出一段动作块、缓冲队列逐步出队，掩盖推理延迟；块边界的不连续由 PI 的 **Real-Time Chunking（RTC）** 等处理。
+- **神经形态 / SNN 计算**（与以上正交的新路线）：事件驱动脉冲神经网络跑在神经形态芯片上，脉冲稀疏 → 量级更低的功耗/延迟。[[Guo et al. - NeuroVLA Brain-inspired Neuromorphic Cortex-Cerebellum-Spinal VLA|NeuroVLA]] 的脊髓 SNN 在 FPGA 上 **0.4W / 2.19ms / <20ms 反射**。区别于量化（[[VLA quantization]]，常规加速器低比特）——这是把 VLA 塞进端侧的**另一条轴**。
 
 ## 与大脑的接口（从小脑侧看）
 
@@ -98,6 +101,7 @@
 - [[Memory in Embodied AI]] — 端侧隐式/程序性记忆
 - [[Figure AI - Helix a VLA for Generalist Humanoid Control]] — 原生快系统 S1（小脑形态②）
 - [[ACE Robotics - Kairos 3.0 a Real-Time Generative Video World Model]] — 边缘世界模型（小脑形态③）+ 三件套边缘技术
+- [[Guo et al. - NeuroVLA Brain-inspired Neuromorphic Cortex-Cerebellum-Spinal VLA]] — 三层框架（皮层/小脑/脊髓）的一手印证；学习 SNN 反射层；神经形态边缘路线。⚠️ 其 cortex/cerebellum/spinal = 生物结构+算力轴、全在端侧，≠ 本页部署轴
 - [[World-Action Models]] — 世界模型路线（部分可下端）
 
 ## tags

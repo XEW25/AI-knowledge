@@ -38,6 +38,7 @@
 - [[DuQuant: Distributing Outliers via Dual Transformation Makes Stronger Quantized LLMs]] — source note on the rotation-based W4A4 **LLM** quant method (Lin et al., NeurIPS 2024 Oral) **underpinning both QuantVLA and Ω-QVLA**; dual transformation = greedy data-aware block rotation + zigzag permutation + smoothing; named "massive outliers" @ FFN down_proj; reports real 2.08× speedup. Route-2 anchor / VLA-quant ancestor
 - [[Bi et al. - Motus A Unified Latent Action World Model]] — unified latent-action **world-action model** (Tsinghua TSAIL × Horizon Robotics); tri-expert **MoT** (Qwen3-VL-2B understanding + Wan 2.2 5B video-gen + flow-matching action), **范式 A** joint attention; **UniDiffuser-style timestep scheduling → 5 switchable inference modes** (VLA / World Model / IDM / VGM / Joint); optical-flow "delta" latent actions + six-layer data pyramid; makes "world model at inference" a **runtime knob** (4th-gen WAM, vs GigaWorld's fixed drop); RoboTwin 2.0 88.66%, LIBERO-Long 97.6; project page only, no code
 - [[ACE Robotics - Kairos 3.0 a Real-Time Generative Video World Model]] — **NO-PAPER** ingest (code-verified): ACE Robotics (王晓刚/SenseTime-lineage) edge-first **generative video world model**, Cosmos rival. `KairosDiT` 4B video DiT (dim2560×32L, flow-matching) + **hybrid linear attention** (GatedDeltaNet 1-in-4, 25%) + Wan2.1 VAE + Qwen2.5-VL-7B + DMD-distilled edge variant; T2V/I2V/TI2V. **KEY: open release is video-gen ONLY — no action head despite PR's "action prediction" claim** (verify-don't-assume). Real open-source (Apache-2.0, weights on HF). Challenges the "pixel-level WM unsuitable for edge" assumption
+- [[Guo et al. - NeuroVLA Brain-inspired Neuromorphic Cortex-Cerebellum-Spinal VLA]] — **brain-inspired three-layer VLA** (HKUST-GZ Hui Xiong × AI2 Robotics): cortex (Qwen-VL+Q-Former) plans, cerebellum (GRU+FiLM) stabilizes @200Hz, **spinal = SNN on neuromorphic FPGA** (0.4W, 2.19ms, <20ms reflex). First neuromorphic VLA on real robots (self-claimed); jerk −75.6%, collision recovery 54.8% vs 0%; beats OpenVLA/-OFT/UniVLA/WorldVLA. Real open-source. Adds **neuromorphic/SNN as an edge-efficiency route** parallel to [[VLA quantization]]; independently corroborates the cortex/cerebellum/spinal stack but on a bio-structural+compute axis, NOT the deployment axis (its 3 layers are all on-board)
 
 ## Wiki
 
@@ -73,6 +74,7 @@
 - [[DeepCybo]] — 中关村孵化，PhysBrain（VLM-as-brain，人类视频路线）
 - [[LimX Dynamics]] — 深圳足式+具身（ChemBot 完全分离双层架构）
 - [[ACE Robotics]] — 上海具身世界模型（王晓刚/商汤系；Kairos 3.0 边缘生成式视频世界模型，对标 Cosmos；真开源）
+- [[AI2 Robotics]] — 深圳脑启发/神经形态具身（郭彦东；NeuroVLA = cortex/cerebellum/spinal SNN VLA，HKUST-GZ 熊辉合作；真开源）
 
 ### Topics
 - [[Agent memory]] — topic page for memory as policy, decomposition, and self-managed memory in agent systems

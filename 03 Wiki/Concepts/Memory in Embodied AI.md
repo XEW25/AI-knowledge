@@ -23,6 +23,8 @@
 - **优点**：推理零开销、技能自然内化
 - **缺点**：不可解释、不能选择性回忆、每次更新需要重新训练
 
+> **隐式的两种子型**：上面是**权重内化**（RL/微调改参数）。另有**运行时状态记忆**——把时序信息存在激活/隐状态里，不改权重也不外检索：[[Guo et al. - NeuroVLA Brain-inspired Neuromorphic Cortex-Cerebellum-Spinal VLA|NeuroVLA]] 用 **SNN 膜电位**（stateful LIF u[τ] 跨步保留）+ 小脑 GRU 隐状态做隐式时序工作记忆，无需 LSTM。介于"权重记忆"与"外部检索"之间，是第三种隐式形态。
+
 ### 显式记忆（Episodic Memory）
 
 把经验以可检索的形式存储——"记得具体发生了什么"。
@@ -51,6 +53,7 @@
 | π₀.7 | ✅ | ✅ MEM | PI 第一个双记忆 VLA，subgoal image conditioning |
 | GigaWorld-Policy | ❌ | ❌ | 无记忆机制 |
 | Voyager | ❌ | ✅ 技能库 | 上层技能积累 |
+| NeuroVLA | ✅ 膜电位/GRU 状态 | ❌ | SNN 膜电位做隐式时序工作记忆（**运行时状态**，非权重也非检索）|
 
 ## 开放问题
 

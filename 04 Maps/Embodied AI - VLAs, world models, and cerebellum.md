@@ -29,6 +29,7 @@ This map collects the vault's embodied-AI cluster: vision-language-action (VLA) 
 - [[Galaxea - G0 Dual-System VLA Model|G0]] · [[Galaxea - G0.5 Autoregressive VLM-as-Actor VLA|G0.5]] — encoder→actor reversal
 - [[DeepCybo - PhysBrain Human Egocentric Data as a Bridge from VLMs to Physical Intelligence|PhysBrain]] · [[DeepCybo - TwinBrainVLA Asymmetric Mixture-of-Transformers for Anti-Forgetting VLA|TwinBrainVLA]]
 - [[Huang et al. - ChemBot Long-Term Memory for VLA-based Agents|ChemBot]] · [[Huang et al. - ReKep Spatiotemporal Reasoning Keypoint Constraints for Robotic Manipulation|ReKep]]
+- [[Guo et al. - NeuroVLA Brain-inspired Neuromorphic Cortex-Cerebellum-Spinal VLA|NeuroVLA]] — neuromorphic/SNN three-layer (cortex/cerebellum/spinal), <20ms on-board reflex, 0.4W
 
 ### Sources — world models
 - [[Bi et al. - Motus A Unified Latent Action World Model|Motus]] — unified MoT, mode-switchable

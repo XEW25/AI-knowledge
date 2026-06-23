@@ -18,6 +18,9 @@ This paper proposes HiFloat8 (HiF8), a new 8-bit floating-point format for deep 
 
 The most important design idea is the `dot field`, which determines how many bits go to exponent and mantissa depending on the encoded region. This makes HiF8 a kind of structured, hardware-conscious tapered-precision float. The paper also argues that rounding design matters just as much as the format itself, and introduces a hybrid rounding strategy for backward pass behavior.
 
+## Visualization
+[[hif8_value_density.html|HiF8 ↔ FP8 representable-value density (interactive)]] — values per octave (binade) on a log₂ axis, comparing HiF8 against FP8 E4M3 / E5M2, with each format's precision-change boundaries labelled on the x-axis. Hover any octave to read its actual representable values. It makes the `dot field`'s tapered precision concrete: HiF8 carries 8 values/octave near the centre (where data concentrates) and tapers to 2→1 toward the extremes, spending the same 256-code budget as flat E4M3 (dense but narrow) and E5M2 (wide but coarse). Built by enumerating all 256 codes, so it is exact — including the top-octave dips where a code is spent on NaN (E4M3, 2⁸) or Inf (HiF8, 2¹⁵).
+
 ## Key claims
 1. Standard FP8 formats force an unsatisfying precision/range tradeoff.
 2. HiF8’s variable field allocation gives a better balance between dynamic range and local precision.

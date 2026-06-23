@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HiF8 vs FP8 — representable value density</title>
+<style>
+:root{--bg:#fff;--fg:#1a1a18;--muted:#6b6b66;--panel:#fff;--border:rgba(0,0,0,.13)}
+@media (prefers-color-scheme:dark){:root{--bg:#1b1b1a;--fg:#e8e6df;--muted:#a3a29c;--panel:#262624;--border:rgba(255,255,255,.15)}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;line-height:1.5}
+.wrap{max-width:1040px;margin:0 auto;padding:24px 20px 44px}
+h1{font-size:20px;font-weight:600;margin:0 0 4px}
+.sub{color:var(--muted);font-size:14px;margin:0 0 18px}
+.legend{display:flex;flex-wrap:wrap;gap:20px;font-size:13px;margin:0 0 12px}
+.legend .it{display:flex;align-items:center;gap:8px}
+.chart{color:var(--fg)}
+.chart svg{width:100%;height:auto;max-width:1000px;display:block}
+.chartbox{position:relative}
+.tip{position:absolute;display:none;pointer-events:none;background:var(--panel);border:1px solid var(--border);border-radius:8px;padding:9px 11px;font-size:12.5px;box-shadow:0 6px 18px rgba(0,0,0,.16);min-width:200px;z-index:5}
+.tip b{font-weight:600}
+.tip .row{margin-top:4px}
+.tip .dot{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:6px}
+.note{color:var(--muted);font-size:12.5px;margin-top:16px;max-width:900px}
+.note code{font-size:12px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>HiF8 vs FP8 — representable values per octave</h1>
+  <p class="sub">Density = number of representable magnitudes inside each binade [2<sup>k</sup>, 2<sup>k+1</sup>), on a log&#8322; axis. Built by enumerating all 256 codes of each format. Hover any octave to read its actual values.</p>
+  <div class="legend" id="legend"></div>
+  <div class="chartbox">
+    <div class="chart" id="chart"></div>
+    <div class="tip" id="tip"></div>
+  </div>
+  <p class="note" id="note"></p>
+</div>
+<script>
+// ---- exact decoders (byte -> represented value; null = zero/NaN/Inf) ----
+function hif8(b){
+  const S=(b>>7)&1, rest=b&0x7F, b6=(rest>>6)&1, b5=(rest>>5)&1;
+  let D,dw;
+  if(b6&&b5){D=4;dw=2;} else if(b6&&!b5){D=3;dw=2;} else if(!b6&&b5){D=2;dw=2;}
+  else if((rest>>4)&1){D=1;dw=3;} else if((rest>>3)&1){D=0;dw=4;} else {D='DML';dw=4;}
+  const sg=S?-1:1;
+  if(D==='DML'){const M=rest&7; return M===0?null:sg*Math.pow(2,M-23);}
+  if(D===0) return sg*(1+(rest&7)/8);
+  const mw=7-dw-D, mant=rest&((1<<mw)-1), expf=(rest>>mw)&((1<<D)-1);
+  const Se=(expf>>(D-1))&1, mag=(1<<(D-1))|(expf&((1<<(D-1))-1)), E=Se?-mag:mag;
+  if(D===4&&E===15&&mant===1) return null;          // 2^15 * 1.5 -> Inf
+  return sg*Math.pow(2,E)*(1+mant/(1<<mw));
+}
+function e4m3(b){
+  const S=(b>>7)&1,e=(b>>3)&0xF,m=b&7,sg=S?-1:1;
+  if(e===0) return m===0?null:sg*Math.pow(2,-6)*(m/8);
+  if(e===15&&m===7) return null;                    // NaN
+  return sg*Math.pow(2,e-7)*(1+m/8);
+}
+function e5m2(b){
+  const S=(b>>7)&1,e=(b>>2)&0x1F,m=b&3,sg=S?-1:1;
+  if(e===0) return m===0?null:sg*Math.pow(2,-14)*(m/4);
+  if(e===31) return null;                           // Inf / NaN
+  return sg*Math.pow(2,e-15)*(1+m/4);
+}
+// ---- analyse: positive magnitudes binned per octave ----
+function analyse(dec){
+  const dens={}, vals={};
+  for(let b=0;b<256;b++){
+    const v=dec(b); if(v===null||v<=0) continue;
+    const e=Math.floor(Math.log2(v)+1e-9);
+    dens[e]=(dens[e]||0)+1;
+    (vals[e]=vals[e]||[]).push(v/Math.pow(2,e));
+  }
+  for(const e in vals) vals[e].sort((a,b)=>a-b);
+  const es=Object.keys(dens).map(Number).sort((a,b)=>a-b);
+  const lo=es[0], hi=es[es.length-1];
+  const trans=[];
+  for(let e=lo;e<=hi+1;e++){ if((dens[e]||0)!==(dens[e-1]||0)) trans.push(e); }
+  return {dens,vals,lo,hi,trans};
+}
+const FMT=[
+  {name:'HiF8',     dec:hif8, color:'#D85A30', dash:'',    info:'peak 8 → 1 /oct · 2⁻²² … 2¹⁵'},
+  {name:'FP8 E4M3', dec:e4m3, color:'#7F77DD', dash:'7,4', info:'8 /oct (flat) · 2⁻⁹ … 448'},
+  {name:'FP8 E5M2', dec:e5m2, color:'#1D9E75', dash:'2,3', info:'4 /oct (flat) · 2⁻¹⁶ … 57344'}
+];
+FMT.forEach(F=>F.A=analyse(F.dec));
+
+// ---- geometry ----
+const W=1000,H=580,PL=72,PR=978,PT=38,PB=416,EMIN=-23,EMAX=16,DMAX=8.6;
+const X=e=>PL+(e-EMIN)/(EMAX-EMIN)*(PR-PL);
+const Y=d=>PB-d/DMAX*(PB-PT);
+const invX=px=>EMIN+(px-PL)/(PR-PL)*(EMAX-EMIN);
+const SUP={'-':'⁻','0':'⁰','1':'¹','2':'²','3':'³','4':'⁴','5':'⁵','6':'⁶','7':'⁷','8':'⁸','9':'⁹'};
+const sup=n=>String(n).split('').map(c=>SUP[c]).join('');
+const pow2=e=>'2'+sup(e);
+function runs(dens){
+  const es=Object.keys(dens).map(Number).sort((a,b)=>a-b), out=[];
+  es.forEach((e,i)=>{
+    if(out.length&&es[i-1]===e-1&&dens[e]===out[out.length-1].d) out[out.length-1].hi=e;
+    else out.push({lo:e,hi:e,d:dens[e]});
+  });
+  return out;
+}
+function paths(A){
+  const y0=Y(0), pts=[[X(A.lo),y0]];
+  for(let e=A.lo;e<=A.hi;e++){ const yy=Y(A.dens[e]||0); pts.push([X(e),yy],[X(e+1),yy]); }
+  pts.push([X(A.hi+1),y0]);
+  const line='M '+pts.map(p=>p[0].toFixed(1)+' '+p[1].toFixed(1)).join(' L ');
+  return {line, area:line+' Z'};
+}
+
+// ---- build SVG ----
+let s=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Stepped chart of representable values per octave versus log2 value for HiF8, FP8 E4M3 and FP8 E5M2.">`;
+[0,1,2,4,8].forEach(d=>{ const y=Y(d).toFixed(1);
+  s+=`<line x1="${PL}" y1="${y}" x2="${PR}" y2="${y}" stroke="currentColor" stroke-opacity="0.12"/>`;
+  s+=`<text x="${PL-9}" y="${(+y+4)}" text-anchor="end" font-size="12" fill="currentColor" fill-opacity="0.7">${d}</text>`;
+});
+s+=`<text x="18" y="${(PT+PB)/2}" font-size="12" fill="currentColor" fill-opacity="0.7" text-anchor="middle" transform="rotate(-90 18 ${(PT+PB)/2})">values per octave</text>`;
+s+=`<rect id="hl" x="0" y="${PT}" width="0" height="${PB-PT}" fill="currentColor" fill-opacity="0.07" style="display:none"/>`;
+// HiF8 full-height region guides
+FMT[0].A.trans.filter(e=>e<=FMT[0].A.hi).forEach(e=>{
+  s+=`<line x1="${X(e).toFixed(1)}" y1="${PT}" x2="${X(e).toFixed(1)}" y2="${PB}" stroke="${FMT[0].color}" stroke-opacity="0.22" stroke-dasharray="3,4"/>`;
+});
+// areas + step lines
+FMT.forEach(F=>{ const p=paths(F.A);
+  s+=`<path d="${p.area}" fill="${F.color}" fill-opacity="0.12"/>`;
+  s+=`<path d="${p.line}" fill="none" stroke="${F.color}" stroke-width="2.5"${F.dash?` stroke-dasharray="${F.dash}"`:''}/>`;
+});
+// HiF8 plateau density labels
+runs(FMT[0].A.dens).forEach(r=>{ const cx=(X(r.lo)+X(r.hi+1))/2;
+  s+=`<text x="${cx.toFixed(1)}" y="${(Y(r.d)-7).toFixed(1)}" text-anchor="middle" font-size="11" fill="${FMT[0].color}">${r.d}/oct</text>`;
+});
+// x baseline + sparse reference ticks
+s+=`<line x1="${PL}" y1="${PB}" x2="${PR}" y2="${PB}" stroke="currentColor" stroke-opacity="0.4"/>`;
+[-22,-16,-8,0,8,15].forEach(e=>{
+  s+=`<text x="${X(e).toFixed(1)}" y="${PB+17}" text-anchor="middle" font-size="11" fill="currentColor" fill-opacity="0.55">${e===0?'1':pow2(e)}</text>`;
+});
+// per-format transition rows (the values where density changes)
+const rowY=[462,498,534];
+FMT.forEach((F,i)=>{ const y=rowY[i];
+  s+=`<text x="${PL-9}" y="${y+4}" text-anchor="end" font-size="11" fill="${F.color}">${F.name}</text>`;
+  F.A.trans.filter(e=>e<=F.A.hi).forEach(e=>{
+    s+=`<circle cx="${X(e).toFixed(1)}" cy="${y}" r="2.6" fill="${F.color}"/>`;
+    s+=`<text x="${X(e).toFixed(1)}" y="${y-7}" text-anchor="middle" font-size="10.5" fill="${F.color}" transform="rotate(-32 ${X(e).toFixed(1)} ${y-7})">${pow2(e)}</text>`;
+  });
+});
+s+=`<rect id="ov" x="${PL}" y="${PT}" width="${PR-PL}" height="${PB-PT}" fill="transparent" style="cursor:crosshair"/>`;
+s+=`</svg>`;
+document.getElementById('chart').innerHTML=s;
+
+// ---- legend ----
+document.getElementById('legend').innerHTML=FMT.map(F=>
+  `<span class="it"><svg width="32" height="8" aria-hidden="true"><line x1="0" y1="4" x2="32" y2="4" stroke="${F.color}" stroke-width="2.5"${F.dash?` stroke-dasharray="${F.dash}"`:''}/></svg>${F.name} &mdash; ${F.info}</span>`
+).join('');
+document.getElementById('note').innerHTML=
+  'Coloured ticks under the axis mark the exact values where each format’s precision changes. '+
+  'Two top-octave dips are real: E4M3 shows <b>7</b>/oct at 2⁸ (the all-ones code is NaN) and HiF8 shows <b>1</b>/oct at 2¹⁵ (the 2¹⁵·1.5 code is Inf). '+
+  'Area under each curve is the same 8-bit budget (126 / 126 / 123 positive magnitudes) — HiF8 just spends it as height in the centre plus a long thin tail.';
+
+// ---- hover ----
+const svg=document.querySelector('#chart svg'), ov=svg.querySelector('#ov'), hl=svg.querySelector('#hl'),
+      tip=document.getElementById('tip'), box=document.querySelector('.chartbox');
+function fmtVal(v){
+  const a=Math.abs(v);
+  if(a>=1&&Number.isInteger(v)) return v.toString();
+  if(a>=1e-4&&a<1e7) return (+v.toPrecision(4)).toString();
+  return v.toExponential(2);
+}
+function tipHTML(e){
+  const base=Math.pow(2,e); let any=false, body='';
+  FMT.forEach(F=>{ const vs=F.A.vals[e];
+    if(vs&&vs.length){ any=true;
+      const reals=vs.map(m=>fmtVal(m*base)).join(', ');
+      body+=`<div class="row"><span class="dot" style="background:${F.color}"></span>${F.name}: <b>${vs.length}</b> &mdash; ${reals}</div>`;
+    } else {
+      body+=`<div class="row"><span class="dot" style="background:${F.color};opacity:.3"></span>${F.name}: —</div>`;
+    }
+  });
+  return `<b>octave [${pow2(e)}, ${pow2(e+1)})</b>`+(any?body:'<div class="row" style="color:var(--muted)">no representable values</div>');
+}
+ov.addEventListener('mousemove',ev=>{
+  const r=svg.getBoundingClientRect(), sx=(ev.clientX-r.left)/r.width*W, e=Math.floor(invX(sx));
+  if(e<EMIN||e>=EMAX){tip.style.display='none';hl.style.display='none';return;}
+  hl.setAttribute('x',X(e).toFixed(1)); hl.setAttribute('width',(X(e+1)-X(e)).toFixed(1)); hl.style.display='block';
+  tip.innerHTML=tipHTML(e); tip.style.display='block';
+  const b=box.getBoundingClientRect(); let left=ev.clientX-b.left+16;
+  if(left>b.width-230) left=ev.clientX-b.left-230;
+  tip.style.left=Math.max(0,left)+'px'; tip.style.top=(ev.clientY-b.top+12)+'px';
+});
+ov.addEventListener('mouseleave',()=>{tip.style.display='none';hl.style.display='none';});
+</script>
+</body>
+</html>

@@ -27,6 +27,9 @@ This topic includes:
 ### Concepts / sub-clusters
 - [[VLA quantization]] — VLA-specific low-bit quantization (application sub-cluster cutting across the routes below)
 
+### Figures
+- [[hif8_value_density.html|HiF8 ↔ FP8 representable-value density]] — interactive: values per octave on a log₂ axis (route 1, format design), making HiF8's tapered precision visible against flat E4M3 / E5M2
+
 ## Current thesis direction
 This topic is still at an early stage in the vault, but a clearer internal structure is beginning to emerge. Quantization should not be treated only as a compression or deployment trick. In some settings, especially LLM quantization and low-bit training, the problem becomes one of choosing where to intervene in the numerical system.
 

@@ -131,7 +131,7 @@ If a claim is uncertain, disputed, incomplete, or source-dependent, say so in th
 
 ### Ingest workflow
 When processing a new source, the agent should usually:
-1. inspect the raw material or inbox capture — when ingesting an external file (e.g., a PDF), apply the `01 Raw/` raw-tier rule: large binaries (PDFs more than a few MB) → **URL-only (Tier 1)**, keep a local copy only when small and important or hard to re-access
+1. inspect the raw material or inbox capture — when ingesting an external file (e.g., a PDF), apply the `01 Raw/` raw-tier rule: large binaries (PDFs more than a few MB) → **URL-only (Tier 1)**, keep a local copy only when small and important or hard to re-access; and read it via the **Reading source material** procedure below (pick the most faithful source; never let a summary stand in for an exact fact)
 2. discuss key takeaways with the user when the material is important, interpretive, strategic, or likely to shape the vault's direction
 3. create or update a note in `02 Sources/`
 4. update relevant pages in `03 Wiki/`
@@ -153,6 +153,31 @@ Periodically, the agent may:
 - detect duplicated or overlapping pages
 - surface contradictions or stale claims
 - propose new pages or reorganizations
+
+## Reading source material (PDFs, papers, web)
+
+Accuracy depends on *how* a source is read. Prefer the most faithful access available, and never let a summary stand in for a primary fact.
+
+### Source-format priority (most → least faithful)
+**LaTeX / e-print source > HTML > rendered page images > extracted text > summarizer.** Choosing the right source is a bigger accuracy lever than any tool.
+- arXiv papers: prefer the arXiv ID/URL — use the HTML (`arxiv.org/html/<id>`) and/or LaTeX source (`arxiv.org/e-print/<id>`) for equations and tables; use the PDF only as fallback.
+- Non-arXiv / local docs (slides, reports): render to page images and/or extract text.
+
+### Reading methods (toolchain installed on this machine)
+- **Visual read / diagrams / table layout:** `Read` the PDF directly — it renders page images (poppler / `pdftoppm` installed). For fine print, render at higher DPI or crop into tiles (PyMuPDF / `fitz`).
+- **Tables (structured):** `pdfplumber` (preserves rows/columns) or render-and-look — do NOT trust flat text extraction for which-number-goes-where.
+- **Body / multi-column text:** `pdftotext -layout` or `pypdf`.
+- **Equations:** prefer LaTeX / HTML source; PDF text mangles symbols; render-to-image as fallback.
+- **Figures / diagrams:** must render to image — text extraction yields only captions, not figure content.
+- **Scanned / image PDFs:** OCR via `tesseract`.
+- **CJK / CID-font PDFs:** text extraction may be mojibake → render to image instead.
+- Large PDFs: read from a repo-external temp per the `01 Raw/` raw-tier rule; do not commit; clean up after.
+
+### Reliability discipline
+- A summarizer (e.g., WebFetch) is fine to identify a source and get the gist, but is **not authoritative for exact facts** — numbers, table values, benchmark / SOTA claims, architecture specifics. Verify those against the primary source yourself; do not repeat the summary as fact.
+- For code or architecture claims, read the actual repository.
+- State confidence in the note, matched to the method used (e.g., `代码核实` / `已核实` / `vendor-reported` / `存疑` / `未逐行核实`) so a reader can tell what backed each claim.
+- Cautionary pattern: a claim that a model "outperforms X" can hide that there is no quantitative table (only a qualitative figure) — confirm the table exists before recording a comparative claim.
 
 ## Naming guidance
 

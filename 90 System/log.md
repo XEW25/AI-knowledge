@@ -477,3 +477,7 @@
 - Established `assets/` as the vault's folder for non-markdown attachments (none existed; Obsidian had no attachment folder configured → defaulted to root)
 - Linked from [[Ascend HiFloat8 Format for Deep Learning]] (new Visualization section) and [[Model quantization]] (Figures entry under route 1, representation design)
 - Origin: generated this session while reading the HiF8 paper (arXiv:2409.16626) via the now-working native PDF Read; exercised the value-density discussion (per-octave density as the readable alternative to a representable-value ruler)
+
+## [2026-06-23] maintenance | HiF8 arXiv PDF backfill (small + important)
+- Backfilled `01 Raw/2026-04-13 - Luo et al. - Ascend HiFloat8 Format for Deep Learning.pdf` (arXiv:2409.16626 **v2**, 0.72 MB) — the HiF8 raw note had been URL-only (Tier 1). Kept per the `01 Raw/` rule ("preserve a local copy when small and important"): HiF8 anchors the [[Model quantization]] cluster, and committing it freezes the exact version the source note + deepened analysis + value-density viz are based on. Mirrors the earlier MemPO PDF backfill; consistent with the ReKep PDF already kept
+- Added local-PDF wikilinks to the raw note and the [[Ascend HiFloat8 Format for Deep Learning]] source note

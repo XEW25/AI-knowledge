@@ -10,6 +10,7 @@
 - Date accessed: 2026-04-13
 - Original URL: https://arxiv.org/abs/2409.16626
 - PDF URL: https://arxiv.org/pdf/2409.16626
+- Local PDF: [[2026-04-13 - Luo et al. - Ascend HiFloat8 Format for Deep Learning.pdf]] (arXiv v2, kept in `01 Raw/`)
 - Related: [[Model quantization]]
 - Tags: #quantization #fp8 #low-bit-training #number-formats #inference #training
 

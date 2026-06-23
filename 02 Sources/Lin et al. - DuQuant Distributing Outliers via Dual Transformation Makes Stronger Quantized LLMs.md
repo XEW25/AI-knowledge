@@ -54,6 +54,24 @@ DuQuant is best filed as **the canonical Route-2 rotation method and the literal
 
 The most striking cross-cluster contrast: **DuQuant, the LLM root, reports real wall-clock speedup with a real INT4 kernel; its two VLA descendants (QuantVLA, Ω-QVLA) report only memory/accuracy.** The deployability *regressed* moving from text to embodied — precisely because the VLA action head (DiT attention, per-step scales) breaks the clean integer-GEMM path DuQuant relied on.
 
+## Rotation construction & relationship to QuaRot (discussion, 2026-06-03)
+A deep-dive (with Ethan) on *how* DuQuant builds its rotation `R̃` (Eq. 2) and *why* it is not just a Hadamard.
+
+**1. Right-multiplication row↔column duality.** The transform is `X → XR̃` (a column transform): `(XR̃)_{ik} = Σ_j X_{ij} R̃_{jk}`. So **input column j fans out to all output columns weighted by ROW j of `R̃`** (dually, output column k is assembled from input columns via COLUMN k). DuQuant swaps the located outlier into column 1 (switching matrix `E_{d(1)}`), so the outlier's fan-out is governed by **row 1** of `R̃`.
+
+**2. Why a uniform (flat) first row mitigates the column-1 outlier.** A flat first row is the unit vector with all entries `±1/√n`, so the outlier column contributes `outlier/√n` to *every* output column → spread evenly → its peak drops from `|outlier|` to `|outlier|/√n`. A non-flat first row would leave a chunk in one column (a `0.8` entry → `0.8·outlier` stays concentrated). The flat vector is the **maximally-incoherent (L∞-minimal) unit vector** — the optimal spreader for a spike.
+
+**3. "uniform (flat)" ≠ "random orthonormal".** Both are unit vectors (norm 1) — that is *all* they share. *Flat* = all `|entries| = 1/√n` (even, specific). *Random orthonormal* = entries random and **uneven** (Gaussian-normalized); a Haar-random unit vector's max entry is `~√(2 ln n)·(1/√n)`, a `√(2 ln n)` factor above flat → it has peaks, so it is a *worse* spreader. The paper's "uniformly distributed first row" means *flat entries*, NOT "uniformly random".
+
+**4. Why the other rows are general random-orthogonal (+ honest scoping).** Rows 2..n fan out the *non-outlier* columns (already fine) → no designed structure needed; a random orthonormal completion is sufficient, cheap, and **robust** (a *fixed* structured matrix has adversarial inputs that align with its rows and re-concentrate — exactly why QuaRot uses *randomized* Hadamard). It also fits the **greedy** scheme (`R̂=R1R2…`, each step relocating the current max outlier; massive outliers are randomly located). **Honest scoping:** DuQuant's measured win over QuaRot comes from the **data-aware flat-first-row + greedy targeting**, NOT from random-vs-Hadamard for the rest — that completion choice is low-stakes (a randomized Hadamard there would work about as well, just unnecessarily structured).
+
+**5. Relationship to QuaRot — the Hadamard boundary (all-or-nothing).** A Hadamard matrix is *defined* as "all entries `±1/√n` + orthogonal" = **all rows flat**. Hence:
+- **flat first row + flat orthogonal other rows ≡ a (randomized) Hadamard** — the orthogonality constraint couples the rows, so requiring all-flat just *is* "pick a Hadamard". That is **QuaRot** (data-independent, blind uniform spread).
+- **DuQuant's `R̃` = one flat (data-aimed) row + general random-orthogonal (uneven) rest → NOT a Hadamard.** Flatten the rest and it *collapses* back to a Hadamard = QuaRot.
+- Dichotomy: *all rows flat ⟺ Hadamard / QuaRot*; *only-first-row-flat-and-targeted + random rest ⟺ DuQuant*. (Hadamard exists only at special `n` — powers of 2, etc.; random orthogonal works at any block size.)
+
+**6. Online cost & deployment (both rotate online; DuQuant amortizes it).** The activation transform runs **online at inference** in both DuQuant and QuaRot (the per-layer input rotation can't be fully folded; only smoothing `Λ` and `G⁻¹` are folded into weights offline). DuQuant measures the online rotation+permutation at **~8.9–9.3%** added compute ("Perm 1"); because it runs on a **real W4A4 INT kernel**, that overhead amortizes into a net **~2.08×** pre-fill speedup. (Sharp contrast: Ω-QVLA inherits the *same* online rotation mechanism but is fake-quant → pure overhead, no speedup.)
+
 ## Questions worth following up
 1. What does **DuQuant++** (announced Apr 2026) change — and does it close the W3/W2 gap or address the down_proj massive outliers more directly?
 2. DuQuant's rotation is **greedy/data-aware**; Ω-QVLA's is **SVD·Hadamard**; QuaRot's is **random Hadamard**. Is there a clean ordering of these on the data-aware↔data-independent axis vs accuracy/cost?

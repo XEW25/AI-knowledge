@@ -169,9 +169,10 @@ Accuracy depends on *how* a source is read. Prefer the most faithful access avai
 - **Body / multi-column text:** `pdftotext -layout` or `pypdf`.
 - **Equations:** prefer LaTeX / HTML source; PDF text mangles symbols; render-to-image as fallback.
 - **Figures / diagrams:** must render to image — text extraction yields only captions, not figure content.
-- **Scanned / image PDFs:** OCR via `tesseract`.
+- **Scanned / image PDFs:** OCR via `tesseract`. For Chinese, the `chi_sim`/`chi_tra` packs are in `%LOCALAPPDATA%\tessdata` — invoke with `tesseract --tessdata-dir "$env:LOCALAPPDATA\tessdata" -l chi_sim+eng …` (the default install is English-only).
 - **CJK / CID-font PDFs:** text extraction may be mojibake → render to image instead.
 - Large PDFs: read from a repo-external temp per the `01 Raw/` raw-tier rule; do not commit; clean up after.
+- **A tool reports *not found* despite being installed** (e.g. `Read` a PDF → `pdftoppm ... not found`): a PATH/availability issue, not a missing install — the binary must be on the **Claude harness process's PATH**. Fix by **fully quitting and reopening the Claude app** (a new chat is not enough) so it inherits the current PATH; don't reinstall.
 
 ### Reliability discipline
 - A summarizer (e.g., WebFetch) is fine to identify a source and get the gist, but is **not authoritative for exact facts** — numbers, table values, benchmark / SOTA claims, architecture specifics. Verify those against the primary source yourself; do not repeat the summary as fact.

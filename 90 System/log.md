@@ -519,3 +519,7 @@
 - ReKep converted to **URL-only**: removed the live PDF; raw note's "Local PDF" line now points to arXiv 2409.01652 (source note already had the arXiv link)
 - Reclaimed ~22 MB from history; **force-pushed** rewritten master (commit SHAs from the first PDF-introducing commit onward changed). A full-history backup bundle was created at a repo-external temp before the rewrite
 - Remaining `01 Raw` PDFs (HiF8 0.75 MB, MemPO 0.54 MB) comply with the rule and were kept
+
+## [2026-06-25] maintenance | AGENTS.md — concrete Raw-binary commit rule (>2 MB → URL-only + pre-commit size check)
+- Replaced the fuzzy "PDFs more than a few MB" with a **concrete 2 MB threshold** across all three places that state the rule (`01 Raw/` section, ingest-workflow step 1, Reading-source section): binaries > 2 MB → URL-only by default; committed copy only when ≤ 2 MB and important, or hard to re-access; arXiv stable → arXiv PDFs default URL-only
+- Added an explicit **pre-commit size-check hook**: check size before `git add` of any `01 Raw/` binary; if > 2 MB, don't add → URL-only. This is the enforcement step whose absence let the Humanoid-GPT (8.8 MB) and ReKep (13.8 MB) PDFs slip into history (both since purged via filter-repo)

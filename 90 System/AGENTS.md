@@ -40,7 +40,8 @@ Use this for:
 Rule:
 - Prefer preserving original content.
 - Avoid modifying raw files unless there is a strong operational reason.
-- For large binaries (e.g., PDFs more than a few MB), prefer **URL-only (Tier 1)** capture: record the source URL in the note instead of committing the file. Preserve a local copy only when the artifact is small and important, or hard to re-access. (Not every paper needs its raw PDF in the repo.)
+- **Binaries > 2 MB → URL-only (Tier 1) by default**: record the source URL in the note, don't commit the file. Keep a *committed* copy only when it is **≤ 2 MB and important**, or **hard to re-access** (blog / X / slides that may vanish; arXiv is stable → arXiv PDFs default to URL-only). (Not every paper needs its raw PDF in the repo.)
+- **Pre-commit size check** — before `git add` of any `01 Raw/` binary, check its size; if > 2 MB, do **not** add it (switch to URL-only; if you need to read it, keep the copy in a repo-external temp and clean up after). This is the enforcement hook — skipping it is how the Humanoid-GPT / ReKep PDFs slipped into history.
 
 The agent should:
 - read from Raw freely
@@ -131,7 +132,7 @@ If a claim is uncertain, disputed, incomplete, or source-dependent, say so in th
 
 ### Ingest workflow
 When processing a new source, the agent should usually:
-1. inspect the raw material or inbox capture — when ingesting an external file (e.g., a PDF), apply the `01 Raw/` raw-tier rule: large binaries (PDFs more than a few MB) → **URL-only (Tier 1)**, keep a local copy only when small and important or hard to re-access; and read it via the **Reading source material** procedure below (pick the most faithful source; never let a summary stand in for an exact fact)
+1. inspect the raw material or inbox capture — when ingesting an external file (e.g., a PDF), apply the `01 Raw/` raw-tier rule: **binaries > 2 MB → URL-only (Tier 1)** (check size *before* `git add`), keep a committed copy only when ≤ 2 MB and important, or hard to re-access; and read it via the **Reading source material** procedure below (pick the most faithful source; never let a summary stand in for an exact fact)
 2. discuss key takeaways with the user when the material is important, interpretive, strategic, or likely to shape the vault's direction
 3. create or update a note in `02 Sources/`
 4. update relevant pages in `03 Wiki/`
@@ -171,7 +172,7 @@ Accuracy depends on *how* a source is read. Prefer the most faithful access avai
 - **Figures / diagrams:** must render to image — text extraction yields only captions, not figure content.
 - **Scanned / image PDFs:** OCR via `tesseract`. For Chinese, the `chi_sim`/`chi_tra` packs are in `%LOCALAPPDATA%\tessdata` — invoke with `tesseract --tessdata-dir "$env:LOCALAPPDATA\tessdata" -l chi_sim+eng …` (the default install is English-only).
 - **CJK / CID-font PDFs:** text extraction may be mojibake → render to image instead.
-- Large PDFs: read from a repo-external temp per the `01 Raw/` raw-tier rule; do not commit; clean up after.
+- PDFs > 2 MB: read from a repo-external temp per the `01 Raw/` raw-tier rule; do not commit; clean up after.
 - **A tool reports *not found* despite being installed** (e.g. `Read` a PDF → `pdftoppm ... not found`): a PATH/availability issue, not a missing install — the binary must be on the **Claude harness process's PATH**. Fix by **fully quitting and reopening the Claude app** (a new chat is not enough) so it inherits the current PATH; don't reinstall.
 
 ### Reliability discipline

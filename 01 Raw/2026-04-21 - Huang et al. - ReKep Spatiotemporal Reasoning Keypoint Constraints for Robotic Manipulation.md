@@ -8,7 +8,7 @@
 - arXiv ID: 2409.01652
 - Authors: Wenlong Huang*, Chen Wang*, Yunzhu Li, Ruohan Zhang, Li Fei-Fei
 - Affiliations: Stanford University, Columbia University
-- Local PDF: [[2026-04-21 - Huang et al. - ReKep Spatiotemporal Reasoning Keypoint Constraints for Robotic Manipulation.pdf]]
+- Local PDF: — 已移除(13.8 MB,超 AGENTS.md `01 Raw` 体积阈值;见上方 Canonical / PDF URL,arXiv 2409.01652 可随时重取)
 
 ## Raw capture
 

@@ -513,3 +513,9 @@
 - [[Embodied Cerebellum Models]]: annotated the frequency ladder — the **WBC (全身/关节空间控制) rung's "learnable? = 边界"** is now effectively ✅ (Humanoid-GPT learns whole-body control as a GPT), classical floor reduced to the kHz FOC spinal layer
 - **Fix (self-caught rule violation)**: committing the 8.84 MB PDF in the previous commit **violated the existing AGENTS.md `01 Raw` rule** (PDFs more than a few MB → URL-only, do not commit). `git rm`'d the PDF; source note's Raw line changed to URL-only (facts were already pdftotext-extracted). Note: the blob remains in git history (no history rewrite); a filter-repo + force-push could reclaim ~9 MB if ever wanted
 - Trigger: Ethan's question — this "cerebellum" reproduces mocap motions (tracking), which is a different layer from "cerebellum executes a subtask"; clarified to prevent future conflation
+
+## [2026-06-25] maintenance | git history purge — reclaim oversized Raw PDFs (Humanoid-GPT 8.8MB + ReKep 13.8MB)
+- Rewrote history with `git filter-repo --invert-paths` to excise two PDFs that violated the `01 Raw` "PDFs > a few MB → URL-only" rule: `01 Raw/2026-06-02 - Qi et al. - Humanoid-GPT …pdf` (8.84 MB, added then removed earlier today) and `01 Raw/2026-04-21 - Huang et al. - ReKep …pdf` (13.8 MB, a previously-kept live file — Ethan opted to reclaim it too)
+- ReKep converted to **URL-only**: removed the live PDF; raw note's "Local PDF" line now points to arXiv 2409.01652 (source note already had the arXiv link)
+- Reclaimed ~22 MB from history; **force-pushed** rewritten master (commit SHAs from the first PDF-introducing commit onward changed). A full-history backup bundle was created at a repo-external temp before the rewrite
+- Remaining `01 Raw` PDFs (HiF8 0.75 MB, MemPO 0.54 MB) comply with the rule and were kept

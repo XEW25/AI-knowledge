@@ -20,6 +20,8 @@ This map collects the vault's embodied-AI cluster: vision-language-action (VLA) 
 
 ### Syntheses
 - [[Home robot architecture - a hierarchical embodied agent]] — where the brain/cerebellum/spinal layering lands on a real home robot; capability-vs-dependability
+- [[Cloud-edge co-evolving embodied agent - a continuous-evolution framework]] — the edge/cloud continuous co-evolution framework: two core problems, edge 3 + cloud 4 categories + symmetric bridge, four key technologies (2+2), verified evidence, open problems
+- [[Cloud-edge co-evolving embodied agent - figures and evidence]] — its figures + verified-data table (reconstructable SVG: contention / siloed-vs-collaborative / cost-scaling / CLS / Simplex)
 
 ### Sources — VLA models
 - π series (范式 A source): [[Physical Intelligence - pi0 a Vision-Language-Action Flow Model for General Robot Control|π₀]] · [[Physical Intelligence - pi0.5 a VLA with Open-World Generalization|π₀.5]] · [[Physical Intelligence - pi0.6 a VLA That Learns From Experience|π*₀.6]] · [[Physical Intelligence - pi0.7 a Steerable Generalist Robotic Foundation Model|π₀.7]] · [[Physical Intelligence - RL Tokens Precise Manipulation with Efficient Online RL|RL Tokens]]

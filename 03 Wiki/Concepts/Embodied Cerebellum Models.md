@@ -97,6 +97,7 @@
 
 - [[Embodied Brain Models]] — 对位页（大脑侧）；部署驱动框架、三流派、接口谱系
 - [[Home robot architecture - a hierarchical embodied agent]] — 把大脑/小脑/脊髓分层落到家庭机器人的具体架构；capability-vs-dependability
+- [[Cloud-edge co-evolving embodied agent - a continuous-evolution framework]] — 端云持续演进框架;关键技术 T1(高效自演进)/T2(安全)正落在小脑层
 - [[VLA quantization]] — 小脑落地的核心技术簇（低比特边缘部署）
 - [[Memory in Embodied AI]] — 端侧隐式/程序性记忆
 - [[Figure AI - Helix a VLA for Generalist Humanoid Control]] — 原生快系统 S1（小脑形态②）

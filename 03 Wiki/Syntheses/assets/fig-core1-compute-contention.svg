@@ -1,0 +1,34 @@
+<svg viewBox="0 0 680 450" xmlns="http://www.w3.org/2000/svg"><style>text{font-family:"Segoe UI","Microsoft YaHei","PingFang SC",sans-serif}.t{fill:#2C2C2A}.ts{fill:#5F5E5A}.th{fill:#888780}.c-teal rect{fill:#E1F5EE}.c-teal .t{fill:#0F6E56}.c-teal .ts{fill:#1D9E75}.c-gray rect{fill:#F1EFE8}.c-gray .t{fill:#444441}.c-gray .ts{fill:#5F5E5A}.c-amber rect{fill:#FAEEDA}.c-amber .t{fill:#854F0B}.c-amber .ts{fill:#BA7517}.c-purple rect{fill:#EEEDFE}.c-purple .t{fill:#3C3489}.c-purple .ts{fill:#534AB7}.c-red rect{fill:#FCEBEB}.c-red .t{fill:#A32D2D}.c-red .ts{fill:#A32D2D}.c-green rect{fill:#EAF3DE}.c-green .t{fill:#27500A}.c-green .ts{fill:#3B6D11}</style><rect width="680" height="450" fill="#FAF9F5"/>
+  <text x="24" y="28" class="t" font-size="17" font-weight="500">实时算力争用:训练并发 → 推理延迟冲破实时标准</text>
+  <text x="130" y="52" class="th" font-size="11">推理延迟 (ms)</text>
+  <line x1="130" y1="60" x2="130" y2="180" stroke="#C9C7BD" stroke-width="1"/>
+  <line x1="130" y1="180" x2="650" y2="180" stroke="#C9C7BD" stroke-width="1"/>
+  <text x="124" y="69" class="ts" font-size="11" text-anchor="end">50</text>
+  <text x="124" y="136" class="ts" font-size="11" text-anchor="end">20</text>
+  <text x="124" y="184" class="ts" font-size="11" text-anchor="end">0</text>
+  <rect x="320" y="60" width="180" height="72" fill="#E24B4A" fill-opacity="0.10"/>
+  <line x1="130" y1="132" x2="650" y2="132" stroke="#A32D2D" stroke-width="1" stroke-dasharray="5 4"/>
+  <text x="646" y="127" class="ts" font-size="11" text-anchor="end">实时标准 ~20ms(控制节拍)</text>
+  <polyline fill="none" stroke="#378ADD" stroke-width="2.5" stroke-linejoin="round" points="130,156 175,154 220,157 270,155 320,156 330,108 345,84 358,120 372,70 388,110 404,82 420,118 436,75 452,112 468,95 484,120 500,108 512,156 560,154 610,156 650,156"/>
+  <g class="c-red"><text x="410" y="80" class="t" font-size="12" text-anchor="middle">延迟 ↑ ~3–5× → 超出标准</text></g>
+  <text x="225" y="196" class="ts" font-size="11" text-anchor="middle">推理独占</text>
+  <g class="c-red"><text x="410" y="196" class="t" font-size="11" text-anchor="middle">推理 + 训练并发 ✗</text></g>
+  <text x="575" y="196" class="ts" font-size="11" text-anchor="middle">训练停</text>
+  <text x="24" y="233" class="ts" font-size="12">推理</text>
+  <rect x="130" y="221" width="520" height="18" rx="3" fill="#1D9E75"/>
+  <text x="24" y="263" class="ts" font-size="12">训练</text>
+  <rect x="320" y="251" width="180" height="18" rx="3" fill="#E24B4A"/>
+  <line x1="410" y1="251" x2="410" y2="180" stroke="#B4B2A9" stroke-width="0.5" stroke-dasharray="3 3"/>
+  <text x="130" y="292" class="ts" font-size="12">训练与推理抢同一 GPU / 带宽 → 推理掉帧、违反实时标准</text>
+  <line x1="24" y1="310" x2="656" y2="310" stroke="#C9C7BD" stroke-width="0.5"/>
+  <text x="24" y="334" class="t" font-size="14" font-weight="500">解法:错峰 —— 训练挪到空闲 / 充电,推理独占算力</text>
+  <text x="290" y="356" class="th" font-size="11" text-anchor="middle">运行</text>
+  <text x="555" y="356" class="th" font-size="11" text-anchor="middle">空闲 / 充电</text>
+  <line x1="460" y1="362" x2="460" y2="392" stroke="#B4B2A9" stroke-width="1" stroke-dasharray="4 4"/>
+  <rect x="130" y="366" width="330" height="18" rx="3" fill="#1D9E75"/>
+  <rect x="460" y="366" width="190" height="18" rx="3" fill="#378ADD"/>
+  <text x="130" y="410" class="ts" font-size="12">→ 推理延迟回到标准以内,训练不抢实时算力</text>
+  <rect x="24" y="430" width="12" height="12" rx="2" fill="#1D9E75"/><text x="41" y="440" class="ts" font-size="11">推理</text>
+  <rect x="120" y="430" width="12" height="12" rx="2" fill="#E24B4A"/><text x="137" y="440" class="ts" font-size="11">训练(并发抢占)</text>
+  <rect x="320" y="430" width="12" height="12" rx="2" fill="#378ADD"/><text x="337" y="440" class="ts" font-size="11">训练 / 巩固(错峰)</text>
+</svg>

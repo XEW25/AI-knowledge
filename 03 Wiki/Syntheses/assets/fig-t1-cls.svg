@@ -1,0 +1,18 @@
+<svg viewBox="0 0 680 320" xmlns="http://www.w3.org/2000/svg"><style>text{font-family:"Segoe UI","Microsoft YaHei","PingFang SC",sans-serif}.t{fill:#2C2C2A}.ts{fill:#5F5E5A}.th{fill:#888780}.c-teal rect{fill:#E1F5EE}.c-teal .t{fill:#0F6E56}.c-teal .ts{fill:#1D9E75}.c-gray rect{fill:#F1EFE8}.c-gray .t{fill:#444441}.c-gray .ts{fill:#5F5E5A}.c-amber rect{fill:#FAEEDA}.c-amber .t{fill:#854F0B}.c-amber .ts{fill:#BA7517}.c-purple rect{fill:#EEEDFE}.c-purple .t{fill:#3C3489}.c-purple .ts{fill:#534AB7}.c-red rect{fill:#FCEBEB}.c-red .t{fill:#A32D2D}.c-red .ts{fill:#A32D2D}.c-green rect{fill:#EAF3DE}.c-green .t{fill:#27500A}.c-green .ts{fill:#3B6D11}</style><rect width="680" height="320" fill="#FAF9F5"/>
+  <defs><marker id="a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+  <text x="24" y="28" class="t" font-size="17" font-weight="500">互补学习系统(CLS):快情景记忆 + 慢权重巩固</text>
+  <line x1="355" y1="48" x2="355" y2="210" stroke="#B4B2A9" stroke-width="0.5" stroke-dasharray="4 4"/>
+  <text x="190" y="62" class="th" font-size="12" text-anchor="middle">运行 · 在线(廉价)</text>
+  <text x="515" y="62" class="th" font-size="12" text-anchor="middle">空闲 / 充电 · 离线(错峰)</text>
+  <g class="c-gray"><rect x="24" y="104" width="110" height="52" rx="8"/><text class="t" x="79" y="126" font-size="13" text-anchor="middle">体验</text><text class="ts" x="79" y="144" font-size="10" text-anchor="middle">+ 验证信号</text></g>
+  <g class="c-purple"><rect x="170" y="92" width="160" height="72" rx="10"/><text class="t" x="250" y="116" font-size="14" text-anchor="middle">情景缓冲</text><text class="ts" x="250" y="134" font-size="11" text-anchor="middle">(快 · 海马)</text><text class="ts" x="250" y="152" font-size="10" text-anchor="middle">高可塑 · 即时捕获 · 廉价</text></g>
+  <g class="c-teal"><rect x="450" y="92" width="170" height="72" rx="10"/><text class="t" x="535" y="116" font-size="14" text-anchor="middle">专家慢权重</text><text class="ts" x="535" y="134" font-size="11" text-anchor="middle">(慢 · 新皮层)</text><text class="ts" x="535" y="152" font-size="10" text-anchor="middle">低可塑 · 整合 · 只动 adapter</text></g>
+  <line x1="136" y1="128" x2="166" y2="128" stroke="#2C2C2A" stroke-width="1.5" marker-end="url(#a)"/>
+  <text x="389" y="118" class="ts" font-size="11" text-anchor="middle">replay 巩固</text>
+  <line x1="332" y1="128" x2="446" y2="128" stroke="#2C2C2A" stroke-width="1.5" marker-end="url(#a)"/>
+  <path d="M535 166 V196 Q535 206 525 206 H89 Q79 206 79 196 V158" fill="none" stroke="#B4B2A9" stroke-width="1.5" marker-end="url(#a)"/>
+  <text x="307" y="224" class="ts" font-size="11" text-anchor="middle">下发 / 部署 → 更好执行 → 新体验</text>
+  <text x="24" y="254" class="t" font-size="12" font-weight="500">为何高效:在线只捕获(便宜) · 重巩固错峰到充电(不抢实时) · 只动 adapter(小)</text>
+  <text x="24" y="284" class="th" font-size="10">CLS(Complementary Learning Systems, McClelland 1995):海马快学 + 新皮层慢学 + replay 巩固。</text>
+  <text x="24" y="300" class="th" font-size="10">映射:情景缓冲 ↔ 快(海马),专家权重 ↔ 慢(新皮层),错峰巩固 ↔ 睡眠。交错回放(新旧混合)防遗忘。</text>
+</svg>

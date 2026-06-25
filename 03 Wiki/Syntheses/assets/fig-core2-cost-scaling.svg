@@ -1,0 +1,16 @@
+<svg viewBox="0 0 680 390" xmlns="http://www.w3.org/2000/svg"><style>text{font-family:"Segoe UI","Microsoft YaHei","PingFang SC",sans-serif}.t{fill:#2C2C2A}.ts{fill:#5F5E5A}.th{fill:#888780}.c-teal rect{fill:#E1F5EE}.c-teal .t{fill:#0F6E56}.c-teal .ts{fill:#1D9E75}.c-gray rect{fill:#F1EFE8}.c-gray .t{fill:#444441}.c-gray .ts{fill:#5F5E5A}.c-amber rect{fill:#FAEEDA}.c-amber .t{fill:#854F0B}.c-amber .ts{fill:#BA7517}.c-purple rect{fill:#EEEDFE}.c-purple .t{fill:#3C3489}.c-purple .ts{fill:#534AB7}.c-red rect{fill:#FCEBEB}.c-red .t{fill:#A32D2D}.c-red .ts{fill:#A32D2D}.c-green rect{fill:#EAF3DE}.c-green .t{fill:#27500A}.c-green .ts{fill:#3B6D11}</style><rect width="680" height="390" fill="#FAF9F5"/>
+  <defs><marker id="ax" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+  <text x="24" y="28" class="t" font-size="17" font-weight="500">适配成本随场景数:孤岛线性 vs 协同亚线性</text>
+  <line x1="70" y1="58" x2="70" y2="320" stroke="#C9C7BD" stroke-width="1" marker-start="url(#ax)"/>
+  <line x1="70" y1="320" x2="652" y2="320" stroke="#C9C7BD" stroke-width="1" marker-end="url(#ax)"/>
+  <text x="40" y="190" class="th" font-size="11" text-anchor="middle" transform="rotate(-90 40 190)">总适配成本(训练/数据/人力)</text>
+  <text x="646" y="342" class="th" font-size="11" text-anchor="end">场景 / 部署数 N →</text>
+  <path d="M70 305 L640 95" fill="none" stroke="#E24B4A" stroke-width="2.5"/>
+  <g class="c-red"><text class="t" x="636" y="88" font-size="12" text-anchor="end">孤岛:N × 单场景(线性)</text></g>
+  <path d="M70 285 C 220 250 420 232 640 222" fill="none" stroke="#1D9E75" stroke-width="2.5"/>
+  <g class="c-teal"><text class="t" x="636" y="242" font-size="12" text-anchor="end">协同:共享基座 + 小 adapter(亚线性)</text></g>
+  <circle cx="147" cy="278" r="3.5" fill="#2C2C2A"/>
+  <text x="162" y="268" class="ts" font-size="11">超过几个场景后,协同更省 →</text>
+  <text x="24" y="358" class="th" font-size="11">概念示意:讲“线性 vs 亚线性”的形状,非实测绝对值。</text>
+  <text x="24" y="374" class="th" font-size="11">协同的亚线性来自 B 模块化 + 云② 联邦聚合(通用技能共享、场景特化本地)。</text>
+</svg>

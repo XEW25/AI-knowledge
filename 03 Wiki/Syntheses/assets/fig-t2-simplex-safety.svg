@@ -1,0 +1,29 @@
+<svg viewBox="0 0 680 400" xmlns="http://www.w3.org/2000/svg"><style>text{font-family:"Segoe UI","Microsoft YaHei","PingFang SC",sans-serif}.t{fill:#2C2C2A}.ts{fill:#5F5E5A}.th{fill:#888780}.c-teal rect{fill:#E1F5EE}.c-teal .t{fill:#0F6E56}.c-teal .ts{fill:#1D9E75}.c-gray rect{fill:#F1EFE8}.c-gray .t{fill:#444441}.c-gray .ts{fill:#5F5E5A}.c-amber rect{fill:#FAEEDA}.c-amber .t{fill:#854F0B}.c-amber .ts{fill:#BA7517}.c-purple rect{fill:#EEEDFE}.c-purple .t{fill:#3C3489}.c-purple .ts{fill:#534AB7}.c-red rect{fill:#FCEBEB}.c-red .t{fill:#A32D2D}.c-red .ts{fill:#A32D2D}.c-green rect{fill:#EAF3DE}.c-green .t{fill:#27500A}.c-green .ts{fill:#3B6D11}</style><rect width="680" height="400" fill="#FAF9F5"/>
+  <defs><marker id="a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+  <text x="24" y="26" class="t" font-size="17" font-weight="500">系统安全策略:部署前门控 + 运行时 Simplex 守护</text>
+  <text x="24" y="52" class="ts" font-size="12">部署前 · 让新版本“挣得”上岗(门控 + 可回滚)</text>
+  <g class="c-gray"><rect x="24" y="66" width="100" height="40" rx="8"/><text class="t" x="74" y="91" font-size="12" text-anchor="middle">候选新版本</text></g>
+  <g class="c-gray"><rect x="144" y="66" width="100" height="40" rx="8"/><text class="t" x="194" y="91" font-size="12" text-anchor="middle">影子验证</text></g>
+  <g class="c-gray"><rect x="264" y="66" width="100" height="40" rx="8"/><text class="t" x="314" y="91" font-size="12" text-anchor="middle">金丝雀</text></g>
+  <g class="c-green"><rect x="384" y="66" width="110" height="40" rx="8"/><text class="t" x="439" y="91" font-size="12" text-anchor="middle">提升上线 ✓</text></g>
+  <line x1="124" y1="86" x2="142" y2="86" stroke="#2C2C2A" stroke-width="1.5" marker-end="url(#a)"/>
+  <line x1="244" y1="86" x2="262" y2="86" stroke="#2C2C2A" stroke-width="1.5" marker-end="url(#a)"/>
+  <line x1="364" y1="86" x2="382" y2="86" stroke="#2C2C2A" stroke-width="1.5" marker-end="url(#a)"/>
+  <line x1="300" y1="106" x2="300" y2="120" stroke="#A32D2D" stroke-width="1.5" marker-end="url(#a)"/>
+  <g class="c-red"><rect x="182" y="120" width="210" height="30" rx="8"/><text class="t" x="287" y="139" font-size="11" text-anchor="middle">✗ 验证失败 → 回滚至 last-good</text></g>
+  <line x1="24" y1="166" x2="656" y2="166" stroke="#C9C7BD" stroke-width="0.5"/>
+  <text x="340" y="184" class="ts" font-size="11" text-anchor="middle">通过门控的版本 → 进入运行时,仍受 Simplex 约束</text>
+  <text x="24" y="206" class="ts" font-size="12">运行时 · Simplex 守护(学习组件被验证地板兜住)</text>
+  <g class="c-amber"><rect x="36" y="220" width="156" height="54" rx="10"/><text class="t" x="114" y="244" font-size="13" text-anchor="middle">演进专家</text><text class="ts" x="114" y="262" font-size="10" text-anchor="middle">(不可信 · 会变)</text></g>
+  <g class="c-green"><rect x="36" y="292" width="156" height="50" rx="10"/><text class="t" x="114" y="313" font-size="13" text-anchor="middle">已验证安全控制器</text><text class="ts" x="114" y="330" font-size="10" text-anchor="middle">经典地板 · 不学习</text></g>
+  <g class="c-gray"><rect x="252" y="252" width="150" height="56" rx="10"/><text class="t" x="327" y="276" font-size="13" text-anchor="middle">安全监视器 / 切换</text><text class="ts" x="327" y="294" font-size="10" text-anchor="middle">检查包络 / CBF</text></g>
+  <g class="c-gray"><rect x="470" y="258" width="140" height="44" rx="10"/><text class="t" x="540" y="284" font-size="13" text-anchor="middle">机器人 / 作动</text></g>
+  <line x1="192" y1="247" x2="250" y2="270" stroke="#2C2C2A" stroke-width="1.5" marker-end="url(#a)"/>
+  <text x="214" y="252" class="th" font-size="10">候选动作</text>
+  <line x1="192" y1="315" x2="250" y2="292" stroke="#2C2C2A" stroke-width="1.5" marker-end="url(#a)"/>
+  <text x="214" y="320" class="th" font-size="10">安全动作</text>
+  <line x1="402" y1="280" x2="468" y2="280" stroke="#2C2C2A" stroke-width="1.5" marker-end="url(#a)"/>
+  <text x="435" y="274" class="th" font-size="10" text-anchor="middle">选其一驱动</text>
+  <text x="252" y="326" class="ts" font-size="10">正常 → 演进专家;越界 → 切经典地板</text>
+  <text x="24" y="384" class="th" font-size="10">原则:每步演进都被门控、可回滚,且被一条不学习的经典地板(可证明稳定 / CBF)兜底。</text>
+</svg>

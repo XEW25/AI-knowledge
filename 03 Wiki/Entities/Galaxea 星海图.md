@@ -8,7 +8,7 @@
 - **Flagship**: **G0 / G0Plus** 双系统 VLA → **G0.5** 统一自回归 VLA（架构转向）；R1 系列机器人（R1 / R1 Pro / R1 Lite，双 6-DoF 臂 + 4-DoF 躯干 + 向量转向移动底盘）
 - **Funding**: 累计融资 ~$210M；估值约 $700M+（部分报道称近百亿人民币"独角兽"）
 
-> **命名注意**：中文名 **星海图**（Crunchbase/CB Insights 收录为 Xinghaitu）。⚠️ 不要与"跨维智能（Dexmal）"混淆——那是另一家公司。
+> **命名注意**：中文名 **星海图**（Crunchbase/CB Insights 收录为 Xinghaitu）。⚠️ 不要与"跨维智能（Dexmal）"混淆——那是另一家公司。⚠️ 也**不要与 [[Galbot 银河通用]]（Galaxy General Robotics，王鹤）混淆**——两家不同公司，英文名都带 "galaxy" 味、都有 0.5 版本号，极易张冠李戴。
 
 ## 在具身领域的站位
 

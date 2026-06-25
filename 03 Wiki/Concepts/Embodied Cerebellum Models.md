@@ -43,6 +43,8 @@
 | **③ 边缘世界模型** | 把"想象/预测"压到端侧实时 | [[ACE Robotics - Kairos 3.0 a Real-Time Generative Video World Model\|Kairos 3.0]]（4B 视频世界模型冲 Jetson Thor）|
 | **④ 经典控制层** | 不是学出来的——PD/阻抗/伺服 | 任何机器人的底层栈（永远端侧、永远经典、可靠性兜底）|
 
+> **新增形态(2026)· 通用运控基座(GPT-style WBC FM)**:不从 VLA 裂解,而是**蒸馏大量 RL 运控专家**成一个 GPT 因果序列模型(输出逐关节 PD 目标)。[[Qi et al. - Humanoid-GPT (AstraBrain-WBC) Scaling Data and Structure for Zero-Shot Motion Tracking|Humanoid-GPT / AstraBrain-WBC]](Galbot)是首例——也是下文「前瞻·5 年外」那条的提前兑现。
+
 ## 使能边缘部署的关键技术
 
 把大模型塞进端侧需要多个乘法因子各砍一刀（[[ACE Robotics - Kairos 3.0 a Real-Time Generative Video World Model\|Kairos]] 是三件套同用的范例）：
@@ -87,7 +89,7 @@
 - 端侧 NPU（Jetson Thor 之后再上档）扩大可下端的模型规模
 
 **5 年外（押注性）**：
-- 小脑核心从"蒸馏的 action expert"演化为独立设计的端侧架构
+- 小脑核心从"蒸馏的 action expert"演化为独立设计的端侧架构 ——**已现首例(2026)**:[[Qi et al. - Humanoid-GPT (AstraBrain-WBC) Scaling Data and Structure for Zero-Shot Motion Tracking|Humanoid-GPT]] 蒸馏 RL 专家成 GPT 运控基座,正属此形态
 - 边缘世界模型（若 Kairos 路线兑现）把"想象"从云脑下放到端
 - "脊髓"经典层依旧不失守——可靠性底线不交给学习组件
 
@@ -104,6 +106,7 @@
 - [[ACE Robotics - Kairos 3.0 a Real-Time Generative Video World Model]] — 边缘世界模型（小脑形态③）+ 三件套边缘技术
 - [[Guo et al. - NeuroVLA Brain-inspired Neuromorphic Cortex-Cerebellum-Spinal VLA]] — 三层框架（皮层/小脑/脊髓）的一手印证；学习 SNN 反射层；神经形态边缘路线。⚠️ 其 cortex/cerebellum/spinal = 生物结构+算力轴、全在端侧，≠ 本页部署轴
 - [[World-Action Models]] — 世界模型路线（部分可下端）
+- [[Qi et al. - Humanoid-GPT (AstraBrain-WBC) Scaling Data and Structure for Zero-Shot Motion Tracking]] — 通用运控基座(GPT-style WBC FM)新形态 · [[Galbot 银河通用]]
 
 ## tags
 

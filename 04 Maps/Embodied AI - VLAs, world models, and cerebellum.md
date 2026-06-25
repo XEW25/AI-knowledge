@@ -32,6 +32,7 @@ This map collects the vault's embodied-AI cluster: vision-language-action (VLA) 
 - [[DeepCybo - PhysBrain Human Egocentric Data as a Bridge from VLMs to Physical Intelligence|PhysBrain]] · [[DeepCybo - TwinBrainVLA Asymmetric Mixture-of-Transformers for Anti-Forgetting VLA|TwinBrainVLA]]
 - [[Huang et al. - ChemBot Long-Term Memory for VLA-based Agents|ChemBot]] · [[Huang et al. - ReKep Spatiotemporal Reasoning Keypoint Constraints for Robotic Manipulation|ReKep]]
 - [[Guo et al. - NeuroVLA Brain-inspired Neuromorphic Cortex-Cerebellum-Spinal VLA|NeuroVLA]] — neuromorphic/SNN three-layer (cortex/cerebellum/spinal), <20ms on-board reflex, 0.4W
+- [[Qi et al. - Humanoid-GPT (AstraBrain-WBC) Scaling Data and Structure for Zero-Shot Motion Tracking|Humanoid-GPT / AstraBrain-WBC]] — Galbot whole-body-control cerebellum FM (GPT-style, distilled from RL experts, 2B frames, CVPR 2026, Apache-2.0); **not a VLA** (pure motion tracker)
 
 ### Sources — world models
 - [[Bi et al. - Motus A Unified Latent Action World Model|Motus]] — unified MoT, mode-switchable
@@ -42,7 +43,7 @@ This map collects the vault's embodied-AI cluster: vision-language-action (VLA) 
 - [[DyQ-VLA: Temporal-Dynamic-Aware Quantization for Embodied Vision-Language-Action Models|DyQ-VLA]] · [[QuantVLA: Scale-Calibrated Post-Training Quantization for Vision-Language-Action Models|QuantVLA]] · [[Ω-QVLA: Robust Quantization for Vision-Language-Action Models via Composite Rotation and Per-step Scaling|Ω-QVLA]] · [[DuQuant: Distributing Outliers via Dual Transformation Makes Stronger Quantized LLMs|DuQuant]]
 
 ### Entities
-- [[Physical Intelligence (π)]] · [[NVIDIA]] · [[Figure AI]] · [[AgiBot 智元]] · [[Galaxea 星海图]] · [[DeepCybo]] · [[LimX Dynamics]] · [[ACE Robotics]]
+- [[Physical Intelligence (π)]] · [[NVIDIA]] · [[Figure AI]] · [[AgiBot 智元]] · [[Galaxea 星海图]] · [[Galbot 银河通用]] · [[DeepCybo]] · [[LimX Dynamics]] · [[ACE Robotics]]
 
 ## Narrative spine
 A useful path through the cluster:

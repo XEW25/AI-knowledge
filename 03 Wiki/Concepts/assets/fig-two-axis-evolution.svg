@@ -14,7 +14,7 @@
 
   <text x="24" y="214" class="t" font-size="13" font-weight="500">② 大小脑分层轴 · 小脑逐步独立 → 多专家 →</text>
   <g class="c-purple"><rect x="24" y="222" width="192" height="92" rx="9"/><text class="t" x="34" y="242" font-size="11" font-weight="500">L1 双系统·小脑薄执行头</text><text class="ts" x="34" y="260" font-size="9.5">脑+小脑分开,小脑薄/共训</text><text class="ts" x="34" y="278" font-size="9.5">Helix~ · Galaxea G0 · Atlas~</text></g>
-  <g class="c-purple"><rect x="244" y="222" width="192" height="92" rx="9"/><text class="t" x="254" y="242" font-size="11" font-weight="500">L2 小脑=通用运控基座</text><text class="ts" x="254" y="260" font-size="9.5">小脑独立成泛化运动基座</text><text class="ts" x="254" y="278" font-size="9.5">智元 BFM-2~ · GCFM~ · NeuroVLA</text></g>
+  <g class="c-purple"><rect x="244" y="222" width="192" height="92" rx="9"/><text class="t" x="254" y="242" font-size="11" font-weight="500">L2 小脑=通用运控基座</text><text class="ts" x="254" y="259" font-size="9.5">小脑独立成泛化运动基座</text><text class="ts" x="254" y="276" font-size="9.5">Humanoid-GPT · NeuroVLA</text><text class="ts" x="254" y="291" font-size="9.5">智元 BFM-2~ · GCFM~</text></g>
   <g class="c-amber"><rect x="464" y="222" width="192" height="92" rx="9" stroke="#BA7517" stroke-width="1" stroke-dasharray="4 3"/><text class="t" x="474" y="242" font-size="11" font-weight="500">L3 小脑多专家库+脑编排</text><text class="ts" x="474" y="259" font-size="9.5">小脑=可路由专家库(前沿)</text><text class="ts" x="474" y="276" font-size="9.5">Being-0 · MetaWorld-X</text><text class="ts" x="474" y="291" font-size="9.5">ChemBot · 本框架(提案)</text></g>
   <line x1="216" y1="268" x2="242" y2="268" stroke="#2C2C2A" stroke-width="1.5" marker-end="url(#a)"/>
   <line x1="436" y1="268" x2="462" y2="268" stroke="#2C2C2A" stroke-width="1.5" marker-end="url(#a)"/>

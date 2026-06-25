@@ -198,6 +198,63 @@
 
 ---
 
+## 图 6 · 关键技术 T3:模块化联邦协同进化
+
+**说明**:按技能、模块粒度联邦——通用技能 adapter 跨端聚合(FedAvg,非原始数据/非全量权重),场景特化 adapter 留本地。化解"个性化 vs 泛化"。示意结构图。
+
+```svg
+<svg viewBox="0 0 680 415" xmlns="http://www.w3.org/2000/svg" font-family="var(--font-sans)">
+  <defs><marker id="bi" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+  <text x="24" y="28" class="t" font-size="16" font-weight="500">T3 模块化联邦协同:通用技能联邦共享,场景特化本地保留</text>
+  <g class="c-teal"><rect x="200" y="66" width="280" height="58" rx="10"/><text class="t" x="340" y="90" font-size="13" text-anchor="middle">云② · 按技能联邦聚合(FedAvg)</text><text class="ts" x="340" y="108" font-size="10" text-anchor="middle">仅聚合通用技能 adapter,非原始数据</text></g>
+  <line x1="120" y1="296" x2="250" y2="126" stroke="#1D9E75" stroke-width="1.5" marker-start="url(#bi)" marker-end="url(#bi)"/>
+  <line x1="340" y1="296" x2="340" y2="126" stroke="#1D9E75" stroke-width="1.5" marker-start="url(#bi)" marker-end="url(#bi)"/>
+  <line x1="560" y1="296" x2="440" y2="126" stroke="#1D9E75" stroke-width="1.5" marker-start="url(#bi)" marker-end="url(#bi)"/>
+  <text x="392" y="200" class="ts" font-size="10" text-anchor="middle">↕ Δadapter 上行 / 聚合下行(仅通用技能)</text>
+  <text x="392" y="216" class="th" font-size="9" text-anchor="middle">非全量权重 · 非原始数据</text>
+  <rect x="30" y="270" width="180" height="112" rx="10" fill="none" stroke="var(--b)" stroke-width="1"/>
+  <text x="120" y="288" class="t" font-size="13" text-anchor="middle">家庭 A</text>
+  <g class="c-teal"><rect x="40" y="296" width="160" height="28" rx="6"/><text class="t" x="120" y="314" font-size="11" text-anchor="middle">通用技能 adapter</text></g>
+  <g class="c-amber"><rect x="40" y="330" width="160" height="28" rx="6"/><text class="t" x="120" y="348" font-size="11" text-anchor="middle">特化 adapter(本地)</text></g>
+  <rect x="250" y="270" width="180" height="112" rx="10" fill="none" stroke="var(--b)" stroke-width="1"/>
+  <text x="340" y="288" class="t" font-size="13" text-anchor="middle">工厂 B</text>
+  <g class="c-teal"><rect x="260" y="296" width="160" height="28" rx="6"/><text class="t" x="340" y="314" font-size="11" text-anchor="middle">通用技能 adapter</text></g>
+  <g class="c-amber"><rect x="260" y="330" width="160" height="28" rx="6"/><text class="t" x="340" y="348" font-size="11" text-anchor="middle">特化 adapter(本地)</text></g>
+  <rect x="470" y="270" width="180" height="112" rx="10" fill="none" stroke="var(--b)" stroke-width="1"/>
+  <text x="560" y="288" class="t" font-size="13" text-anchor="middle">商场 C</text>
+  <g class="c-teal"><rect x="480" y="296" width="160" height="28" rx="6"/><text class="t" x="560" y="314" font-size="11" text-anchor="middle">通用技能 adapter</text></g>
+  <g class="c-amber"><rect x="480" y="330" width="160" height="28" rx="6"/><text class="t" x="560" y="348" font-size="11" text-anchor="middle">特化 adapter(本地)</text></g>
+  <text x="24" y="404" class="th" font-size="11">通用上行共享 + 特化本地保留 → 个性化 vs 泛化两全(模块粒度联邦;通用技能 adapter 跨端聚合,特化 adapter 不上传)。</text>
+</svg>
+```
+
+---
+
+## 图 7 · 关键技术 T4:能力画像 + 契约共版本化(不传权重)
+
+**说明**:B 之下大脑↔专家的演进接口不交换权重,只同步 ① 能力画像、② 契约版本、③ 缺口信号;更优指令经运行时通道自然下发。示意结构图。
+
+```svg
+<svg viewBox="0 0 680 322" xmlns="http://www.w3.org/2000/svg" font-family="var(--font-sans)">
+  <defs><marker id="a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+  <text x="24" y="28" class="t" font-size="16" font-weight="500">T4 端云协同接口:能力画像 + 契约共版本化(不传权重)</text>
+  <g class="c-teal"><rect x="24" y="56" width="210" height="128" rx="10"/><text class="t" x="129" y="76" font-size="12" text-anchor="middle">云 · 大脑 + 能力登记表</text><text class="ts" x="129" y="92" font-size="10" text-anchor="middle">(权威能力画像)</text><text class="ts" x="44" y="116" font-size="10">倒液 · 成功率 92% · v4</text><text class="ts" x="44" y="136" font-size="10">抓取 · 成功率 85% · v2</text><text class="ts" x="44" y="156" font-size="10">移动 · 成功率 90% · v3</text></g>
+  <g class="c-gray"><rect x="446" y="56" width="210" height="128" rx="10"/><text class="t" x="551" y="76" font-size="12" text-anchor="middle">端 · 专家库(独立模块)</text><text class="ts" x="466" y="100" font-size="10">倒液专家 · v4</text><text class="ts" x="466" y="120" font-size="10">抓取专家 · v2</text><text class="ts" x="466" y="140" font-size="10">移动专家 · v3</text><text class="ts" x="466" y="160" font-size="10">…</text></g>
+  <text x="340" y="86" class="ts" font-size="11" text-anchor="middle">① 能力画像同步</text>
+  <line x1="440" y1="96" x2="240" y2="96" stroke="var(--p)" stroke-width="1.5" marker-end="url(#a)"/>
+  <text x="340" y="122" class="ts" font-size="11" text-anchor="middle">② 契约共版本化 v3</text>
+  <line x1="240" y1="132" x2="440" y2="132" stroke="var(--p)" stroke-width="1.5" marker-start="url(#a)" marker-end="url(#a)"/>
+  <text x="340" y="158" class="ts" font-size="11" text-anchor="middle">③ 缺口信号 ↔ 新专家包</text>
+  <line x1="240" y1="168" x2="440" y2="168" stroke="var(--p)" stroke-width="1.5" marker-start="url(#a)" marker-end="url(#a)"/>
+  <g class="c-amber"><rect x="24" y="198" width="632" height="44" rx="8"/><text class="t" x="340" y="218" font-size="12" text-anchor="middle">✗ 大脑演进后不推权重(B:专家独立)</text><text class="ts" x="340" y="234" font-size="10" text-anchor="middle">更优指令经运行时通道自然下发;演进平面只同步 ① 能力画像 + ② 契约版本 + ③ 缺口信号</text></g>
+  <text x="24" y="266" class="th" font-size="10">① 能力画像同步:专家被改 → 更新云对它的能力 card(能干啥 / 边界 / 成功率),非权重。</text>
+  <text x="24" y="284" class="th" font-size="10">② 契约共版本化:子任务 / 约束 / 验证 schema 两侧对齐(协商版本、前后兼容),防“语言”漂移。</text>
+  <text x="24" y="302" class="th" font-size="10">③ 缺口信号 → 新专家:大脑要的技能没有 → 端报缺口 → 云训新专家 → 签名下发。</text>
+</svg>
+```
+
+---
+
 ## tags
 
 #synthesis #figures #evidence #embodied-ai #cloud-edge #continuous-evolution

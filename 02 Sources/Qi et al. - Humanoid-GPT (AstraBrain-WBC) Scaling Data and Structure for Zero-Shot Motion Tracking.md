@@ -5,7 +5,7 @@
 - **Paper**: *Humanoid-GPT: Scaling Data and Structure for Zero-Shot Motion Tracking* — [arXiv:2606.03985](https://arxiv.org/abs/2606.03985)(submitted 2026-06-02;**Accepted at CVPR 2026**)
 - **Product name**: 银河通用(Galbot)对外发布的 **AstraBrain-WBC 0.5**(2026-06-19)
 - **Code**: [github.com/GalaxyGeneralRobotics/Humanoid-GPT](https://github.com/GalaxyGeneralRobotics/Humanoid-GPT)(Apache-2.0)· [项目页](https://qizekun.github.io/Humanoid-GPT/) · [HF](https://huggingface.co/papers/2606.03985) · [CVPR poster](https://cvpr.thecvf.com/virtual/2026/poster/39399)
-- **Raw**: [[2026-06-02 - Qi et al. - Humanoid-GPT Scaling Data and Structure for Zero-Shot Motion Tracking.pdf]](本地 PDF,8.84 MB,arXiv v1)
+- **Raw**: **URL-only**(arXiv 链接见上)——8.84 MB PDF 超过 AGENTS.md `01 Raw` "几 MB 即 URL-only" 阈值,故**不入库**;事实已由 `pdftotext` 抽取核实(原 PDF 提交后按规则移除,arXiv v1 可随时重取)。
 - **Authors**: Zekun Qi¹², Xuchuan Chen, Dairu Liu, Chenghuai Lin, Yunrui Lian, Sikai Liang, Zhikai Zhang, Yu Guan, Jilong Wang, Wenyao Zhang²³, Xinqiang Yu, **He Wang²⁴(王鹤,通讯,Galbot 创始人)**, **Li Yi¹⁵(易力,通讯)** — ¹Tsinghua ²**Galbot Inc.** ³SJTU ⁴PKU ⁵Shanghai Qi Zhi
 
 ---
@@ -37,6 +37,23 @@
 - **不是**:不是大脑(无规划/语言/感知输入)、不是 VLA(无视觉-语言)、不是世界模型(不预测未来帧)。参考动作由**上游**(动作生成器 / 大脑 / 遥操)给;它只负责"忠实地把动作做出来"。
 - **在分层体系里**:典型的**执行端小脑**——正是本库"大脑出意图、小脑出连续控制"里小脑那一侧。
 
+## 关键区分:它是 WBC tracker,不是子任务执行器
+
+⚠️ **易误读点(Ethan 提出)**:"通用小脑"听起来像"接子任务去执行",但它其实是**运动追踪 / 全身控制器**——吃一段**已完全指定的参考动作**(逐帧关节轨迹)+ 本体感知,**不看环境、不做决策**,只把这段动作在真机上稳稳复现(零样本到没练过的动作)。参考动作由**上游**(遥操 / 动作生成器 / 动捕)给。
+
+它和本库一直在 VLA 语义下谈的"小脑"是**两个不同的功能层**:
+
+| | 技能/子任务小脑(我们之前默认)| **Humanoid-GPT 这一层** |
+|---|---|---|
+| 输入 | 子任务 / latent / subgoal(语义、压缩)| **完整参考动作**(运动学轨迹,稠密)|
+| 解决 | "怎么动才能完成任务"(语义→运动)| "怎么把这段运动做稳"(运动学→动力学)|
+| 看世界 | 通常要(感知物体/场景)| **不看**(只跟参考 + 本体感知)|
+| 代表 | Helix S1、GraspVLA、skill 专家 | Humanoid-GPT、SONIC、TWIST |
+
+**在 [[Embodied Cerebellum Models]] 频率阶梯里的位置**:它学的是**"全身/关节空间控制(WBC)"那一格**(100Hz–1kHz,经典上是阻抗律/重力补偿/IK/插值)——即该页标为"**边界**"的那层,如今被一个 GPT 实质接管;经典只剩 kHz FOC 脊髓。
+
+> **术语提醒**:"小脑"被两个圈子各用各的——**人形运控圈**:小脑 = 全身运动控制器(WBC,本工作即此,标准叫法、不算夸);**VLA/操作圈(本库惯用)**:小脑常含"接子任务做技能"那层。两者非同一功能层,是 Ethan 直觉"和我们想的不太一样"的根源。
+
 ## 架构与方法(PDF 核实)
 
 - **Backbone**:可缩放的 **causal Transformer + GPT-style 自回归**(+ RoPE,代码核实)。论文论点:控制本质**因果**(测试时拿不到未来),所以因果 Transformer 比 MLP / 非因果变体更契合、且**随数据与模型同步缩放**而不早早饱和。
@@ -62,6 +79,24 @@
 **基线**:GMT(MoE tracker)、**TWIST**(遥操全身模仿蒸馏)、**SONIC**(NVIDIA,MLP,缩到 100M 帧/100M 参数)、BeyondMimic、ASAP、UniTracker 等。论文报告在近乎所有指标上领先。
 
 > ⚠️ **"全球首个 / GPT-1 时刻 / 超越 SONIC"** 属公司框架与论文自报结果(SONIC 对比是其自测),陈述时归为"论文/厂商主张",不背书"全球首个"。
+
+## 评测协议与通用性边界
+
+**测试集(关键:是动作追踪评测,不是任务成功率榜)**:
+
+| 评测 | 测试集 | 指标 |
+|---|---|---|
+| 仿真(§5.3)| **AMASS-test 留出 split**(标准动捕 held-out,训练未见);MuJoCo | SR(成功追踪轨迹占比)、MPJPE / MPJVE / RootVelErr |
+| 真机(§5.4)| 真 Unitree-G1 上 **4 段未见舞蹈**(Table 3,高动态)| MPJPE / MPJVE(目标 vs 实际关节)|
+| 在线遥操(§5.5)| 动捕演员动作实时重定向流给 G1,零样本不微调 | <1.5ms@RTX4090,~5× 快于 TWIST |
+
+> 92.58% SR = **AMASS-test(未见动作)上的追踪成功率**,即"能否忠实跟随给定参考动作",**不是 LIBERO/RoboTwin 那种任务成功率**(它不做操作任务)。真机**定量**只有 4 段舞;篮球/拳击/翻滚等是**定性 demo**。
+
+**通用性的范围与边界**:
+- **是"动作空间"通用**:一个模型零样本追踪任意/未见的全身动作(打破"敏捷 vs 泛化"二选一);由 **data + structure scaling** 驱动(2M→2B 帧、0.25M→80.4M 参数,SR 76.89%→92.58%;MLP/TCN 早饱和甚至回退)。多样性 + 均衡采样也被证明驱动泛化。
+- **不是任务通用**(不做操作任务)、**不是跨本体**(仅 Unitree-G1 29-DoF)、**是追踪非自主**(忠实执行上游给的动作)。
+
+**参数族**:MLP 基线 0.25M → Humanoid-GPT-S 5.7M → 中号 ~22M → **L 80.4M(= 头部型号 = AstraBrain-WBC 0.5)**;≈ GPT-1(117M)那档,按 VLA/LLM 标准**极小**,故能 <1.5ms 跑边缘 GPU。"0.5" 是版本号、非大小。
 
 ## 开源状态(code-verified,2026-06-25)
 

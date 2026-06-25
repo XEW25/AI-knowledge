@@ -34,6 +34,8 @@
 
 > ⚠️ **反射层正被学习蚕食（待复现验证）**：[[Guo et al. - NeuroVLA Brain-inspired Neuromorphic Cortex-Cerebellum-Spinal VLA|NeuroVLA]] 把一个**学习的 SNN** 放进 <20ms 安全反射层（神经形态 FPGA 上），说明"反射"这一子层可由学习神经形态电路承担。修正后的判断：边界已从"PD 之上"下探到**反射层**；但 kHz 电机 FOC 环大概率仍是经典底线。
 
+> ⚠️ **WBC 层也已被学习接管(2026)**：[[Qi et al. - Humanoid-GPT (AstraBrain-WBC) Scaling Data and Structure for Zero-Shot Motion Tracking|Humanoid-GPT]] 用一个 GPT-style 因果 Transformer 学了整格**全身/关节空间控制**（100Hz–1kHz，经典上是阻抗/重力补偿/IK）：输入参考动作 → 输出逐关节 PD 目标。即上表"全身/关节空间控制"行的"可学习？= **边界**"已实质翻为 ✅，**经典只剩 kHz FOC 脊髓**。注意它是 **WBC tracker（追踪给定动作）、非子任务执行器**。
+
 ## 小脑模型的四种来源/形态
 
 | 形态 | 怎么来的 | 代表 |

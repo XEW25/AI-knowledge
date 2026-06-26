@@ -33,6 +33,7 @@ This map collects the vault's embodied-AI cluster: vision-language-action (VLA) 
 - [[Huang et al. - ChemBot Long-Term Memory for VLA-based Agents|ChemBot]] · [[Huang et al. - ReKep Spatiotemporal Reasoning Keypoint Constraints for Robotic Manipulation|ReKep]]
 - [[Guo et al. - NeuroVLA Brain-inspired Neuromorphic Cortex-Cerebellum-Spinal VLA|NeuroVLA]] — neuromorphic/SNN three-layer (cortex/cerebellum/spinal), <20ms on-board reflex, 0.4W
 - [[Qi et al. - Humanoid-GPT (AstraBrain-WBC) Scaling Data and Structure for Zero-Shot Motion Tracking|Humanoid-GPT / AstraBrain-WBC]] — Galbot whole-body-control cerebellum FM (GPT-style, distilled from RL experts, 2B frames, CVPR 2026, Apache-2.0); **not a VLA** (pure motion tracker)
+- [[AgiBot - BFM-2 Motion-Between Whole-Body Motion Foundation Model|BFM-2]] — AgiBot 运动小脑 (generative whole-body-control FM, two-stage "Motion-Between"); **⚠️ vendor PR-only — no paper/code** (the low-verifiability contrast to Humanoid-GPT)
 
 ### Sources — world models
 - [[Bi et al. - Motus A Unified Latent Action World Model|Motus]] — unified MoT, mode-switchable

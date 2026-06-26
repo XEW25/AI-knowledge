@@ -12,10 +12,12 @@
 
 - **战略**：全栈（本体 + 模型 + 数据）+ **开源**（AgiBot World 100 万+ 轨迹、217 任务；GO-1 2025-09 开源），是中国"数据规模派"的代表。
 - **架构创新**：GO-1 提出 **ViLLA（Vision-Language-Latent-Action）**——三段式 hierarchy，用 **VQ-VAE latent action token** 作系统接口，使模型能**从无标注 web 视频学动作表征**（绕开真机动作标签稀缺）。VLM↔Latent Planner 内部是**范式 A**（逐层 joint）。
+- **双线基座**：**大脑 / ViLLA 线** GO-1 → GO-2（Action-CoT + 记忆）；**运动小脑线** BFM → [[AgiBot - BFM-2 Motion-Between Whole-Body Motion Foundation Model|BFM-2]]（生成式全身运控，2026-05）→ 预告 BFM-3（多模态）。
 
 ## 与知识库主题的关联
 
 - [[AgiBot - GO-1 ViLLA Generalist Embodied Foundation Model]] — GO-1 / ViLLA / latent action 详解
+- [[AgiBot - BFM-2 Motion-Between Whole-Body Motion Foundation Model]] — **运动小脑**基座（生成式全身运控，2026-05；⚠️ PR-only 无论文无代码）
 - [[Embodied Brain Models]] — latent action token 系统接口；范式 A 内部耦合；"从视频学动作"synthesis 候选
 - [[Home robot architecture - a hierarchical embodied agent]] — latent action 是家庭"廉价监督学技能"的关键路径
 

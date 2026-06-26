@@ -45,7 +45,22 @@
 | **③ 边缘世界模型** | 把"想象/预测"压到端侧实时 | [[ACE Robotics - Kairos 3.0 a Real-Time Generative Video World Model\|Kairos 3.0]]（4B 视频世界模型冲 Jetson Thor）|
 | **④ 经典控制层** | 不是学出来的——PD/阻抗/伺服 | 任何机器人的底层栈（永远端侧、永远经典、可靠性兜底）|
 
-> **新增形态(2026)· 通用运控基座(GPT-style WBC FM)**:不从 VLA 裂解,而是**蒸馏大量 RL 运控专家**成一个 GPT 因果序列模型(输出逐关节 PD 目标)。[[Qi et al. - Humanoid-GPT (AstraBrain-WBC) Scaling Data and Structure for Zero-Shot Motion Tracking|Humanoid-GPT / AstraBrain-WBC]](Galbot)是首例——也是下文「前瞻·5 年外」那条的提前兑现。
+> **新增形态(2026)· 通用运控基座(GPT-style WBC FM)**:不从 VLA 裂解,而是**蒸馏大量 RL 运控专家**成一个 GPT 因果序列模型(输出逐关节 PD 目标)。[[Qi et al. - Humanoid-GPT (AstraBrain-WBC) Scaling Data and Structure for Zero-Shot Motion Tracking|Humanoid-GPT / AstraBrain-WBC]](Galbot)是首例——也是下文「前瞻·5 年外」那条的提前兑现。智元 [[AgiBot - BFM-2 Motion-Between Whole-Body Motion Foundation Model|BFM-2]] 是同形态的另一路线（生成式建模全身动力学分布、强调任意态恢复，非"蒸馏 RL 专家成 GPT"；⚠️ PR-only 无论文）。
+
+## 小脑的反馈闭环:分四层(别混为一谈)
+
+"小脑自我闭合反馈环"有四层,**层级越高越不属于纯小脑**:
+
+| 层 | 闭的环 | 反馈信号 | 代表 |
+|---|---|---|---|
+| **L1 控制 / 抗扰** | 感知→动作→纠偏,维持稳定/跟踪 | 本体感知、平衡/跟踪误差 | [[Qi et al. - Humanoid-GPT (AstraBrain-WBC) Scaling Data and Structure for Zero-Shot Motion Tracking\|Humanoid-GPT]](跟踪)、[[AgiBot - BFM-2 Motion-Between Whole-Body Motion Foundation Model\|BFM-2]](生成式恢复)、CLONE |
+| **L2 前向模型** | 内部预测自身动作的感觉后果,按预测误差纠正 | efference copy + 预测误差 | [[Guo et al. - NeuroVLA Brain-inspired Neuromorphic Cortex-Cerebellum-Spinal VLA\|NeuroVLA]](K=2 前向模型,部分)|
+| **L3 失败检测 + 恢复** | 察觉将失败→主动回退/恢复 | 任务进度 / 失败预测 | CycleVLA、RePO-VLA(多在 VLM 层、非纯小脑;均未核实)|
+| **L4 自我改进** | 用执行结果更新自身权重 | 任务成败 / 奖励 | [[Physical Intelligence - pi0.6 a VLA That Learns From Experience\|π*₀.6]](Recap)、[[Physical Intelligence - RL Tokens Precise Manipulation with Efficient Online RL\|RL Tokens]]、RISE |
+
+**关键判断**:**L1/L2 才长在小脑里(控制/运动层);L3/L4 是任务/认知层**——2026 趋势是把 L3 放进更高的 VLM 失败预测器,而非塞进小脑;本库端云框架里 L3 失败则**回大脑重规划**(见 [[Cloud-edge co-evolving embodied agent - a continuous-evolution framework]])。
+
+**判别口诀**:看闭环的**反馈信号**——**本体感知/平衡/跟踪误差 = 控制环(真小脑);任务成败/语义进度 = 认知环(VLM/大脑)**。用它量任何"闭环"宣传,立刻知道闭在哪层。BFM-2 的"动态任务闭环"= **L1 控制环 + 自主运动恢复**,非认知环。
 
 ## 使能边缘部署的关键技术
 

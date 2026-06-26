@@ -5,7 +5,7 @@
 - **Date ingested**: 2026-06-25
 - **Entity**: [[AgiBot 智元]]
 - **Sources(URL-only)**: [智元官方](https://www.agibot.com.cn/article/315/detail/161) · [传感器专家网](https://m.sensorexpert.com.cn/article/487750.html) · [IT之家](https://www.ithome.com/0/954/319.htm) · [腾讯新闻](https://news.qq.com/rain/a/20260525A09OPX00)
-- **缩写**: "BFM" 官方未展开(对外即"**运动基座模型**" / whole-body motion foundation model);"运动小脑"是其市场定位
+- **缩写**: BFM ≈ **Behavior Foundation Model**(业界术语);智元的 BFM = "感控融合全身运控基座"(BFM(1):~120万→4200万参数、1 亿帧/700h 动捕)。**BFM-2** 是其升级版,参数未公开。"运动小脑"是市场定位
 
 ---
 
@@ -44,7 +44,7 @@
 
 - **大脑/ViLLA 侧**:[[AgiBot - GO-1 ViLLA Generalist Embodied Foundation Model|GO-1]] → GO-2(Action-CoT + OpenClaw 记忆,2026)。
 - **运动小脑侧**:BFM → **BFM-2**(本笔记)→ 官方预告 **BFM-3**(将融合视觉/触觉/语音/空间语义/环境拓扑等多模态)。
-- 注:图中并列的 **GCFM** 未单独核实,本笔记不展开。
+- **GCFM(Generative Control Foundation Model,生成式运控模型)**:智元另一运动侧基座,**2026-04 合作伙伴大会**发布,号称行业首个——**文 / 音 / 视频 → 实时自然动作**(文生动作、音频配肢体语言),强调即兴、无需预编排;属"一体三智"全栈下 8 个基座之一。**与 BFM-2 功能不同**:GCFM = prompt→动作**生成**,BFM-2 = 鲁棒全身**控制 / 恢复**。**同样 PR-only**(未见论文 / 代码)。〔2026-06-25 已核实为真,非杜撰〕
 
 `★ Insight ─────────────────────────────────────`
 - **BFM-2 与 Humanoid-GPT 是 L2 同位的两种取向**:Humanoid-GPT = **追踪器**(给一段参考动作→忠实复现,零样本泛化到未见动作);BFM-2 = **生成器**(给"目标构型"→自己生成从当前态到目标的全程轨迹,强调任意态恢复/重规划)。一个"跟得准",一个"自己想出怎么动到那儿"——后者的闭环更靠近"自主恢复",但也更难验证。

@@ -12,7 +12,7 @@
 
 - **战略**：全栈（本体 + 模型 + 数据）+ **开源**（AgiBot World 100 万+ 轨迹、217 任务；GO-1 2025-09 开源），是中国"数据规模派"的代表。
 - **架构创新**：GO-1 提出 **ViLLA（Vision-Language-Latent-Action）**——三段式 hierarchy，用 **VQ-VAE latent action token** 作系统接口，使模型能**从无标注 web 视频学动作表征**（绕开真机动作标签稀缺）。VLM↔Latent Planner 内部是**范式 A**（逐层 joint）。
-- **双线基座**：**大脑 / ViLLA 线** GO-1 → GO-2（Action-CoT + 记忆）；**运动小脑线** BFM → [[AgiBot - BFM-2 Motion-Between Whole-Body Motion Foundation Model|BFM-2]]（生成式全身运控，2026-05）→ 预告 BFM-3（多模态）。
+- **"一体三智"全栈（8 个基座模型）**：**大脑 / ViLLA 线** GO-1 → GO-2（Action-CoT + 记忆）；**运动小脑线** BFM（Behavior FM，感控融合全身运控，~120万→4200万参数）→ [[AgiBot - BFM-2 Motion-Between Whole-Body Motion Foundation Model|BFM-2]]（生成式全身运控，2026-05）→ 预告 BFM-3；另有 **GCFM**（Generative Control FM，文 / 音 / 视频→实时动作生成，2026-04）。BFM-2 与 GCFM 均 **PR-only**。
 
 ## 与知识库主题的关联
 

@@ -44,7 +44,8 @@
 
 - **大脑/ViLLA 侧**:[[AgiBot - GO-1 ViLLA Generalist Embodied Foundation Model|GO-1]] → GO-2(Action-CoT + OpenClaw 记忆,2026)。
 - **运动小脑侧**:BFM → **BFM-2**(本笔记)→ 官方预告 **BFM-3**(将融合视觉/触觉/语音/空间语义/环境拓扑等多模态)。
-- **GCFM(Generative Control Foundation Model,生成式运控模型)**:智元另一运动侧基座,**2026-04 合作伙伴大会**发布,号称行业首个——**文 / 音 / 视频 → 实时自然动作**(文生动作、音频配肢体语言),强调即兴、无需预编排;属"一体三智"全栈下 8 个基座之一。**与 BFM-2 功能不同**:GCFM = prompt→动作**生成**,BFM-2 = 鲁棒全身**控制 / 恢复**。**同样 PR-only**(未见论文 / 代码)。〔2026-06-25 已核实为真,非杜撰〕
+- **GCFM(Generative Control Foundation Model,生成式运控模型)**:智元另一运动侧基座,**2026-04 合作伙伴大会**发布,号称行业首个——**文 / 音 / 视频 → 实时自然动作**(文生动作、音频配肢体语言),强调即兴、无需预编排;属"一体三智"全栈下 8 个基座之一。**与 BFM-2 功能不同**:GCFM = prompt→动作**生成**,BFM-2 = 鲁棒全身**控制 / 恢复**。**同样 PR-only**〔2026-06-25 **专门复核**:arXiv + GitHub + 官方 research 页(中英双语)仍**无论文、无开源代码**;唯一信源为 2026-04-17 合作伙伴大会新闻稿。GCFM 本身已核实为真、非杜撰〕。
+  - ⚠️ **防混**:搜索会冒出 [arXiv:2509.13780《Behavior Foundation Model for Humanoid Robots》](https://arxiv.org/abs/2509.13780)(CVAE + masked online distillation;bfm4humanoid.github.io)——那是**另一学术团队**的工作,**≠ 智元的 BFM / BFM-2 / GCFM**(仅名字撞车)。智元运动侧(BFM-2、GCFM)至今**全部 PR-only**;其公开可核实的只在大脑/数据侧(GO-1、AgiBot-World)。
 
 `★ Insight ─────────────────────────────────────`
 - **BFM-2 与 Humanoid-GPT 是 L2 同位的两种取向**:Humanoid-GPT = **追踪器**(给一段参考动作→忠实复现,零样本泛化到未见动作);BFM-2 = **生成器**(给"目标构型"→自己生成从当前态到目标的全程轨迹,强调任意态恢复/重规划)。一个"跟得准",一个"自己想出怎么动到那儿"——后者的闭环更靠近"自主恢复",但也更难验证。

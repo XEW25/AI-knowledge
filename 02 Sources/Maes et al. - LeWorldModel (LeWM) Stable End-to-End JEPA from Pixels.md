@@ -32,11 +32,14 @@ JEPA(Joint-Embedding Predictive Architecture)= 在 **latent 空间预测未来**
   1. **下一步 latent 预测 MSE**;
   2. **SIGReg**:把 latent **投影到多条随机方向**,对每个 1D 投影做**正态性检验**,聚合 → 逼整体分布趋于**各向同性高斯**,从而**可证防塌缩**(替代 EMA/stop-grad/VICReg 这些启发式)。
 - **无任何训练启发式**:no stop-grad / no EMA / no 预训练 encoder / no 重建 / no 奖励。**可调损失超参从(PLDM 的)6 降到 1**。
-- **~15M 参数,单卡几小时**。
+- **~15M 参数,单卡几小时**。具体:Encoder = **ViT-Tiny(5M)**(patch 14、12 层、dim 192,取 [CLS]+投影);Predictor = **ViT-S**;输入观测 **224×224 RGB**。
+- **非生成式(关键身份)**:世界模型**只在 latent 空间**预测/规划,**不生成像素**(无重建损失)→ **没有"生成分辨率"一说**。论文另挂一个**仅用于可视化的 decoder**(latent→224×224 RGB,Fig 7 诊断 rollout),**不参与规划**。
 
 ## 结果
 
 - **规划快约 48×**(vs DINO-WM):因其编码 observation 的 **token 数比 DINO-WM 少约 200×** → 规划速度≈PLDM、比 DINO-WM 快约 50×。**固定 FLOPs** 下在 **Push-T(2D)、OGBench-Cube(3D)** 显著优于 DINO-WM。
+- **任务 = 目标条件控制/规划(成功率,非生成)**:Push-T(2D 推 T 块)、Reacher(2D 到达)、Two-Room(2D 导航)、OGBench-Cube(3D 机械臂推方块)。基线:**DINO-WM**(冻结 DINOv2 的 WM)、**PLDM**(7 项损失端到端 JEPA)、GCBC/GCIQL/GCIVRL。
+- **逐任务"和谁持平"**:Push-T、Reacher **超过 PLDM 与 DINO-WM**(PushT 比 PLDM 高 **18%**,且**像素-only** 超过**带本体感知**的 DINO-WM);OGBench-Cube **略低于 DINO-WM**(基本持平);Two-Room **不及** PLDM/DINO-WM。**核心:15M 端到端 ≈ 持平/超过"骑在冻结 DINOv2 大编码器上的 DINO-WM"**——即"拿来规划"的 WM 不必依赖大预训练编码器。
 - **直觉物理**:latent 空间**编码物理量**(线性 probing 可读出);**违反预期 / surprise 检验**可靠检出"非物理"轨迹。
 - 规划 = **latent 空间内 MPC 式、reward-free 向目标规划**(在"想象空间"里评估候选动作序列)。
 

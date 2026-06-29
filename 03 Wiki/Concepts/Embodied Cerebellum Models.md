@@ -92,7 +92,7 @@
 
 - **裂解断点在哪**：一体化 VLA 拆成"云大脑 + 端小脑"时，切口落在哪个接口？（范式 B 的干净 embedding 断点 vs 范式 A 的逐层 KV——见 [[Embodied Brain Models]]）
 - **学习边界会不会跌破 PD 环**：变阻抗/学习型力控会不会把神经网络推进 kHz 层？还是认证成本永远挡住？
-- **边缘世界模型可行性**：[[ACE Robotics - Kairos 3.0 a Real-Time Generative Video World Model\|Kairos]] 式像素级世界模型能否真在端侧实时闭环？（其开源版无动作头，只是部分验证）
+- **边缘世界模型可行性**：[[ACE Robotics - Kairos 3.0 a Real-Time Generative Video World Model\|Kairos]] 式像素级世界模型能否真在端侧实时闭环？（其开源版无动作头，只是部分验证）；对照 [[Maes et al. - LeWorldModel (LeWM) Stable End-to-End JEPA from Pixels|LeWM]] 提示:可下端的边缘 WM 更可能是**小 latent JEPA**(15M、token 少 ~200×、规划快 ~48×),而非大像素生成 WM
 - **端侧自适应**：小脑能否在不回云的情况下做有限的在线适应，而不破坏可靠性？
 - **可验证性责任在哪一层**：安全与认证落在小脑、脊髓、还是大脑？
 

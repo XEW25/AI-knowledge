@@ -68,7 +68,7 @@
 | 子分支 | 描述 | 代表 | 云-端定位 |
 |--------|------|------|----------|
 | **像素级世界模型** | 直接预测视频帧 | BAGEL, Cosmos, Genie 2/3, [[ACE Robotics - Kairos 3.0 a Real-Time Generative Video World Model\|Kairos 3.0]] | 默认云脑 imagination；但 Kairos（4B + 线性注意力 + DMD）正冲边缘实时——惟其开源版为**纯视频世界模型（无动作头）**，对“像素级 WAM 能否下端”只是**部分验证**，待复现 |
-| **潜在世界模型** | 预测 latent state | V-JEPA, Dreamer V3 | "内部模拟器"，可能云-端协同 |
+| **潜在世界模型** | 预测 latent state | V-JEPA, Dreamer V3, [[Maes et al. - LeWorldModel (LeWM) Stable End-to-End JEPA from Pixels|LeWM]](LeCun,端到端极简,15M,可下端)| "内部模拟器"，可能云-端协同 |
 | **结构化世界模型** | 预测物体/关系/物理 | PIN-WM, 物理引擎嫁接 | 可解释，sim-to-real 友好 |
 
 **与现有页面的关系**：本流派把"表征 + 预测"作为统一框架。

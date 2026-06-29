@@ -56,6 +56,7 @@
 - [[3D Spatial Representation]] — 理想 3D 空间表征的必要性、特征、语言类比，及 open research question
 - [[Object-Centric Representation]] — 以物体为基本单元的场景表示方法，支持组合泛化
 - [[World-Action Models]] — WAM 范式：视频生成 backbone + 动作预测，架构演进与路线对比
+- [[JEPA]] — Joint-Embedding Predictive Architecture(LeCun):**隐空间、非生成**的世界模型框架;谱系 I-JEPA→V-JEPA→**V-JEPA 2 / V-JEPA 2-AC**(Meta)/ DINO-WM / PLDM / [[Maes et al. - LeWorldModel (LeWM) Stable End-to-End JEPA from Pixels|LeWM]] + 防塌缩谱系(EMA/VICReg/SIGReg);JEPA vs 生成式对照。世界模型趋势讨论底座
 - [[Embodied Brain Models]] — 大脑模型的部署驱动定义（云=大脑、端=小脑）、三个主流流派（LLM/VLM-as-brain, Predictive Spatial Models, VLA 特殊定位）、接口/方法学正交维度、前瞻预判（骨架页）
 - [[Embodied Cerebellum Models]] — **大脑页的对位页**：小脑（端侧）模型——多速率控制栈（50Hz VLA→1kHz 控制→40kHz 伺服）、小脑四种来源、边缘部署技术（量化/蒸馏/线性注意力/AOT/chunking）、可靠性"脊髓"层（骨架页）
 - [[Memory in Embodied AI]] — 隐式（程序性，端侧）vs 显式（episodic，云端）记忆的两层分工；各 VLA 工作的记忆状态表

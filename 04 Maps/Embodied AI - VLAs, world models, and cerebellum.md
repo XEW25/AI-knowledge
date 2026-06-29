@@ -11,6 +11,7 @@ This map collects the vault's embodied-AI cluster: vision-language-action (VLA) 
 - [[Embodied Brain Models]] — the central page: deployment-driven brain/cerebellum definition, 三流派 taxonomy, VLM-as-actor vs encoder axis, Paradigm A/B, two-level coupling framework, forward predictions
 - [[Embodied Cerebellum Models]] — the edge half: the multi-rate control stack, four cerebellum forms, edge-deployment tech, dependability/"脊髓" layer
 - [[World-Action Models]] — video-backbone + action paradigm; 4-generation architecture evolution
+- [[JEPA]] — Joint-Embedding Predictive Architecture (LeCun): latent (non-generative) world-model framework; I-JEPA→V-JEPA→V-JEPA 2 / V-JEPA 2-AC / DINO-WM / PLDM / LeWM + anti-collapse spectrum
 - [[VLA quantization]] — low-bit edge deployment sub-cluster (why VLA quant ≠ LLM quant)
 - [[Memory in Embodied AI]] — implicit (procedural) vs explicit (episodic) memory across the two layers
 

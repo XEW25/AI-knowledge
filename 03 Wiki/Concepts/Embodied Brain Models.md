@@ -76,6 +76,7 @@
 - [[Spatial Intelligence for Embodied AI]] — 更广的具身空间智能讨论
 - [[3D Gaussian Splatting]] / [[Object-Centric Representation]] — 表征的具体实现
 - [[World-Action Models]] — WAM 路线（视频生成 backbone + 动作）可看作此流派与 VLA 的嫁接
+- [[JEPA]] — **本流派"潜在世界模型"分支的统一框架**(I-JEPA→V-JEPA→V-JEPA 2 / DINO-WM / PLDM / LeWM)+ 防塌缩谱系(EMA / VICReg / SIGReg)
 
 ### ③ VLA 流派（特殊定位：被肢解的过渡范式）
 

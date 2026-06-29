@@ -12,6 +12,7 @@
 
 ## 与知识库主题的关联
 
+- [[JEPA]] — 他提出的框架(联合嵌入预测架构)的概念页:谱系 + 防塌缩 + vs 生成式
 - [[Maes et al. - LeWorldModel (LeWM) Stable End-to-End JEPA from Pixels]] — 资深作者;LeWM = 极简端到端 JEPA 世界模型
 - [[Embodied Brain Models]] — Predictive Spatial 流派 / 潜在世界模型
 - [[World-Action Models]] — 世界模型路线

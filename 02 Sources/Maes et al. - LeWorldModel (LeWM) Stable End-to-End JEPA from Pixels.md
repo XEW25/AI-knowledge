@@ -65,6 +65,7 @@ JEPA(Joint-Embedding Predictive Architecture)= 在 **latent 空间预测未来**
 ## Related
 
 - [[Yann LeCun]] — 资深作者;JEPA / 世界模型路线倡导者
+- [[JEPA]] — 所属框架(联合嵌入预测架构)概念页 · 家族谱系 · 防塌缩谱系
 - [[Embodied Brain Models]] — Predictive Spatial 流派 · 潜在世界模型
 - [[World-Action Models]] — 世界模型路线(潜空间预测一支)
 - [[Embodied Cerebellum Models]] — 边缘世界模型形态③;LeWM 是"小 latent WM 下端"的对照

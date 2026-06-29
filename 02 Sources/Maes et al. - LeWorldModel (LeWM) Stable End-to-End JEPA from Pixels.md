@@ -35,6 +35,14 @@ JEPA(Joint-Embedding Predictive Architecture)= 在 **latent 空间预测未来**
 - **~15M 参数,单卡几小时**。具体:Encoder = **ViT-Tiny(5M)**(patch 14、12 层、dim 192,取 [CLS]+投影);Predictor = **ViT-S**;输入观测 **224×224 RGB**。
 - **非生成式(关键身份)**:世界模型**只在 latent 空间**预测/规划,**不生成像素**(无重建损失)→ **没有"生成分辨率"一说**。论文另挂一个**仅用于可视化的 decoder**(latent→224×224 RGB,Fig 7 诊断 rollout),**不参与规划**。
 
+## 怎么"产生动作"(无策略头 → 靠规划)
+
+⚠️ **易误读(Ethan 提出)**:两个 loss 都在隐空间,但 LeWM **不是策略、没有动作输出头**——它是世界模型,**动作是测试时规划搜出来的**,不是模型前向"吐"出来的。
+- **动作是 predictor 的条件输入,不是 loss 目标**:predictor = (z_t, **动作 a_t**) → z_{t+1};训练数据含真实 (obs, action) 对。隐空间 loss 学的是"**动作的后果 / 动力学**",不是"该做什么动作"——要把 z_{t+1} 预测准,latent 就必须编码动作后果。
+- **测试时 = 隐空间 MPC(reward-free 向目标)**:编码当前观测→z_t、目标→z_goal → **搜索候选动作序列** → 用 predictor 在隐空间 rollout → 按"预测 latent 离 z_goal 多近"打分 → 选最优、执行第一个动作、逐步重规划(receding horizon)。目标函数 = 隐空间到目标的距离 ⇒ **无需奖励**。
+- **任务无关**:不为各 benchmark 重训,**只换 goal(和动作空间)**,同一世界模型规划向不同目标(Push-T / Reacher / Two-Room / OGBench-Cube 皆然)。
+- 即 LeCun 路线:**自监督世界模型 + 规划(MPC)**,而非 RL 训反应式策略。代价是**规划贵**(每步要搜动作序列)→ 这正是把模型做到 15M、规划快 48× 的意义:让"在世界模型里规划"可实时 / 可下端。
+
 ## 结果
 
 - **规划快约 48×**(vs DINO-WM):因其编码 observation 的 **token 数比 DINO-WM 少约 200×** → 规划速度≈PLDM、比 DINO-WM 快约 50×。**固定 FLOPs** 下在 **Push-T(2D)、OGBench-Cube(3D)** 显著优于 DINO-WM。

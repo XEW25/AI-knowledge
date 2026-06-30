@@ -66,6 +66,7 @@ JEPA / 联合嵌入 SSL **易表征塌缩**(encoder 输出趋常数、predictor 
 - [[Maes et al. - LeWorldModel (LeWM) Stable End-to-End JEPA from Pixels]] — 库内已收的 JEPA 世界模型(极简端到端)
 - [[Embodied Brain Models]] — Predictive Spatial 流派
 - [[World-Action Models]] — 视频生成 backbone + 动作(生成式一支,与 JEPA 对照)
+- [[World model trends - architecture, scale, function, hardware]] — 把 JEPA 放进世界模型大趋势看(架构/规模/功能/硬件五块;输出表征=总变量)
 - [[Embodied Cerebellum Models]] — 边缘世界模型
 - [[ACE Robotics - Kairos 3.0 a Real-Time Generative Video World Model]] — 生成式像素 WM(对照)
 

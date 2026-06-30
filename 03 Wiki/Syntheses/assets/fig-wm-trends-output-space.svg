@@ -1,0 +1,30 @@
+<svg viewBox="0 0 680 444" xmlns="http://www.w3.org/2000/svg"><style>text{font-family:"Segoe UI","Microsoft YaHei","PingFang SC",sans-serif}.t{fill:#2C2C2A}.ts{fill:#5F5E5A}.th{fill:#888780}.c-teal rect{fill:#E1F5EE}.c-teal .t{fill:#0F6E56}.c-teal .ts{fill:#1D9E75}.c-purple rect{fill:#EEEDFE}.c-purple .t{fill:#3C3489}.c-purple .ts{fill:#534AB7}.c-gray rect{fill:#F1EFE8}.c-gray .t{fill:#444441}.c-gray .ts{fill:#5F5E5A}</style><rect width="680" height="444" fill="#FAF9F5"/>
+  <text x="24" y="26" class="t" font-size="16" font-weight="500">世界模型趋势:输出表征是「总变量」</text>
+
+  <g class="c-teal"><rect x="24" y="40" width="312" height="46" rx="9"/><text class="t" x="34" y="60" font-size="11" font-weight="500">产像素 · 生成式</text><text class="ts" x="34" y="78" font-size="8">Cosmos · Genie · Sora · DreamerV4 · Marble · Kairos</text></g>
+  <g class="c-purple"><rect x="344" y="40" width="312" height="46" rx="9"/><text class="t" x="354" y="60" font-size="11" font-weight="500">产隐状态 · 预测式</text><text class="ts" x="354" y="78" font-size="8">JEPA:V-JEPA 2-AC · DINO-WM · LeWM</text></g>
+
+  <text x="24" y="104" class="ts" font-size="10">输出表征(总变量)决定下列五项 —— 左=产像素端,右=产隐端:</text>
+
+  <text class="t" x="28" y="141" font-size="11" font-weight="500">架构</text>
+  <g class="c-teal"><rect x="108" y="110" width="272" height="54" rx="7"/><text class="t" x="118" y="132" font-size="9.5">DiT(扩散)/ AR-token</text><text class="ts" x="118" y="150" font-size="9.5">+ VAE / 像素解码器</text></g>
+  <g class="c-purple"><rect x="386" y="110" width="270" height="54" rx="7"/><text class="t" x="396" y="132" font-size="9.5">ViT 编码器 + 预测器</text><text class="ts" x="396" y="150" font-size="9.5">(无像素解码器)</text></g>
+
+  <text class="t" x="28" y="205" font-size="11" font-weight="500">规模</text>
+  <g class="c-teal"><rect x="108" y="172" width="272" height="54" rx="7"/><text class="t" x="118" y="203" font-size="9.5">B 级(2B – 100B+)</text></g>
+  <g class="c-purple"><rect x="386" y="172" width="270" height="54" rx="7"/><text class="t" x="396" y="203" font-size="9.5">M 级(15M – 300M)</text></g>
+
+  <text class="t" x="28" y="267" font-size="11" font-weight="500">功能</text>
+  <g class="c-teal"><rect x="108" y="234" width="272" height="54" rx="7"/><text class="t" x="118" y="265" font-size="9.5">仿真 · 造数据 · 可玩 · 创作</text></g>
+  <g class="c-purple"><rect x="386" y="234" width="270" height="54" rx="7"/><text class="t" x="396" y="265" font-size="9.5">规划 · 控制 · 验证</text></g>
+
+  <text class="t" x="28" y="327" font-size="11" font-weight="500">训练硬件</text>
+  <g class="c-teal"><rect x="108" y="296" width="272" height="54" rx="7"/><text class="t" x="118" y="318" font-size="9.5">data-movement-bound</text><text class="ts" x="118" y="336" font-size="9.5">视频 I/O·解码·存储·HBM</text></g>
+  <g class="c-purple"><rect x="386" y="296" width="270" height="54" rx="7"/><text class="t" x="396" y="318" font-size="9.5">训练便宜(小模型)</text><text class="ts" x="396" y="336" font-size="9.5">但 RL-in-loop 加 rollout</text></g>
+
+  <text class="t" x="28" y="389" font-size="11" font-weight="500">推理硬件</text>
+  <g class="c-teal"><rect x="108" y="358" width="272" height="54" rx="7"/><text class="t" x="118" y="380" font-size="9.5">迭代生成(N步/帧)+解码贵</text><text class="ts" x="118" y="398" font-size="9.5">compute-bound;实时靠蒸馏</text></g>
+  <g class="c-purple"><rect x="386" y="358" width="270" height="54" rx="7"/><text class="t" x="396" y="380" font-size="9.5">搜索在环(多 rollout)</text><text class="ts" x="396" y="398" font-size="9.5">延迟-bound·无解码·可上端</text></g>
+
+  <text x="24" y="432" class="th" font-size="8">中段:3D/几何(Marble/OccWorld)偏生成侧 + 渲染/稀疏;动作-价值(MuZero/WAM)偏预测侧。模型数据多为本会话检索核实。</text>
+</svg>

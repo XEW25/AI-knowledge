@@ -12,7 +12,7 @@ World-Action Models（WAM）是一类从预训练视频生成 backbone 初始化
 
 ## 架构演进
 
-> 这条演进线索的核心问题始终是同一个：**推理时要不要先生成视频**——生成则慢（密集监督的代价），不生成则丢掉世界模型的预测红利。四代是对这个 trade-off 的不同回答。
+> 这条演进线索的核心问题始终是同一个：**推理时要不要先生成视频**——生成则慢（密集监督的代价），不生成则丢掉世界模型的预测红利。四代是对这个 trade-off 的不同回答。**第五代(LaWAM)更激进:连视频生成 backbone 都不要**,改在 latent 空间单次预测特征子目标。
 
 ### 第一代：Bidirectional Attention
 - 动作 token 和视频 token 双向注意力
@@ -39,6 +39,12 @@ World-Action Models（WAM）是一类从预训练视频生成 backbone 初始化
 
 > ⚠️ **修正记录**：此页早先把 Motus 列为"第一代 Bidirectional"。核实 [2512.13030](https://arxiv.org/abs/2512.13030) 后确认 Motus 是模式可切换的第四代设计，VLA 模式推理时不生成视频，已据实改归。
 
+### 第五代:Latent-Subgoal(跳出像素空间)
+- **连视频生成 backbone 都不要了**:前四代都保留一个视频生成模型(只争论推理时跑不跑);LaWAM 改用**冻结视觉 encoder(DINOv3)+ latent-action-model 的 decoder**,在 latent 空间**单次前向**解出"未来观测特征 = 隐视觉子目标",喂 Alternate-DiT 动作专家。
+- 即把"world"从"视频"重定义为"latent 特征":世界建模参数从 5B 级降到 **230M**、延迟降 ~**24×**(187ms),而 LIBERO/RoboTwin **标准榜**不输 3.5–5.5B 大模型。
+- 代表:[[Chen et al. - LaWAM Latent World Action Models for Efficient Dynamics-Aware Robot Policies|LaWAM]](2026)。对照:π0.7(像素子目标、由单独迭代模型产)、LDA-1B(DINO latent 但联合扩散去噪、迭代)。
+> 注:LaWAM 突破了本页"WAM = 视频 backbone + 动作"的原定义(见开头"边界澄清")——它是**隐空间 WAM**,把 world 从像素移到 latent。
+
 ## 与其他路线对比
 
 | 路线 | 泛化来源 | 数据需求 | 代表工作 |
@@ -59,5 +65,6 @@ World-Action Models（WAM）是一类从预训练视频生成 backbone 初始化
 - [[Spatial Intelligence for Embodied AI]] — 更广的具身智能主题
 - [[GigaWorld Team - GigaWorld-Policy An Efficient Action-Centered World-Action Model]] — 第三代（causal mask 硬隔离 + 推理丢分支）
 - [[Bi et al. - Motus A Unified Latent Action World Model]] — 第四代（时间步调度，模式可切换）；同属 latent-action 谱系
+- [[Chen et al. - LaWAM Latent World Action Models for Efficient Dynamics-Aware Robot Policies]] — 第五代（隐空间子目标，单次非迭代；冻结 DINOv3 + LAM-decoder 当世界模型，230M，比像素 WAM 快 ~24×）
 - [[Embodied Brain Models]] — WAM 作为 Predictive Spatial × VLA 嫁接；范式 A 的 MoT 扩展
 - [[Huang et al. - ReKep Spatiotemporal Reasoning Keypoint Constraints for Robotic Manipulation]]

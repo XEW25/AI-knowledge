@@ -67,6 +67,7 @@ JEPA / 联合嵌入 SSL **易表征塌缩**(encoder 输出趋常数、predictor 
 - [[Embodied Brain Models]] — Predictive Spatial 流派
 - [[World-Action Models]] — 视频生成 backbone + 动作(生成式一支,与 JEPA 对照)
 - [[World model trends - architecture, scale, function, hardware]] — 把 JEPA 放进世界模型大趋势看(架构/规模/功能/硬件五块;输出表征=总变量)
+- [[Chen et al. - LaWAM Latent World Action Models for Efficient Dynamics-Aware Robot Policies]] — 在冻结 DINOv3 latent 空间做 WAM(LAM-decoder 当世界模型);JEPA/DINO 隐预测的控制落地
 - [[Embodied Cerebellum Models]] — 边缘世界模型
 - [[ACE Robotics - Kairos 3.0 a Real-Time Generative Video World Model]] — 生成式像素 WM(对照)
 

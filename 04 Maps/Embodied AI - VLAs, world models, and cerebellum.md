@@ -42,6 +42,7 @@ This map collects the vault's embodied-AI cluster: vision-language-action (VLA) 
 - [[ACE Robotics - Kairos 3.0 a Real-Time Generative Video World Model|Kairos 3.0]] — edge video world model
 - [[GigaWorld Team - GigaWorld-Policy An Efficient Action-Centered World-Action Model|GigaWorld-Policy]] — 训繁推简
 - [[Maes et al. - LeWorldModel (LeWM) Stable End-to-End JEPA from Pixels|LeWM]] — LeCun 等;极简端到端 **JEPA 世界模型**(15M、单卡,latent 规划比 DINO-WM 快 ~48×);潜在世界模型路线,边缘 WM 轻量候选
+- [[Chen et al. - LaWAM Latent World Action Models for Efficient Dynamics-Aware Robot Policies|LaWAM]] — **隐空间 World-Action Model**(冻结 DINOv3 + 把 LAM-decoder 复用成 230M 世界模型,单次出隐子目标喂动作专家);比像素 WAM 快 ~24×,LIBERO 98.6%/RoboTwin 91.22%(标准榜)
 
 ### Sources — VLA quantization
 - [[DyQ-VLA: Temporal-Dynamic-Aware Quantization for Embodied Vision-Language-Action Models|DyQ-VLA]] · [[QuantVLA: Scale-Calibrated Post-Training Quantization for Vision-Language-Action Models|QuantVLA]] · [[Ω-QVLA: Robust Quantization for Vision-Language-Action Models via Composite Rotation and Per-step Scaling|Ω-QVLA]] · [[DuQuant: Distributing Outliers via Dual Transformation Makes Stronger Quantized LLMs|DuQuant]]

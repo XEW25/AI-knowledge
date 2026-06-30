@@ -69,6 +69,7 @@ LLM 的 I/O 被固定成 `text → text`;**WM 的 I/O 本身是设计自由度**
 | V-JEPA 2-AC | 隐(动作条件)| 300M | ViT JEPA |
 | DINO-WM | 隐 | ~300M(冻结 DINOv2)| 冻结 encoder + ViT 动力学 |
 | LeWM | 隐 | 15M | ViT JEPA(2 损失)|
+| LaWAM | 隐子目标(WAM)| 230M(LaWM)| 冻结 DINOv3 + LAM-decoder 当 WM,单次非迭代;比像素 WAM 快 ~24× |
 | MuZero | 价值/奖励 | 小 | 隐动力学 + MCTS |
 | OccWorld | 3D occupancy | — | occupancy tokenizer + ST-Transformer |
 

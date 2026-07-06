@@ -155,6 +155,8 @@ Periodically, the agent may:
 - surface contradictions or stale claims
 - propose new pages or reorganizations
 
+**Tooling:** run `python "90 System/scripts/vault_lint.py"` to mechanically find broken wikilinks (including filename-mismatch), orphan notes, and duplicate basenames — see [[Vault linting]] for usage and how to read the output. Link health is not reliably eyeballable (unresolved links still render, just greyed), so use the linter rather than inspection.
+
 ## Reading source material (PDFs, papers, web)
 
 Accuracy depends on *how* a source is read. Prefer the most faithful access available, and never let a summary stand in for a primary fact.

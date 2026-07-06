@@ -118,3 +118,4 @@
 ## System
 - [[90 System/AGENTS]]
 - [[90 System/log]]
+- [[Vault linting]] — link-integrity linter (`scripts/vault_lint.py`) + usage

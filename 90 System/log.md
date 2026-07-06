@@ -596,3 +596,10 @@
 - **Entities (3):** [[GigaAI]] — world-model company (GigaWorld-Policy); [[Stanford Vision and Learning Lab]] — ReKep source group (with [[Li Fei-Fei]]); [[Huawei]] — Ascend / HiFloat8 FP8 format. Written with confidence discipline (vault-supported facts stated; org background beyond the vault flagged, esp. GigaAI)
 - De-annotated the stale `(to be created)` on [[Task Decomposition as OOD Mitigation]] in the ReKep note. Wired all 7 into `index.md` (Concepts + Entities); added [[AI coding agents]] + [[Task Decomposition as OOD Mitigation]] to the Agent MOC and [[GigaAI]] to the Embodied MOC Orgs
 - Lint after (118 notes): no person/concept dangling links remain except (a) [[hif8_value_density.html]] (a real asset that resolves in Obsidian — lint false-positive) and (b) folder/example fragments inside this log (append-only history, left as-is). Orphans still 1 (root AGENTS.md). No new broken links introduced by the new pages
+
+
+## [2026-07-06] tooling | Vault link-linter installed
+- Added `90 System/scripts/vault_lint.py` — the link-integrity self-check used in the 07-06 passes, cleaned up into a permanent tool (plain Python 3, no deps; auto-locates the vault two levels up from itself). Reports broken wikilinks (**A** = target exists under a different filename → real bug; **B** = no match → dangling/future page), orphan notes, and duplicate basenames
+- Improvements over the throwaway version: indexes nested `assets/` + non-md targets (svg/pdf/html/jpg) so embeds & asset links resolve (kills the earlier false-positives); strips fenced/inline code so doc examples aren't miscounted as links; excludes append-only `90 System/log.md` from the broken-link scan by default (`--include-log` to override); flags `--broken` / `--orphans`
+- Added usage note [[Vault linting]] (how to run, resolution model, noise control, known-benign baseline) and referenced it from the [[90 System/AGENTS|Lint workflow]] + the index System section
+- Baseline clean run: **0 broken-A / 0 broken-B / 1 orphan** (root `AGENTS.md`, the entry pointer) **/ 1 duplicate** (`agents`: root vs `90 System/AGENTS.md`) over 119 notes + 15 assets

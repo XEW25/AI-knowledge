@@ -110,6 +110,8 @@
 - [[World model trends - architecture, scale, function, hardware]] — **跨公司世界模型趋势综述**(架构 / 规模 / 功能 / 训练硬件 / 推理硬件 五块):核心论点"**输出表征 = 总变量**",一手决定其余;含 Dreamer/Cosmos/Genie/Sora/Marble/JEPA 系速查表 + 一张"输出表征→五项"对照图。世界模型趋势讨论的总收口
 - [[Embodied model function evolution - generalization as the master line]] — **具身模型功能演进重述**:端到端→大小脑协同→端云自闭环→**Agentic**,**以"泛化/可用性墙"为驱动**(泛化载体 模型→组合);含长程崩支点(p^N × 缺 L3)、例子池 + 脑/小脑配对表、可直接进汇报的论述。回应专家"需融入泛化不足"的反馈
 
+- [[Future embodied Agent framework - integrated view]] — **整合入口**:把功能演进(why)/ 家庭架构(what)/ 端云 co-evolution(how)/ 地基(capability⟂dependability)缝成一页;含分层架构图 + "云↔端两条通道"整合点
+
 ## Maps
 - [[Home]] — top-level navigation page for the vault
 - [[Agent systems, decomposition, and memory]] — navigation page for the cluster around agent architecture, decomposition, and memory control

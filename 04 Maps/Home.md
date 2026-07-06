@@ -13,7 +13,7 @@ The vault has two big clusters, each with its own map of content:
 - Core concepts: [[VLA - Vision-Language-Action Models]] · [[Embodied Brain Models]] · [[Embodied Cerebellum Models]] · [[World-Action Models]] · [[JEPA]] · [[Memory in Embodied AI]]
 - Deployment / efficiency: [[VLA quantization]] · [[Model quantization]]
 - Spatial: [[Spatial Intelligence for Embodied AI]] · [[3D Spatial Representation]] · [[3D Gaussian Splatting]] · [[Object-Centric Representation]]
-- Key syntheses: [[Home robot architecture - a hierarchical embodied agent]] · [[Cloud-edge co-evolving embodied agent - a continuous-evolution framework]] · [[World model trends - architecture, scale, function, hardware]] · [[Embodied model function evolution - generalization as the master line]]
+- Key syntheses: **[[Future embodied Agent framework - integrated view]]** (integrated entry) · [[Home robot architecture - a hierarchical embodied agent]] · [[Cloud-edge co-evolving embodied agent - a continuous-evolution framework]] · [[World model trends - architecture, scale, function, hardware]] · [[Embodied model function evolution - generalization as the master line]]
 
 ### Agent systems
 - Core concepts: [[Task decomposition]] · [[Agent orchestration]] · [[Harness design]] · [[Memory Policy]] · [[Recursive Language Models]]

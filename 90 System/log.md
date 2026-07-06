@@ -603,3 +603,12 @@
 - Improvements over the throwaway version: indexes nested `assets/` + non-md targets (svg/pdf/html/jpg) so embeds & asset links resolve (kills the earlier false-positives); strips fenced/inline code so doc examples aren't miscounted as links; excludes append-only `90 System/log.md` from the broken-link scan by default (`--include-log` to override); flags `--broken` / `--orphans`
 - Added usage note [[Vault linting]] (how to run, resolution model, noise control, known-benign baseline) and referenced it from the [[90 System/AGENTS|Lint workflow]] + the index System section
 - Baseline clean run: **0 broken-A / 0 broken-B / 1 orphan** (root `AGENTS.md`, the entry pointer) **/ 1 duplicate** (`agents`: root vs `90 System/AGENTS.md`) over 119 notes + 15 assets
+
+
+## [2026-07-06] synthesis | Future embodied Agent framework — integrated view
+- Created the single-entry overview [[Future embodied Agent framework - integrated view]] at user request, stitching the vault's embodied-Agent vision (previously spread across 4 syntheses) into one **why / what / how / foundation** page
+- Structure: ① **why** — 泛化墙 → Agentic (泛化载体 模型→组合); ② **what** — hierarchical agent (cloud brain propose-then-verify / plan-level interface / edge experts+safety+procedural+distilled; dual memory); ③ **how** — 端云 co-evolution (asymmetric engines + symmetric bridge, modular experts=choice B, evolution interface carries capability-profile **not weights**, 4 techs 2+2); ④ **foundation** — capability ⟂ dependability
+- The page's own contribution (not just a digest): the cloud↔edge coupling is **two channels** — runtime (plan↓ / obs↑) vs evolution (experience↑ / skills↓); the "what" and "how" syntheses are the **static vs dynamic slices of one framework**
+- Self-contained figure `assets/fig-future-embodied-agent-framework.svg` (layered architecture + two channels + foundation bar), house SVG style
+- Wired: index Syntheses + Embodied MOC Syntheses + Home key-syntheses (marked integrated entry); added 🧭 back-pointers from the 3 source syntheses (function-evolution=why / home-arch=what / co-evolution=how)
+- Confidence: model anchors (π / GR00T / GO-1 / Helix / ChemBot) verified; layered form + two-channel split + sublinear-cost mainline = Ethan+Ada forward judgment (flagged). Lint clean: 0 broken / 1 orphan (root AGENTS.md) / 1 dup (agents); 120 notes, 16 assets

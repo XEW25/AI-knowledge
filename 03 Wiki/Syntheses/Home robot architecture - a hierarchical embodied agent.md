@@ -1,5 +1,7 @@
 # Home Robot Architecture: A Hierarchical Embodied Agent
 
+> 🧭 **整合入口**:本页是"未来具身 Agent 框架"的 **what(架构 + 地基)** 切面 —— 全局总览见 [[Future embodied Agent framework - integrated view]]。
+
 > **状态**：synthesis。源自 Ethan + Ada 多轮讨论的原创架构判断，锚定在已核实的模型架构（π 系列、GR00T、GO-1、Helix 等）和当前研究线上。前瞻性内容全程标注置信度。
 
 ## 核心论点

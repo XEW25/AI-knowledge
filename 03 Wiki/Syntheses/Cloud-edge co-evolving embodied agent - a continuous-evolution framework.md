@@ -1,5 +1,7 @@
 # Cloud-edge co-evolving embodied agent — a continuous-evolution framework
 
+> 🧭 **整合入口**:本页是"未来具身 Agent 框架"的 **how(持续演进平面)** 切面 —— 全局总览见 [[Future embodied Agent framework - integrated view]]。
+
 > 端云协同的具身 Agent **持续演进**框架。与 Ethan 多轮 brainstorm 共同推演而成。
 
 - **Type**: Synthesis(框架设计 / 内部汇报底稿)

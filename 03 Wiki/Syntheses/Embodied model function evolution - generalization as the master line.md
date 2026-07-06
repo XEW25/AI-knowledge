@@ -1,5 +1,7 @@
 # Embodied model function evolution — generalization as the master line
 
+> 🧭 **整合入口**:本页是"未来具身 Agent 框架"的 **why(驱动力)** 切面 —— 全局总览见 [[Future embodied Agent framework - integrated view]]。
+
 > 具身模型**功能演进**的重述:端到端 → 大小脑协同 → 端云自闭环 → **具身 Agentic**。**不按"能力越来越强"讲,而按"泛化/可用性墙"驱动来讲**——每阶段是对同一堵墙的回应,主线是**泛化的载体从「模型」走向「组合」**。
 > 缘起:功能趋势汇报后专家反馈"需融入泛化性不足 + 逐场景真机 RL/遥操不可持续"的问题。本页即为回应。
 

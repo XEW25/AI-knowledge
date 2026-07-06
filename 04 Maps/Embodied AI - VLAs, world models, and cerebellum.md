@@ -27,6 +27,8 @@ This map collects the vault's embodied-AI cluster: vision-language-action (VLA) 
 - [[World model trends - architecture, scale, function, hardware]] — cross-company WM trend synthesis (architecture / scale / function / train-HW / infer-HW); thesis **output space is the master variable**; reference table (Dreamer/Cosmos/Genie/Marble/JEPA…) + a master diagram
 - [[Embodied model function evolution - generalization as the master line]] — 具身模型功能趋势(端到端→大小脑→端云→Agentic)重述,**以泛化为主线**;why long-horizon collapses (p^N × missing L3) + why Agentic (compositional reuse); 4-stage figure + brain/cerebellum examples
 
+- [[Future embodied Agent framework - integrated view]] — **整合入口**:why(泛化墙)/ what(分层架构)/ how(端云 co-evolution)/ 地基 四切面缝成单页 + 分层架构图 + "云↔端两条通道"
+
 ### Sources — VLA models
 - π series (范式 A source): [[Physical Intelligence - pi0 a Vision-Language-Action Flow Model for General Robot Control|π₀]] · [[Physical Intelligence - pi0.5 a VLA with Open-World Generalization|π₀.5]] · [[Physical Intelligence - pi0.6 a VLA That Learns From Experience|π*₀.6]] · [[Physical Intelligence - pi0.7 a Steerable Generalist Robotic Foundation Model|π₀.7]] · [[Physical Intelligence - RL Tokens Precise Manipulation with Efficient Online RL|RL Tokens]]
 - [[NVIDIA - GR00T N1 An Open Foundation Model for Generalist Humanoid Robots|GR00T N1]] — 范式 B (cross-attention), code-verified

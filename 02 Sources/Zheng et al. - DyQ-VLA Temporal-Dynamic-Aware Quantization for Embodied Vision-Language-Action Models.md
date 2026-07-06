@@ -5,7 +5,7 @@
 ## Metadata
 - Type: source note
 - Format: arXiv paper (preprint; cs.LG / cs.RO)
-- Authors: [[Zihao Zheng]]* , Hangyu Cao*, Sicheng Tian, Jiayu Chen, Maoliang Li, Xinhao Sun, Hailong Zou, Zhaobo Zhang, Xuanzhe Liu, Donggang Cao, Hong Mei, Xiang Chen† (*equal contribution; †corresponding)
+- Authors: Zihao Zheng* , Hangyu Cao*, Sicheng Tian, Jiayu Chen, Maoliang Li, Xinhao Sun, Hailong Zou, Zhaobo Zhang, Xuanzhe Liu, Donggang Cao, Hong Mei, Xiang Chen† (*equal contribution; †corresponding)
 - Organization: **Peking University** (lead — School of Computer Science / School of EECS), with **South China University of Technology** and **Beijing Normal University**. Corresponding author: Xiang Chen <xiang.chen@pku.edu.cn> *(verified from PDF)*
 - Date accessed: 2026-06-03
 - Original URL: https://arxiv.org/abs/2603.07904

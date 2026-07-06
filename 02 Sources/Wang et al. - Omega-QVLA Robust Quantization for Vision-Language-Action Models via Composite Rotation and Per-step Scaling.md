@@ -5,7 +5,7 @@
 ## Metadata
 - Type: source note
 - Format: arXiv paper (preprint; cs.CV / cs.LG)
-- Authors: [[Xinyu Wang]]*, Mingze Li*, Sicheng Lyu*, Dongxiu Liu, Kaicheng Yang, Ziyu Zhao, Yufei Cui, Xiao-Wen Chang, Peng Lu† (*equal; †corresponding)
+- Authors: Xinyu Wang*, Mingze Li*, Sicheng Lyu*, Dongxiu Liu, Kaicheng Yang, Ziyu Zhao, Yufei Cui, Xiao-Wen Chang, Peng Lu† (*equal; †corresponding)
 - Organization: **McGill University** + **Université de Montréal** + **Mila – Quebec AI Institute** (lead), with **BUPT**, **Shanghai Jiao Tong University**, and **SimpleWay.ai**. Corresponding: Peng Lu (UdeM). *(verified from PDF)*
 - Date accessed: 2026-06-03
 - Original URL: https://arxiv.org/abs/2605.28803

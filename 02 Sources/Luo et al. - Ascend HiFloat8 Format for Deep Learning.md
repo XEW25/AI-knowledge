@@ -5,7 +5,7 @@
 ## Metadata
 - Type: source note
 - Format: arXiv paper / preliminary white paper
-- Authors: [[Yuanyong Luo]] and collaborators
+- Authors: Yuanyong Luo and collaborators
 - Organization: [[Huawei]]
 - Date accessed: 2026-04-13
 - Original URL: https://arxiv.org/abs/2409.16626

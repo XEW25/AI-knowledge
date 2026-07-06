@@ -5,7 +5,7 @@
 ## Metadata
 - Type: source note
 - Format: arXiv paper / ICML 2023
-- Authors: [[Guangxuan Xiao]], [[Ji Lin]], [[Mickael Seznec]], [[Hao Wu]], [[Julien Demouth]], [[Song Han]]
+- Authors: Guangxuan Xiao, Ji Lin, Mickael Seznec, Hao Wu, Julien Demouth, [[Song Han]]
 - Organization: MIT, NVIDIA
 - Date accessed: 2026-04-13
 - Original URL: https://arxiv.org/abs/2211.10438

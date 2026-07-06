@@ -5,7 +5,7 @@
 ## Metadata
 - Type: source note
 - Format: arXiv paper / **ICLR 2026**
-- Authors: [[Yuhao Xu]]*, Yantai Yang*, Zhenyang Fan, Yufan Liu†, Yuming Li, Bing Li†, Zhipeng Zhang† (*equal; †corresponding)
+- Authors: Yuhao Xu*, Yantai Yang*, Zhenyang Fan, Yufan Liu†, Yuming Li, Bing Li†, Zhipeng Zhang† (*equal; †corresponding)
 - Organization: **Shanghai Jiao Tong University (AutoLab)** + **CASIA** + UCAS + Ant Group + Anyverse Dynamics. *(verified from PDF)*
 - Date accessed: 2026-06-23
 - Original URL: https://arxiv.org/abs/2602.03782

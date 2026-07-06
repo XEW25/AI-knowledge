@@ -5,7 +5,7 @@
 ## Metadata
 - Type: source note
 - Format: arXiv paper / **NeurIPS 2024 (Oral)**
-- Authors: [[Haokun Lin]]*, Haobo Xu*, Yichen Wu*, Jingzhi Cui, Yingtao Zhang, Linzhan Mou, Linqi Song, Zhenan Sun†, Ying Wei† (*equal; †corresponding)
+- Authors: Haokun Lin*, Haobo Xu*, Yichen Wu*, Jingzhi Cui, Yingtao Zhang, Linzhan Mou, Linqi Song, Zhenan Sun†, Ying Wei† (*equal; †corresponding)
 - Organization: **UCAS** + **Tsinghua** + **CASIA (Institute of Automation, CAS)** + **City University of Hong Kong** + **Zhejiang University**. *(verified from PDF)* — first author **Haokun Lin later co-authored [[Zhang et al. - QuantVLA Scale-Calibrated Post-Training Quantization for Vision-Language-Action Models|QuantVLA]]**.
 - Date accessed: 2026-06-03
 - Original URL: https://arxiv.org/abs/2406.01721

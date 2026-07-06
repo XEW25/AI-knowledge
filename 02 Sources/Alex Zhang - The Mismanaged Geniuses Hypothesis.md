@@ -3,7 +3,7 @@
 ## Metadata
 - Type: source note
 - Format: X article / threaded post
-- Authors: [[Alex Zhang]], [[Zhening (Zed) Li]], [[Omar Khattab]]
+- Authors: [[Alex Zhang]], Zhening (Zed) Li, Omar Khattab
 - Mentioned systems: [[Claude Code]], [[OpenClaw]], [[Hermes Agent]]
 - Date accessed: 2026-04-11
 - Original URL: https://x.com/a1zhang/status/2042588627260018751?s=46&t=PKX9NxTrLKHopuXJDidrLQ

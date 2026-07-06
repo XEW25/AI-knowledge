@@ -5,7 +5,7 @@
 ## Metadata
 - Type: source note
 - Format: arXiv paper
-- Authors: [[Ruoran Li]], [[Xinghua Zhang]], [[Haiyang Yu]], [[Shitong Duan]], [[Xiang Li]], [[Wenxin Xiang]], [[Chonghua Liao]], [[Xudong Guo]], [[Yongbin Li]], [[Jinli Suo]]
+- Authors: Ruoran Li, Xinghua Zhang, Haiyang Yu, Shitong Duan, Xiang Li, Wenxin Xiang, Chonghua Liao, Xudong Guo, Yongbin Li, Jinli Suo
 - Date accessed: 2026-04-11
 - Original URL: https://arxiv.org/abs/2603.00680
 - PDF URL: https://arxiv.org/pdf/2603.00680

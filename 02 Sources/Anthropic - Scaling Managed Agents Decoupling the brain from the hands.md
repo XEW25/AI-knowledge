@@ -5,7 +5,7 @@
 ## Metadata
 - Type: source note
 - Format: web engineering article
-- Authors: [[Lance Martin]], [[Gabe Cemaj]], [[Michael Cohen]]
+- Authors: Lance Martin, Gabe Cemaj, Michael Cohen
 - Organization: [[Anthropic]]
 - Date accessed: 2026-04-12
 - Original URL: https://www.anthropic.com/engineering/managed-agents

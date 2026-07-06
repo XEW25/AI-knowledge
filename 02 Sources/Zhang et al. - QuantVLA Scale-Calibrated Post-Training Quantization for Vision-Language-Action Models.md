@@ -5,7 +5,7 @@
 ## Metadata
 - Type: source note
 - Format: arXiv paper / **CVPR 2026**
-- Authors: [[Jingxuan Zhang]]*, Yunta Hsieh*, Zhongwei Wan, Haokun Lin, Xin Wang, Ziqi Wang, Yingtie Lei, Mi Zhang† (*equal; †corresponding)
+- Authors: Jingxuan Zhang*, Yunta Hsieh*, Zhongwei Wan, Haokun Lin, Xin Wang, Ziqi Wang, Yingtie Lei, Mi Zhang† (*equal; †corresponding)
 - Organization: **The Ohio State University** (Mi Zhang's AIoT-MLSys-Lab) + **University of Michigan** + **City University of Hong Kong**. *(verified from PDF)* — author **Haokun Lin is the first author of DuQuant**, the method QuantVLA builds on.
 - Date accessed: 2026-06-03
 - Original URL: https://arxiv.org/abs/2602.20309

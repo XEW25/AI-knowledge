@@ -49,8 +49,14 @@ except Exception:
     pass
 
 WIKILINK = re.compile(r"(!?)\[\[([^\]]+?)\]\]")
-FENCED = re.compile(r"```.*?```", re.S)
-INLINE = re.compile(r"`[^`]*`")
+# strip code spans before scanning, longest backtick-run first, so that
+# documentation examples (incl. double-backtick spans like `` `[[X]]` ``) are
+# not miscounted as links
+CODE_RXS = (
+    re.compile(r"```.*?```", re.S),   # fenced / triple
+    re.compile(r"``.+?``", re.S),      # double-backtick spans
+    re.compile(r"`[^`]*`"),            # single-backtick spans
+)
 
 
 def relp(path):
@@ -122,7 +128,9 @@ def main():
 
     for r in md:
         with open(os.path.join(VAULT, r), encoding="utf-8") as f:
-            text = INLINE.sub("", FENCED.sub("", f.read()))   # strip code first
+            text = f.read()
+        for _rx in CODE_RXS:                                   # strip code first
+            text = _rx.sub(" ", text)
         scan_broken = args.include_log or r != LOG_REL
         for m in WIKILINK.finditer(text):
             t = link_target(m.group(2))

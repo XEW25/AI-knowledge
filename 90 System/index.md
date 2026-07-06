@@ -98,6 +98,7 @@
 - [[Cloud-edge co-evolving embodied agent - a continuous-evolution framework]] — **端云协同持续演进框架**(与 Ethan brainstorm 共建):两核心(端侧推理-vs-学习算力争用 / 跨场景无协同)、边端三类(学得好/稳/协同)+ 云端四类 + 对称桥、**四关键技术(2+2)**、核心证据(Thor/Orin 算力带宽、训练 8× 显存、三计算机=Thor 仅推理)、open problems。是 [[Home robot architecture - a hierarchical embodied agent]] 的"持续演进/学习平面"展开
 - [[Cloud-edge co-evolving embodied agent - figures and evidence]] — 上者的配图与证据附录:已核实硬数表(带来源)+ 7 张可重建 SVG(实时算力争用 / 孤岛-协同 / 成本标度 / CLS / Simplex 安全 / 模块化联邦 / 能力画像-契约共版本化)
 - [[World model trends - architecture, scale, function, hardware]] — **跨公司世界模型趋势综述**(架构 / 规模 / 功能 / 训练硬件 / 推理硬件 五块):核心论点"**输出表征 = 总变量**",一手决定其余;含 Dreamer/Cosmos/Genie/Sora/Marble/JEPA 系速查表 + 一张"输出表征→五项"对照图。世界模型趋势讨论的总收口
+- [[Embodied model function evolution - generalization as the master line]] — **具身模型功能演进重述**:端到端→大小脑协同→端云自闭环→**Agentic**,**以"泛化/可用性墙"为驱动**(泛化载体 模型→组合);含长程崩支点(p^N × 缺 L3)、例子池 + 脑/小脑配对表、可直接进汇报的论述。回应专家"需融入泛化不足"的反馈
 
 ## Maps
 - [[Home]] — top-level navigation page for the vault

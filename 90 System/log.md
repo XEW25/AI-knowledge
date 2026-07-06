@@ -561,6 +561,12 @@
 - Convergence point of three vault threads: JEPA/DINO latent prediction + latent-action (GO-1/LAPA) + WAM-for-control, via "a LAM's decoder already is a latent world model" (concurrent w/ Garrido et al.). Cites in-vault Motus + GigaWorld-Policy
 - PDF read from repo-external temp (9.85MB), not committed; cleaned up
 
+## [2026-06-30] synthesis | Embodied model function evolution — generalization as the master line
+- Created [[Embodied model function evolution - generalization as the master line]] — re-narration of the embodied-model function trend (端到端 → 大小脑协同 → 端云自闭环 → **Agentic**) driven by the **generalization/usability wall** rather than raw capability. Master variable: **the unit of generalization shifts 模型 → 组合**. Prompted by expert feedback that the trend must fold in "poor generalization + per-scene real-robot RL/teleop is unsustainable"
+- Content: 4-stage arc table (功能/泛化载体/墙/例子); long-horizon-collapse support (**p^N × missing L3 task-loop**; per-scene RL = linear dead-end; Agentic two knives = shorten chains + inter-skill correction); examples pool + brain/cerebellum pairing table + "内部 action expert ≠ 大小脑" purity spectrum; report-ready one-paragraph framing
+- Self-contained figure `assets/fig-embodied-function-generalization.svg`: 4-stage cards (功能/泛化载体/墙) + generalization-carrier arrow + linear→sublinear cost band
+- Ties together two-axis L3 + co-evolution framework + capability-vs-dependability + the 4-layer feedback loop under "generalization". Linked from Embodied Brain Models, MOC, index. Analysis-level; model examples vault-verified (BFM-2 marked vendor-reported)
+
 ## [2026-06-23] ingest | QVLA (4th VLA-quant source; DyQ-VLA's baseline) — completes a strategy×architecture 2×2
 - Ingested QVLA (Xu et al., SJTU AutoLab + CASIA + UCAS + Ant Group; **ICLR 2026**; arXiv:2602.03782) at user request — DyQ-VLA's per-channel baseline. Hand-verified against the full PDF (v1, 17pp incl. App A–E; pypdf). Raw: URL-only (3.47 MB, complies with the new >2 MB rule)
 - Open source: https://github.com/AutoLab-SAI-SJTU/QVLA (real code: sensitivity proxy + greedy gate assignment + eval, 44★). NB eval is `fakew` (fake-quant); LICENSE unstated. ⚠️ **QVLA (Xu, ICLR) ≠ QuantVLA (Zhang, CVPR)**; also called "AutoQVLA" in its own appendix tables

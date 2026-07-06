@@ -6,18 +6,18 @@
 - Type: source note
 - Format: arXiv paper / **NeurIPS 2024 (Oral)**
 - Authors: [[Haokun Lin]]*, Haobo Xu*, Yichen Wu*, Jingzhi Cui, Yingtao Zhang, Linzhan Mou, Linqi Song, Zhenan Sun†, Ying Wei† (*equal; †corresponding)
-- Organization: **UCAS** + **Tsinghua** + **CASIA (Institute of Automation, CAS)** + **City University of Hong Kong** + **Zhejiang University**. *(verified from PDF)* — first author **Haokun Lin later co-authored [[QuantVLA: Scale-Calibrated Post-Training Quantization for Vision-Language-Action Models|QuantVLA]]**.
+- Organization: **UCAS** + **Tsinghua** + **CASIA (Institute of Automation, CAS)** + **City University of Hong Kong** + **Zhejiang University**. *(verified from PDF)* — first author **Haokun Lin later co-authored [[Zhang et al. - QuantVLA Scale-Calibrated Post-Training Quantization for Vision-Language-Action Models|QuantVLA]]**.
 - Date accessed: 2026-06-03
 - Original URL: https://arxiv.org/abs/2406.01721
 - PDF URL: https://arxiv.org/pdf/2406.01721
 - arXiv ID: 2406.01721 (v3, 2024-11-01)
 - Open source: **yes** — https://github.com/Hsu1023/DuQuant, MIT, verified real code (`quantize/`, `get_rot.py`, eval harness; 180★) + project page duquant.github.io. DuQuant++ follow-up announced (Apr 2026).
 - Verification status: mechanism, baselines, results **hand-verified against the full PDF (v3, 29 pp incl. appendices) on 2026-06-03**.
-- Related: [[Model quantization]], [[VLA quantization]], [[SmoothQuant: Accurate and Efficient Post-Training Quantization for Large Language Models]], [[QuantVLA: Scale-Calibrated Post-Training Quantization for Vision-Language-Action Models]], [[Ω-QVLA: Robust Quantization for Vision-Language-Action Models via Composite Rotation and Per-step Scaling]]
+- Related: [[Model quantization]], [[VLA quantization]], [[Xiao et al. - SmoothQuant Accurate and Efficient Post-Training Quantization for Large Language Models]], [[Zhang et al. - QuantVLA Scale-Calibrated Post-Training Quantization for Vision-Language-Action Models]], [[Wang et al. - Omega-QVLA Robust Quantization for Vision-Language-Action Models via Composite Rotation and Per-step Scaling]]
 - Tags: #quantization #ptq #llm-quantization #w4a4 #rotation-quantization #permutation #activation-outliers #massive-outliers #neurips2024
 
 ## Summary
-DuQuant is a **training-free, rotation-based W4A4 PTQ** method for LLMs and the **foundational method underneath the vault's whole VLA-quant cluster** — both [[QuantVLA: Scale-Calibrated Post-Training Quantization for Vision-Language-Action Models|QuantVLA]] and [[Ω-QVLA: Robust Quantization for Vision-Language-Action Models via Composite Rotation and Per-step Scaling|Ω-QVLA]] adopt its reparameterization, and QuantVLA shares its first author (Haokun Lin).
+DuQuant is a **training-free, rotation-based W4A4 PTQ** method for LLMs and the **foundational method underneath the vault's whole VLA-quant cluster** — both [[Zhang et al. - QuantVLA Scale-Calibrated Post-Training Quantization for Vision-Language-Action Models|QuantVLA]] and [[Wang et al. - Omega-QVLA Robust Quantization for Vision-Language-Action Models via Composite Rotation and Per-step Scaling|Ω-QVLA]] adopt its reparameterization, and QuantVLA shares its first author (Haokun Lin).
 
 Its two contributions: (1) it **names and localizes "Massive Outliers"** — a few tokens with ~1000× magnitudes at the **FFN down-projection input** — and shows why smoothing-only methods (SmoothQuant) and optimization methods (OmniQuant/AffineQuant) break on them; (2) the **"dual transformation"**: a per-channel smoothing `Λ`, a greedy **data-aware block-diagonal rotation** `R̂(1)` that redistributes outliers within blocks, a **zigzag permutation** `P` that balances them across blocks, and a second rotation `R̂(2)`. All are orthogonal (rotation/permutation) or diagonal (smoothing), folded into a composite `G` and `G⁻¹` so the linear map is preserved. Because it smooths weights *and* activations and manages outliers so well, it reaches SOTA W4A4 **using plain RTN — no GPTQ** — and runs fast (quantizes LLaMA2-7B in 50 s, 2.08× pre-fill speedup with a real W4A4 kernel).
 

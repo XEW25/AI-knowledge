@@ -11,9 +11,9 @@
 - Original URL: https://arxiv.org/abs/2605.28803
 - PDF URL: https://arxiv.org/pdf/2605.28803
 - arXiv ID: 2605.28803 (v1, 2026-05-27)
-- Open source: **yes** — https://github.com/UCMP13753/Omega-QVLA, Apache-2.0; verified to contain real quantization code (`gr00t/quantization/`, build/merge/eval scripts), weights via Hugging Face. (Contrast: [[DyQ-VLA: Temporal-Dynamic-Aware Quantization for Embodied Vision-Language-Action Models|DyQ-VLA]] released no code.)
+- Open source: **yes** — https://github.com/UCMP13753/Omega-QVLA, Apache-2.0; verified to contain real quantization code (`gr00t/quantization/`, build/merge/eval scripts), weights via Hugging Face. (Contrast: [[Zheng et al. - DyQ-VLA Temporal-Dynamic-Aware Quantization for Embodied Vision-Language-Action Models|DyQ-VLA]] released no code.)
 - Verification status: mechanism, baselines, results **hand-verified against the full PDF (v1, 18 pp) on 2026-06-03**
-- Related: [[VLA quantization]], [[Model quantization]], [[DyQ-VLA: Temporal-Dynamic-Aware Quantization for Embodied Vision-Language-Action Models]], [[SmoothQuant: Accurate and Efficient Post-Training Quantization for Large Language Models]], [[Physical Intelligence - pi0.5 a VLA with Open-World Generalization]], [[NVIDIA - GR00T N1 An Open Foundation Model for Generalist Humanoid Robots]]
+- Related: [[VLA quantization]], [[Model quantization]], [[Zheng et al. - DyQ-VLA Temporal-Dynamic-Aware Quantization for Embodied Vision-Language-Action Models]], [[Xiao et al. - SmoothQuant Accurate and Efficient Post-Training Quantization for Large Language Models]], [[Physical Intelligence - pi0.5 a VLA with Open-World Generalization]], [[NVIDIA - GR00T N1 An Open Foundation Model for Generalist Humanoid Robots]]
 - Tags: #quantization #ptq #vla-quantization #embodied-ai #w4a4 #rotation-quantization #diffusion-transformer #dit #per-step-scaling
 
 ## Summary
@@ -36,7 +36,7 @@ On LIBERO it quantizes **π0.5** to 98.0% (FP16 97.1%) and **GR00T N1.5** to 87.
 - **Ablation:** SVD-only+PS 79.25 → +Hadamard 85.75 → +per-step 87.75.
 
 ## Why it matters
-This is the vault's **second VLA-quantization source** and the natural counterpart to [[DyQ-VLA: Temporal-Dynamic-Aware Quantization for Embodied Vision-Language-Action Models|DyQ-VLA]]. Together they justify the new concept page [[VLA quantization]], because they take **opposite stances on the central question — does VLA low-bit need mixed precision?**
+This is the vault's **second VLA-quantization source** and the natural counterpart to [[Zheng et al. - DyQ-VLA Temporal-Dynamic-Aware Quantization for Embodied Vision-Language-Action Models|DyQ-VLA]]. Together they justify the new concept page [[VLA quantization]], because they take **opposite stances on the central question — does VLA low-bit need mixed precision?**
 
 - DyQ-VLA (autoregressive OpenVLA): *yes* — uniform low-bit is unstable in fragile phases, so allocate bit-width dynamically (W4AX) via a runtime kinematic proxy.
 - Ω-QVLA (diffusion π0.5 / GR00T): *no* — with the right rotation + per-step scaling, even the notoriously fragile DiT head survives **uniform** W4A4; no mixed precision.

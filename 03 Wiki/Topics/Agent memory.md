@@ -23,7 +23,7 @@ This topic covers:
 - [[Meta-skills for memory orchestration]]
 
 ### Sources
-- [[MemPO: Self-Memory Policy Optimization for Long-Horizon Agents]]
+- [[Li et al. - MemPO Self-Memory Policy Optimization for Long-Horizon Agents]]
 - [[Alex Zhang - The Mismanaged Geniuses Hypothesis]]
 - [[Huang et al. - ChemBot Long-Term Memory for VLA-based Agents]]
 - [[Physical Intelligence - pi0.6 a VLA That Learns From Experience]]

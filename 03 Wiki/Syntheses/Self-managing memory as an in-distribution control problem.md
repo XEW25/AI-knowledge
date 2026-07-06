@@ -7,7 +7,7 @@ A useful way to rethink memory in agent systems is this:
 
 Under this view, the difficulty of memory is not only storage or retrieval. It is also a control problem: deciding when to write, what to preserve, how to structure it, when to retrieve, how to merge new information with old memory, when to discard, and how to turn memory state back into task-relevant working context.
 
-This framing connects naturally to the [[Mismanaged Geniuses Hypothesis]] style of thinking: perhaps the bottleneck is not solely that the model lacks the capability, but that the system lacks the right decomposition for expressing and training the capability.
+This framing connects naturally to the [[Alex Zhang - The Mismanaged Geniuses Hypothesis]] style of thinking: perhaps the bottleneck is not solely that the model lacks the capability, but that the system lacks the right decomposition for expressing and training the capability.
 
 ## From OOD ability to decomposed control
 A common way to describe advanced memory is as if the model must somehow learn a holistic and autonomous memory faculty. Framed this way, self-managed memory sounds like a strongly out-of-distribution capability.
@@ -115,4 +115,4 @@ A useful memory system may need explicit support for:
 - [[Meta-skills for memory orchestration]]
 - [[Open questions in agent memory and decomposition]]
 - [[Memory Policy]]
-- [[MemPO: Self-Memory Policy Optimization for Long-Horizon Agents]]
+- [[Li et al. - MemPO Self-Memory Policy Optimization for Long-Horizon Agents]]

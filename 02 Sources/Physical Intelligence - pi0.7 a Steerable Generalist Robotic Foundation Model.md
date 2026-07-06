@@ -7,7 +7,7 @@
 - **Year**: 2026
 - **Open-source**: ❌ 未开源（已核实：openpi 仅开源 π₀ / π₀-FAST / π₀.5，π₀.7 不在其中）
 - **Accessed**: 2026-04-29
-- **Raw note**: [[2026-04-29 - Physical Intelligence - pi0.7 a Steerable Generalist Robotic Foundation Model.md]]
+- **Raw note**: [[2026-04-29 - Physical Intelligence - pi0.7 a Steerable Generalist Robotic Foundation Model]]
 
 ## Model Paper Checklist
 

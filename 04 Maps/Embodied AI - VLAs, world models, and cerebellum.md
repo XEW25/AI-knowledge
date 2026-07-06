@@ -8,6 +8,7 @@ This map collects the vault's embodied-AI cluster: vision-language-action (VLA) 
 ## Entry points
 
 ### Concepts (start here)
+- [[VLA - Vision-Language-Action Models]] — **base concept / hub** for the VLA family: definition, boundaries (vs WAM / motion controller), architecture axes, and the vault's VLA instances
 - [[Embodied Brain Models]] — the central page: deployment-driven brain/cerebellum definition, 三流派 taxonomy, VLM-as-actor vs encoder axis, Paradigm A/B, two-level coupling framework, forward predictions
 - [[Embodied Cerebellum Models]] — the edge half: the multi-rate control stack, four cerebellum forms, edge-deployment tech, dependability/"脊髓" layer
 - [[World-Action Models]] — video-backbone + action paradigm; 4-generation architecture evolution
@@ -46,10 +47,11 @@ This map collects the vault's embodied-AI cluster: vision-language-action (VLA) 
 - [[Chen et al. - LaWAM Latent World Action Models for Efficient Dynamics-Aware Robot Policies|LaWAM]] — **隐空间 World-Action Model**(冻结 DINOv3 + 把 LAM-decoder 复用成 230M 世界模型,单次出隐子目标喂动作专家);比像素 WAM 快 ~24×,LIBERO 98.6%/RoboTwin 91.22%(标准榜)
 
 ### Sources — VLA quantization
-- [[DyQ-VLA: Temporal-Dynamic-Aware Quantization for Embodied Vision-Language-Action Models|DyQ-VLA]] · [[QuantVLA: Scale-Calibrated Post-Training Quantization for Vision-Language-Action Models|QuantVLA]] · [[Ω-QVLA: Robust Quantization for Vision-Language-Action Models via Composite Rotation and Per-step Scaling|Ω-QVLA]] · [[DuQuant: Distributing Outliers via Dual Transformation Makes Stronger Quantized LLMs|DuQuant]]
+- [[Zheng et al. - DyQ-VLA Temporal-Dynamic-Aware Quantization for Embodied Vision-Language-Action Models|DyQ-VLA]] · [[Zhang et al. - QuantVLA Scale-Calibrated Post-Training Quantization for Vision-Language-Action Models|QuantVLA]] · [[Wang et al. - Omega-QVLA Robust Quantization for Vision-Language-Action Models via Composite Rotation and Per-step Scaling|Ω-QVLA]] · [[Lin et al. - DuQuant Distributing Outliers via Dual Transformation Makes Stronger Quantized LLMs|DuQuant]]
 
 ### Entities
-- [[Physical Intelligence (π)]] · [[NVIDIA]] · [[Figure AI]] · [[AgiBot 智元]] · [[Galaxea 星海图]] · [[Galbot 银河通用]] · [[DeepCybo]] · [[LimX Dynamics]] · [[ACE Robotics]] · [[Yann LeCun]] (人物)
+- Orgs: [[Physical Intelligence (π)]] · [[NVIDIA]] · [[Figure AI]] · [[AgiBot 智元]] · [[Galaxea 星海图]] · [[Galbot 银河通用]] · [[DeepCybo]] · [[LimX Dynamics]] · [[ACE Robotics]] · [[AI2 Robotics]]
+- People: [[Yann LeCun]] · [[Sergey Levine]] · [[Chelsea Finn]] · [[Li Fei-Fei]] · [[Song Han]]
 
 ## Narrative spine
 A useful path through the cluster:
@@ -76,7 +78,7 @@ Cerebellum = a frequency/intelligence/determinism gradient (50Hz VLA → 1kHz co
 The open frontier is not raw capability but reliability — monitoring, safety reflexes, disconnection tolerance — concentrated on the edge side.
 
 ## Suggested next additions
-- person entity pages (Sergey Levine, Chelsea Finn — currently dangling links)
+- ✅ person entity pages (Sergey Levine, Chelsea Finn, Li Fei-Fei, Song Han) — added; base [[VLA - Vision-Language-Action Models]] concept page added
 - academic-baseline source notes (OpenVLA, RT-1/2/X, V-JEPA, Cosmos, Genie)
 - a latent-action synthesis (GO-1 VQ + Motus optical-flow + PhysBrain egocentric + LAPA + Genie)
 - a "world-model-at-inference" synthesis (the 4-tier → runtime-knob spectrum)

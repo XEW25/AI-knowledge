@@ -14,7 +14,7 @@
 - Open source: **yes** — https://github.com/AutoLab-SAI-SJTU/QVLA (real code: sensitivity proxy + greedy gate assignment + eval; 44★). NB: eval is **`fakew` (fake-quant simulation)**; LICENSE not stated.
 - Verification status: method, results, baselines **hand-verified against the full PDF (v1, 17 pp incl. App. A–E) on 2026-06-23**.
 - ⚠️ **QVLA (Xu, this paper) ≠ QuantVLA (Zhang, CVPR 2026, 2602.20309)** — different papers, both Feb 2026. Also called **"AutoQVLA"** in this paper's appendix tables.
-- Related: [[VLA quantization]], [[Model quantization]], [[DyQ-VLA: Temporal-Dynamic-Aware Quantization for Embodied Vision-Language-Action Models]], [[QuantVLA: Scale-Calibrated Post-Training Quantization for Vision-Language-Action Models]], [[Ω-QVLA: Robust Quantization for Vision-Language-Action Models via Composite Rotation and Per-step Scaling]], [[SmoothQuant: Accurate and Efficient Post-Training Quantization for Large Language Models]]
+- Related: [[VLA quantization]], [[Model quantization]], [[Zheng et al. - DyQ-VLA Temporal-Dynamic-Aware Quantization for Embodied Vision-Language-Action Models]], [[Zhang et al. - QuantVLA Scale-Calibrated Post-Training Quantization for Vision-Language-Action Models]], [[Wang et al. - Omega-QVLA Robust Quantization for Vision-Language-Action Models via Composite Rotation and Per-step Scaling]], [[Xiao et al. - SmoothQuant Accurate and Efficient Post-Training Quantization for Large Language Models]]
 - Tags: #quantization #ptq #vla-quantization #embodied-ai #mixed-precision #bit-allocation #pruning #action-centric #iclr2026
 
 ## Summary
@@ -40,8 +40,8 @@ QVLA **completes a clean 2×2** of the vault's VLA-quant cluster (the hub is [[V
 
 | | **静态 / 离线决定精度** | **动态 / 运行时决定精度** |
 |---|---|---|
-| **敏感度驱动比特分配** | **QVLA** (per-channel action-sensitivity + 0-bit prune) | [[DyQ-VLA: Temporal-Dynamic-Aware Quantization for Embodied Vision-Language-Action Models\|DyQ-VLA]] (per-step kinematic bit-switch) |
-| **分布重塑 / 旋转** | [[QuantVLA: Scale-Calibrated Post-Training Quantization for Vision-Language-Action Models\|QuantVLA]] (selective, keep DiT-attn FP) · [[Ω-QVLA: Robust Quantization for Vision-Language-Action Models via Composite Rotation and Per-step Scaling\|Ω-QVLA]] (uniform W4A4) | — |
+| **敏感度驱动比特分配** | **QVLA** (per-channel action-sensitivity + 0-bit prune) | [[Zheng et al. - DyQ-VLA Temporal-Dynamic-Aware Quantization for Embodied Vision-Language-Action Models\|DyQ-VLA]] (per-step kinematic bit-switch) |
+| **分布重塑 / 旋转** | [[Zhang et al. - QuantVLA Scale-Calibrated Post-Training Quantization for Vision-Language-Action Models\|QuantVLA]] (selective, keep DiT-attn FP) · [[Wang et al. - Omega-QVLA Robust Quantization for Vision-Language-Action Models via Composite Rotation and Per-step Scaling\|Ω-QVLA]] (uniform W4A4) | — |
 
 Three sharp relationships:
 - **QVLA is DyQ-VLA's static sibling.** Both are on the OpenVLA family and allocate precision by *action sensitivity*; QVLA decides **per-channel, offline** (+ pruning), DyQ-VLA decides **per-step, at runtime** (via a kinematic proxy). **DyQ-VLA literally uses QVLA as a baseline and beats it by only ~0.1%** — i.e. DyQ-VLA = "QVLA's static allocation, made dynamic," and the dynamic gain over the static allocator is marginal. Reading QVLA explains what DyQ-VLA's "QVLA (per-channel)" baseline actually is.

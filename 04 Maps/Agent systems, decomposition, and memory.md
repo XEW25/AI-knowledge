@@ -7,9 +7,9 @@ This map collects the cluster of pages in the vault that deal with agent organiz
 ### Sources
 - [[Alex Zhang - The Mismanaged Geniuses Hypothesis]]
 - [[Andrej Karpathy - LLM Wiki]]
-- [[MemPO: Self-Memory Policy Optimization for Long-Horizon Agents]]
-- [[Harness design for long-running application development]]
-- [[Scaling Managed Agents Decoupling the brain from the hands]]
+- [[Li et al. - MemPO Self-Memory Policy Optimization for Long-Horizon Agents]]
+- [[Prithvi Rajasekaran - Harness design for long-running application development]]
+- [[Anthropic - Scaling Managed Agents Decoupling the brain from the hands]]
 
 ### Concepts
 - [[LLM Wiki]]
@@ -43,7 +43,7 @@ A useful narrative through these pages is:
 2. [[Alex Zhang - The Mismanaged Geniuses Hypothesis]] argues that AI capability may be bottlenecked by poor decomposition and orchestration rather than only by base-model quality.
 3. [[Task decomposition]] and [[Agent orchestration]] provide the core conceptual tools for understanding that claim.
 4. [[Harness design]] adds the engineering perspective that system scaffolding and load-bearing components materially shape long-running agent performance.
-5. [[Scaling Managed Agents Decoupling the brain from the hands]] extends that line upward into platform abstractions, arguing for stable interfaces around sessions, harnesses, and execution environments.
+5. [[Anthropic - Scaling Managed Agents Decoupling the brain from the hands]] extends that line upward into platform abstractions, arguing for stable interfaces around sessions, harnesses, and execution environments.
 6. [[Recursive Language Models]] suggest that richer decomposition languages may unlock stronger long-horizon behavior.
 7. [[Self-managing memory as an in-distribution control problem]] extends this logic into memory systems.
 8. [[Meta-skills for memory orchestration]] proposes a concrete route for turning memory management into reusable control policies.

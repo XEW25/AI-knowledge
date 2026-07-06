@@ -1,21 +1,19 @@
 # Index
 
 ## Inbox
-- [[00 Inbox]]
+- *(empty — capture / intake area; see [[90 System/AGENTS]] for intake rules)*
 
 ## Raw
-- [[01 Raw]]
 - [[2026-04-11 - Andrej Karpathy - LLM Wiki]] — raw capture of the original `llm-wiki.md` idea document
 
 ## Sources
-- [[02 Sources]]
 - [[Andrej Karpathy - LLM Wiki]] — source note on the LLM Wiki pattern proposed by Andrej Karpathy
 - [[Alex Zhang - The Mismanaged Geniuses Hypothesis]] — source note on learned decomposition, orchestration, and the claim that frontier LMs are underutilized by brittle scaffolds
-- [[MemPO: Self-Memory Policy Optimization for Long-Horizon Agents]] — source note on training memory as an explicit agent action and policy for long-horizon tasks
-- [[Harness design for long-running application development]] — source note on multi-agent harness design, evaluator separation, and long-running application builds
-- [[Scaling Managed Agents Decoupling the brain from the hands]] — source note on managed-agent architecture, decoupled sessions/harnesses/sandboxes, and stable platform abstractions
-- [[Ascend HiFloat8 Format for Deep Learning]] — source note on a proposed FP8-like tapered-precision format for low-bit training and inference
-- [[SmoothQuant: Accurate and Efficient Post-Training Quantization for Large Language Models]] — source note on activation smoothing, difficulty migration, and hardware-friendly W8A8 PTQ for LLMs
+- [[Li et al. - MemPO Self-Memory Policy Optimization for Long-Horizon Agents]] — source note on training memory as an explicit agent action and policy for long-horizon tasks
+- [[Prithvi Rajasekaran - Harness design for long-running application development]] — source note on multi-agent harness design, evaluator separation, and long-running application builds
+- [[Anthropic - Scaling Managed Agents Decoupling the brain from the hands]] — source note on managed-agent architecture, decoupled sessions/harnesses/sandboxes, and stable platform abstractions
+- [[Luo et al. - Ascend HiFloat8 Format for Deep Learning]] — source note on a proposed FP8-like tapered-precision format for low-bit training and inference
+- [[Xiao et al. - SmoothQuant Accurate and Efficient Post-Training Quantization for Large Language Models]] — source note on activation smoothing, difficulty migration, and hardware-friendly W8A8 PTQ for LLMs
 - [[Kerbl et al. - 3D Gaussian Splatting for Real-Time Radiance Field Rendering]] — source note on the foundational 3DGS paper (SIGGRAPH 2023)
 - [[Huang et al. - ReKep Spatiotemporal Reasoning Keypoint Constraints for Robotic Manipulation]] — source note on keypoint-constraint-based manipulation via task decomposition (Li Fei-Fei group, Stanford)
 - [[Huang et al. - ChemBot Long-Term Memory for VLA-based Agents]] — source note on Agent-as-Planner + VLA-as-Skill with dual-layer memory for chemical lab automation
@@ -32,11 +30,11 @@
 - [[Galaxea - G0 Dual-System VLA Model]] — dual-system; language-subtask interface (ChemBot-like); G0-VLA internally Paradigm A (PaliGemma + flow matching); open
 - [[Galaxea - G0.5 Autoregressive VLM-as-Actor VLA]] — **architectural reversal of G0**: unified autoregressive VLM-as-actor (single decoder/weights/objective) vs the VLM-as-encoder mainstream; cross-embodiment VQ ActionCodec + in-stream CoT + visual memory; introduces the more fundamental actor-vs-encoder axis above Paradigm A/B; Qwen3.5-2B backbone; backbone released
 - [[DeepCybo - TwinBrainVLA Asymmetric Mixture-of-Transformers for Anti-Forgetting VLA]] — DeepCybo (PhysBrain team); anti-catastrophic-forgetting via asymmetric dual-VLM (frozen generalist "Left Brain" + trainable specialist "Right Brain" + AsyMoT) → flow-matching expert; VLM-as-encoder / Paradigm-A variant; quantifies forgetting (POPE 88.87%→0.04%); no code released
-- [[DyQ-VLA: Temporal-Dynamic-Aware Quantization for Embodied Vision-Language-Action Models]] — source note on runtime-adaptive (kinematic-gated) mixed-precision PTQ for VLAs; **first embodied/VLA quantization entry** and first bridge between the quantization and embodied clusters; static W4 weights + dynamic activations (W4AX), base model OpenVLA; 99.5% perf at 30.9% memory, 1.49× sim / up to 1.43× real
-- [[Ω-QVLA: Robust Quantization for Vision-Language-Action Models via Composite Rotation and Per-step Scaling]] — source note on **uniform W4A4** PTQ of VLA models *including the diffusion DiT action head*, via composite SVD·Hadamard rotation + per-step scaling; second VLA-quant source and the counterpart to DyQ-VLA (uniform-precision vs dynamic-mixed-precision); quantizes π0.5 (98.0%) & GR00T N1.5 (87.8%) ≈ FP16 at ~71% memory saved; open source (Apache-2.0)
-- [[QuantVLA: Scale-Calibrated Post-Training Quantization for Vision-Language-Action Models]] — source note on **selective W4A8** PTQ for VLAs (Zhang et al., CVPR 2026); third VLA-quant source and Ω-QVLA's main baseline; DuQuant-based, integerizes LLM + DiT MLP but **keeps DiT attention FP16** + ATM/OHB interface calibrations; designed for real integer GEMMs; π0.5 97.6% / GR00T 88.0% (> FP16) at 55–70% mem. NB: ≠ QVLA (Xu, ICLR)
-- [[DuQuant: Distributing Outliers via Dual Transformation Makes Stronger Quantized LLMs]] — source note on the rotation-based W4A4 **LLM** quant method (Lin et al., NeurIPS 2024 Oral) **underpinning both QuantVLA and Ω-QVLA**; dual transformation = greedy data-aware block rotation + zigzag permutation + smoothing; named "massive outliers" @ FFN down_proj; reports real 2.08× speedup. Route-2 anchor / VLA-quant ancestor
-- [[QVLA: Not All Channels Are Equal in Vision-Language-Action Model's Quantization]] — source note on **action-centric** per-channel mixed-precision PTQ for VLAs (Xu et al., **ICLR 2026**); fourth VLA-quant source and **DyQ-VLA's baseline**; static bit allocation {0,2,4,8,16} (0-bit = pruning) by action-space sensitivity, uniform activations, keeps projector+action-head FP16; OpenVLA(-OFT) 98.9% @ 29.2% VRAM, 1.49×. NB: ≠ QuantVLA (Zhang, CVPR)
+- [[Zheng et al. - DyQ-VLA Temporal-Dynamic-Aware Quantization for Embodied Vision-Language-Action Models]] — source note on runtime-adaptive (kinematic-gated) mixed-precision PTQ for VLAs; **first embodied/VLA quantization entry** and first bridge between the quantization and embodied clusters; static W4 weights + dynamic activations (W4AX), base model OpenVLA; 99.5% perf at 30.9% memory, 1.49× sim / up to 1.43× real
+- [[Wang et al. - Omega-QVLA Robust Quantization for Vision-Language-Action Models via Composite Rotation and Per-step Scaling]] — source note on **uniform W4A4** PTQ of VLA models *including the diffusion DiT action head*, via composite SVD·Hadamard rotation + per-step scaling; second VLA-quant source and the counterpart to DyQ-VLA (uniform-precision vs dynamic-mixed-precision); quantizes π0.5 (98.0%) & GR00T N1.5 (87.8%) ≈ FP16 at ~71% memory saved; open source (Apache-2.0)
+- [[Zhang et al. - QuantVLA Scale-Calibrated Post-Training Quantization for Vision-Language-Action Models]] — source note on **selective W4A8** PTQ for VLAs (Zhang et al., CVPR 2026); third VLA-quant source and Ω-QVLA's main baseline; DuQuant-based, integerizes LLM + DiT MLP but **keeps DiT attention FP16** + ATM/OHB interface calibrations; designed for real integer GEMMs; π0.5 97.6% / GR00T 88.0% (> FP16) at 55–70% mem. NB: ≠ QVLA (Xu, ICLR)
+- [[Lin et al. - DuQuant Distributing Outliers via Dual Transformation Makes Stronger Quantized LLMs]] — source note on the rotation-based W4A4 **LLM** quant method (Lin et al., NeurIPS 2024 Oral) **underpinning both QuantVLA and Ω-QVLA**; dual transformation = greedy data-aware block rotation + zigzag permutation + smoothing; named "massive outliers" @ FFN down_proj; reports real 2.08× speedup. Route-2 anchor / VLA-quant ancestor
+- [[Xu et al. - QVLA Not All Channels Are Equal in Vision-Language-Action Models Quantization]] — source note on **action-centric** per-channel mixed-precision PTQ for VLAs (Xu et al., **ICLR 2026**); fourth VLA-quant source and **DyQ-VLA's baseline**; static bit allocation {0,2,4,8,16} (0-bit = pruning) by action-space sensitivity, uniform activations, keeps projector+action-head FP16; OpenVLA(-OFT) 98.9% @ 29.2% VRAM, 1.49×. NB: ≠ QuantVLA (Zhang, CVPR)
 - [[Bi et al. - Motus A Unified Latent Action World Model]] — unified latent-action **world-action model** (Tsinghua TSAIL × Horizon Robotics); tri-expert **MoT** (Qwen3-VL-2B understanding + Wan 2.2 5B video-gen + flow-matching action), **范式 A** joint attention; **UniDiffuser-style timestep scheduling → 5 switchable inference modes** (VLA / World Model / IDM / VGM / Joint); optical-flow "delta" latent actions + six-layer data pyramid; makes "world model at inference" a **runtime knob** (4th-gen WAM, vs GigaWorld's fixed drop); RoboTwin 2.0 88.66%, LIBERO-Long 97.6; project page only, no code
 - [[ACE Robotics - Kairos 3.0 a Real-Time Generative Video World Model]] — **NO-PAPER** ingest (code-verified): ACE Robotics (王晓刚/SenseTime-lineage) edge-first **generative video world model**, Cosmos rival. `KairosDiT` 4B video DiT (dim2560×32L, flow-matching) + **hybrid linear attention** (GatedDeltaNet 1-in-4, 25%) + Wan2.1 VAE + Qwen2.5-VL-7B + DMD-distilled edge variant; T2V/I2V/TI2V. **KEY: open release is video-gen ONLY — no action head despite PR's "action prediction" claim** (verify-don't-assume). Real open-source (Apache-2.0, weights on HF). Challenges the "pixel-level WM unsuitable for edge" assumption
 - [[Guo et al. - NeuroVLA Brain-inspired Neuromorphic Cortex-Cerebellum-Spinal VLA]] — **brain-inspired three-layer VLA** (HKUST-GZ Hui Xiong × AI2 Robotics): cortex (Qwen-VL+Q-Former) plans, cerebellum (GRU+FiLM) stabilizes @200Hz, **spinal = SNN on neuromorphic FPGA** (0.4W, 2.19ms, <20ms reflex). First neuromorphic VLA on real robots (self-claimed); jerk −75.6%, collision recovery 54.8% vs 0% (all **custom metrics on self-designed real-robot tasks — NOT a standard success-rate leaderboard**; OpenVLA/-OFT/UniVLA/WorldVLA comparison is a qualitative bar chart with no published numbers, LIBERO only in an internal ablation). Real open-source. Adds **neuromorphic/SNN as an edge-efficiency route** parallel to [[VLA quantization]]; independently corroborates the cortex/cerebellum/spinal stack but on a bio-structural+compute axis, NOT the deployment axis (its 3 layers are all on-board)
@@ -57,6 +55,7 @@
 - [[3D Gaussian Splatting]] — explicit scene representation via 3D Gaussian blobs, real-time splatting rendering, and applications in embodied AI
 - [[3D Spatial Representation]] — 理想 3D 空间表征的必要性、特征、语言类比，及 open research question
 - [[Object-Centric Representation]] — 以物体为基本单元的场景表示方法，支持组合泛化
+- [[VLA - Vision-Language-Action Models]] — **base concept / hub** for the VLA family: definition, boundaries (vs WAM / motion controller), architecture axes (actor-vs-encoder, Paradigm A/B), and the vault's VLA instances
 - [[World-Action Models]] — WAM 范式：视频生成 backbone + 动作预测，架构演进与路线对比
 - [[JEPA]] — Joint-Embedding Predictive Architecture(LeCun):**隐空间、非生成**的世界模型框架;谱系 I-JEPA→V-JEPA→**V-JEPA 2 / V-JEPA 2-AC**(Meta)/ DINO-WM / PLDM / [[Maes et al. - LeWorldModel (LeWM) Stable End-to-End JEPA from Pixels|LeWM]] + 防塌缩谱系(EMA/VICReg/SIGReg);JEPA vs 生成式对照。世界模型趋势讨论底座
 - [[Embodied Brain Models]] — 大脑模型的部署驱动定义（云=大脑、端=小脑）、三个主流流派（LLM/VLM-as-brain, Predictive Spatial Models, VLA 特殊定位）、接口/方法学正交维度、前瞻预判（骨架页）
@@ -79,6 +78,10 @@
 - [[Galaxea 星海图]] — 中国具身（G0 双系统 VLA，语言子任务接口；开源）
 - [[Galbot 银河通用]] — 中国人形（王鹤 / 北大 EPIC；Humanoid-GPT / AstraBrain-WBC 全身运控小脑基座，真开源）**⚠️ ≠ [[Galaxea 星海图]]**
 - [[Yann LeCun]] — 人物;JEPA / 世界模型路线倡导者(图灵奖)。本库收其 [[Maes et al. - LeWorldModel (LeWM) Stable End-to-End JEPA from Pixels|LeWM]](潜在世界模型)
+- [[Sergey Levine]] — 人物;UC Berkeley + [[Physical Intelligence (π)]] Chief Scientist；π 系列（Paradigm A）背后的思想引擎
+- [[Chelsea Finn]] — 人物;Stanford + [[Physical Intelligence (π)]] Research Lead；π 系列联合创始人，元学习（MAML）
+- [[Li Fei-Fei]] — 人物;Stanford / World Labs；ReKep 出自其团队，空间智能旗手
+- [[Song Han]] — 人物;MIT；SmoothQuant 资深作者，本库量化簇 reshaping 路线的谱系上游
 - [[DeepCybo]] — 中关村孵化，PhysBrain（VLM-as-brain，人类视频路线）
 - [[LimX Dynamics]] — 深圳足式+具身（ChemBot 完全分离双层架构）
 - [[ACE Robotics]] — 上海具身世界模型（王晓刚/商汤系；Kairos 3.0 边缘生成式视频世界模型，对标 Cosmos；真开源）

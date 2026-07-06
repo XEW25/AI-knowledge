@@ -11,6 +11,6 @@ Anthropic is relevant here not just as a model provider, but as a source of conc
 
 ## Related
 - [[Andrej Karpathy - LLM Wiki]]
-- [[Harness design for long-running application development]]
+- [[Prithvi Rajasekaran - Harness design for long-running application development]]
 - [[Claude Code]]
 - [[Harness design]]

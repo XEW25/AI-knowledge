@@ -45,8 +45,8 @@ Harness design is closely connected to:
 - [[Task decomposition]]
 - [[Claude Code]]
 - [[OpenClaw]]
-- [[Harness design for long-running application development]]
-- [[Scaling Managed Agents Decoupling the brain from the hands]]
+- [[Prithvi Rajasekaran - Harness design for long-running application development]]
+- [[Anthropic - Scaling Managed Agents Decoupling the brain from the hands]]
 
 It is a useful concept for understanding when capability gains come from better scaffolding rather than only from better base models, and when platform abstractions should be designed to outlast any single harness implementation.
 
@@ -59,8 +59,8 @@ It is a useful concept for understanding when capability gains come from better 
 ## Related
 - [[Agent orchestration]]
 - [[Task decomposition]]
-- [[Harness design for long-running application development]]
-- [[Scaling Managed Agents Decoupling the brain from the hands]]
+- [[Prithvi Rajasekaran - Harness design for long-running application development]]
+- [[Anthropic - Scaling Managed Agents Decoupling the brain from the hands]]
 - [[Claude Code]]
 - [[OpenClaw]]
 - [[Anthropic]]

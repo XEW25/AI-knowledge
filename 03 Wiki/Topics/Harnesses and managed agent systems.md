@@ -19,8 +19,8 @@ This topic covers:
 - [[Task decomposition]]
 
 ### Sources
-- [[Harness design for long-running application development]]
-- [[Scaling Managed Agents Decoupling the brain from the hands]]
+- [[Prithvi Rajasekaran - Harness design for long-running application development]]
+- [[Anthropic - Scaling Managed Agents Decoupling the brain from the hands]]
 
 ### Entities
 - [[Anthropic]]

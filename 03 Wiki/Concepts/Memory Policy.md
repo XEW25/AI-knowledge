@@ -12,7 +12,7 @@ This framing shifts memory from infrastructure to control. The important questio
 Long-horizon tasks make raw interaction history expensive and brittle. A strong memory policy can help the agent maintain compact, useful state across many steps without depending on ever-growing context windows.
 
 ## Connection to current work
-[[MemPO: Self-Memory Policy Optimization for Long-Horizon Agents]] is a useful example of this direction. It treats memory summarization as an explicit policy action and gives memory tokens dedicated credit assignment during training.
+[[Li et al. - MemPO Self-Memory Policy Optimization for Long-Horizon Agents]] is a useful example of this direction. It treats memory summarization as an explicit policy action and gives memory tokens dedicated credit assignment during training.
 
 ## Relation to this vault’s main line
 Memory policy is closely connected to:
@@ -30,7 +30,7 @@ This concept is especially relevant when asking whether self-managed memory can 
 - How should write, revise, merge, and discard decisions be trained?
 
 ## Related
-- [[MemPO: Self-Memory Policy Optimization for Long-Horizon Agents]]
+- [[Li et al. - MemPO Self-Memory Policy Optimization for Long-Horizon Agents]]
 - [[Self-managing memory as an in-distribution control problem]]
 - [[Meta-skills for memory orchestration]]
 - [[Open questions in agent memory and decomposition]]

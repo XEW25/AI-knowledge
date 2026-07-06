@@ -50,7 +50,7 @@ This map collects the vault's embodied-AI cluster: vision-language-action (VLA) 
 - [[Zheng et al. - DyQ-VLA Temporal-Dynamic-Aware Quantization for Embodied Vision-Language-Action Models|DyQ-VLA]] · [[Zhang et al. - QuantVLA Scale-Calibrated Post-Training Quantization for Vision-Language-Action Models|QuantVLA]] · [[Wang et al. - Omega-QVLA Robust Quantization for Vision-Language-Action Models via Composite Rotation and Per-step Scaling|Ω-QVLA]] · [[Lin et al. - DuQuant Distributing Outliers via Dual Transformation Makes Stronger Quantized LLMs|DuQuant]]
 
 ### Entities
-- Orgs: [[Physical Intelligence (π)]] · [[NVIDIA]] · [[Figure AI]] · [[AgiBot 智元]] · [[Galaxea 星海图]] · [[Galbot 银河通用]] · [[DeepCybo]] · [[LimX Dynamics]] · [[ACE Robotics]] · [[AI2 Robotics]]
+- Orgs: [[Physical Intelligence (π)]] · [[NVIDIA]] · [[Figure AI]] · [[AgiBot 智元]] · [[Galaxea 星海图]] · [[Galbot 银河通用]] · [[DeepCybo]] · [[LimX Dynamics]] · [[ACE Robotics]] · [[AI2 Robotics]] · [[GigaAI]]
 - People: [[Yann LeCun]] · [[Sergey Levine]] · [[Chelsea Finn]] · [[Li Fei-Fei]] · [[Song Han]]
 
 ## Narrative spine

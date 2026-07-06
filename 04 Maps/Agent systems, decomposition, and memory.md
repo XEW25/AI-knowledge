@@ -16,6 +16,8 @@ This map collects the cluster of pages in the vault that deal with agent organiz
 - [[Task decomposition]]
 - [[Agent orchestration]]
 - [[Recursive Language Models]]
+- [[AI coding agents]]
+- [[Task Decomposition as OOD Mitigation]]
 - [[Harness design]]
 
 ### Topics

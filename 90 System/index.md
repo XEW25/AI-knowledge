@@ -50,11 +50,15 @@
 - [[Task decomposition]] — breaking large problems into solvable subtasks for LM systems
 - [[Agent orchestration]] — how LM calls, tools, and subagents are coordinated
 - [[Recursive Language Models]] — recursive structures for richer LM composition
+- [[AI coding agents]] — LM systems that plan / spawn subagents / coordinate multi-step software work; the vault's mature evidence for the Mismanaged Geniuses Hypothesis
 - [[Memory Policy]] — framing memory management as part of agent behavior and control
 - [[Harness design]] — system scaffolding for long-running and structured agent work, extending upward toward meta-harness/platform abstractions
 - [[3D Gaussian Splatting]] — explicit scene representation via 3D Gaussian blobs, real-time splatting rendering, and applications in embodied AI
 - [[3D Spatial Representation]] — 理想 3D 空间表征的必要性、特征、语言类比，及 open research question
 - [[Object-Centric Representation]] — 以物体为基本单元的场景表示方法，支持组合泛化
+- [[Task Decomposition as OOD Mitigation]] — 把 OOD 任务拆成分布内子任务的跨簇论点（ReKep / RL Tokens / ChemBot / MGH）；[[Task decomposition]] 的 OOD 视角
+- [[Keypoint-based Manipulation]] — 以语义 3D 关键点表示场景 + 约束定义操控任务（ReKep 范式）
+- [[Constrained Optimization for Robot Control]] — 把任务写成目标+约束再求解动作（vs 学习策略）；ReKep 的"执行半"
 - [[VLA - Vision-Language-Action Models]] — **base concept / hub** for the VLA family: definition, boundaries (vs WAM / motion controller), architecture axes (actor-vs-encoder, Paradigm A/B), and the vault's VLA instances
 - [[World-Action Models]] — WAM 范式：视频生成 backbone + 动作预测，架构演进与路线对比
 - [[JEPA]] — Joint-Embedding Predictive Architecture(LeCun):**隐空间、非生成**的世界模型框架;谱系 I-JEPA→V-JEPA→**V-JEPA 2 / V-JEPA 2-AC**(Meta)/ DINO-WM / PLDM / [[Maes et al. - LeWorldModel (LeWM) Stable End-to-End JEPA from Pixels|LeWM]] + 防塌缩谱系(EMA/VICReg/SIGReg);JEPA vs 生成式对照。世界模型趋势讨论底座
@@ -86,6 +90,9 @@
 - [[LimX Dynamics]] — 深圳足式+具身（ChemBot 完全分离双层架构）
 - [[ACE Robotics]] — 上海具身世界模型（王晓刚/商汤系；Kairos 3.0 边缘生成式视频世界模型，对标 Cosmos；真开源）
 - [[AI2 Robotics]] — 深圳脑启发/神经形态具身（郭彦东；NeuroVLA = cortex/cerebellum/spinal SNN VLA，HKUST-GZ 熊辉合作；真开源）
+- [[GigaAI]] — 世界模型公司；GigaWorld-Policy（端到端 WAM，"训繁推简"）
+- [[Stanford Vision and Learning Lab]] — 斯坦福视觉/机器人学习实验室（含 Li Fei-Fei）；ReKep 来源组之一
+- [[Huawei]] — 昇腾（Ascend）AI 加速器；Ascend HiFloat8（FP8 数值格式设计路线）
 
 ### Topics
 - [[Agent memory]] — topic page for memory as policy, decomposition, and self-managed memory in agent systems

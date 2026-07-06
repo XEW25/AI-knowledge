@@ -53,7 +53,7 @@ ReKep 代表了一条与端到端 VLA/WAM 不同的解决路径：**任务拆解
 
 ## Related Concepts
 
-- [[Task Decomposition as OOD Mitigation]] (to be created)
+- [[Task Decomposition as OOD Mitigation]]
 - [[VLA - Vision-Language-Action Models]]
 - [[Keypoint-based Manipulation]]
 - [[Constrained Optimization for Robot Control]]

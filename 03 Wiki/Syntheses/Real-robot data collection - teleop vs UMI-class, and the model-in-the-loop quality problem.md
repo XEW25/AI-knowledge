@@ -30,6 +30,21 @@
 | 规模代表 | **AgiBot World**（智元）：100 万+轨迹 / 217 任务 / 5 场景，遥操数采工厂；**DROID**：76k 轨迹 / 350h / 564 场景 / 50 采集员×12 个月（分布式三大洲）；**Galaxea GOD**：500h / 10TB+ / 10 万+操作，R1 Lite 单本体；**Unitree UnifoLM-WBT**（2026-03）：G1 全身遥操、多末端（Inspire/Brainco 灵巧手、Dex1 夹爪） | **FastUMI-100K**：10 万+轨迹 / 54 任务 / ~600h；**DexUMI**：每任务数百条（灵巧手）；**它石智航 WIYH**（2025-12）：10 万+人类操作视频，VLTA（视觉-语言-**触觉**-动作），TARS-Vision+TARS-Glove 穿戴采集（公司口径） |
 | 质量保障现状 | AgiBot：标准化流水线 + **human-in-the-loop 人工核验**（论文一手） | FastUMI-100K：**纯启发式**——线/角速度异常检测 SLAM 漂移 + 工作空间包围盒过滤 |
 
+### 概念澄清：UMI 数据 ≠ human-centric 数据（判据 = 动作空间属于谁的本体）
+
+两者都"离机、由人产生"，但**不是一种数据**。UMI 的本质是**人通过"机器人末端形态的物理代理"演示**——手持夹爪即机器人夹爪替身，动作（SLAM 恢复的 6DoF 末端位姿 + 夹爪宽度）天然落在机器人动作空间，数据近乎直接可训。Human-centric（它石 WIYH 穿戴、[[DeepCybo - PhysBrain Human Egocentric Data as a Bridge from VLMs to Physical Intelligence|PhysBrain]] 纯视频）是**人用自己的手**——动作属于人手本体（或无显式动作），需 retargeting / 人手 inpainting / latent action 提取（[[AgiBot - GO-1 ViLLA Generalist Embodied Foundation Model|GO-1]] ViLLA、LAPA）才能变成训练数据。
+
+| | 遥操 | UMI 类 | 穿戴 human-centric | 纯人类视频 |
+|---|---|---|---|---|
+| 动作空间 | 机器人（真机产生） | **机器人末端**（代理装置） | **人手** | 无显式动作 |
+| 变成可训数据 | 直接 | 近乎直接（过滤） | retargeting + 视觉域迁移 | latent action 提取 |
+| 吞吐/规模上限 | 低 | 中（3–5×遥操） | 高 | 极高（互联网级） |
+| 典型用途 | SFT/精训 | SFT/预训练 | 预训练+对齐 | 表征/世界知识 |
+
+- **边界案例 DexUMI**：戴在人手上但用外骨骼把人手运动**机械约束**进机器灵巧手可行运动学 + SAM2/ProPainter 人手 inpainting——硬件+模型把"穿戴"拉回 UMI 类。判据不是手持/穿戴，而是**动作空间对齐**。
+- **系统含义**：谱系越靠右，**采集成本转移为数据管线的模型加工负载**（retargeting/latent action/inpainting/标注推理）——UMI 类"采集时用硬件关 gap"，human-centric"采集后用算力关 gap"（它石必须配 TARS Datacore 数据引擎即此故）。
+- 佐证：星海图数据金字塔把"UMI 数据"与"人类第一视角视频"列为两个独立类别（media，2026-04）。
+
 ### ⚠️ 核实结论：星海图并无 UMI 类硬件产品（回应调研前提）
 
 截至 2026-04 公开报道（品玩），**星海图未推出/命名任何 UMI 类手持或穿戴数采产品**；"UMI 数据"只是其 2026"真实数据金字塔"里的一个**数据类别/策略**。其旗舰 GOD 数据集刻意用 R1 Lite **单一本体遥操**采集，并把"动作空间一致性、语言标注对齐"作为质量卖点；团队实验发现**本体差距大时跨本体预训练收益显著减弱甚至为负**（media-reported）。中国公司里真正把"离机/穿戴采集"做成产品线的是 [[TARS 它石智航]]（TARS-Vision + TARS-Glove + TARS Datacore 数据引擎）。（若见到星海图新发布数采硬件，应补源更新本节。）

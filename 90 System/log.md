@@ -620,3 +620,4 @@
 - **核实更正**（用户前提）：截至 2026-04 报道，星海图**无** UMI 类硬件产品，"UMI 数据"仅为其数据金字塔类别；GOD 数据集为 R1 Lite 单本体遥操。穿戴离机采集的中国代表是它石智航
 - New entity [[TARS 它石智航]]（全 vendor/media 口径，标注清楚）；[[Galaxea 星海图]] 增补数据战略节 + B+ 轮估值更新。Wired: Embodied MOC（Syntheses + Orgs）、index（Syntheses + Entities）
 - 置信度纪律：对抗验证阶段被跳过 → 笔记顶部与"未覆盖与存疑"节明确声明"关键数字进汇报前需回读原文"；secondary 来源全部标 media/vendor
+- Follow-up (同日): 综合笔记 §1 增补"UMI 数据 ≠ human-centric 数据"概念澄清节——判据=动作空间属于谁的本体（机器人末端代理 vs 人手/无动作）、四范式谱系表、DexUMI 边界案例、"采集成本→管线模型加工负载转移"的系统含义

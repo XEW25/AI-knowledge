@@ -630,3 +630,9 @@
 - Follow-up (同日): §2 增补"机制辨析：哪些是真·训练后看表现"A/B/C/D 四分类（Ethan 追问）——A 聚合级数据集裁决(人人都做)、B 样本级仅 influence/datamodels 家族(DataMIL→CUPID→QoQ 逐级降价)、C 训练裁判=买断制(DemInf VAE统计量/Recap value function，工业化选C不选B的经济学)、D 无训练；"模型在环≠训练后看精度"、只有 A/B 调用昂贵 oracle
 - Follow-up (同日): 增补"训练阶段×数据层矩阵"（Ethan 问 AgiBot World/WIYH/GraspVLA/FastUMI-100K 归类与阶段映射）——四数据集恰各占一类（真机遥操/穿戴人类/仿真合成/UMI桥）；四段管线（VLM底座→具身预训练三层混吃·模仿目标→真机SFT→仿真RL吃环境交互·真机RL吃部署经验）；修正两个混淆（仿真数据主通道=模仿预训练非仿真RL；遥操数据集不喂真机RL）；判断：部署经验是唯一随保有量自动增长的数据类
 - Follow-up (同日): §3 新增 (d)"供给侧：为数据验证吞吐提速的训练管线优化"（Ethan 追问各公司有无专门优化）——五层哑铃形成熟度：I/O格式层(Robo-DM 50×/LeRobot v3 流式，证据最硬)、缩小oracle(冻结骨干+小头/小模型scaling代理)、验证折进训练(Recap/π0.7 消灭独立验证循环，最深)、仿真评估吞吐(万级并行+Tesla影子模式模板[存疑])、编排调度层(仅OSMO/重生成管线有痕迹——消融树调度/warm-start/增量估值近乎空白=空档)；标注研究机会：数据验证吞吐作为一等系统指标
+
+
+## [2026-07-07] restructure | 具身数据 synthesis 按三层金字塔重组
+- 应 Ethan 要求把 [[Real-robot data collection - teleop vs UMI-class, and the model-in-the-loop quality problem]] 从"遥操 vs UMI 范式优先"重写为**三层数据金字塔五段式**：§1 特征对比(大表+UMI桥1.1+遥操vsUMI细表1.2+部署经验1.3+阶段×数据矩阵1.4) → §2 每层例子(顶层/桥/中层/底层四表+星海图核实框) → §3 每层趋势(卖里程→卖闭环 / 双引擎+可重生成管线+sim-to-real六线 / 穿戴式主动生产+可用率个位数;跨层meta) → §4 评估体系(定义收敛+三代谱系+两级体系+三层裁决回路+判别例子+A/B/C/D辨析+分层回答) → §5 计算系统挑战(oracle代理层级+L0–L3评估栈 / 闭环三负载 / 管线基础设施 / 供给侧五层 / **新增三层×算力形态收口表**：顶层贵在评估、中层贵在生成、底层贵在清洗)
+- 对话中八轮追问补丁全部归位；新增内容仅 §5.5 收口表与"第二个异构性"论点；文件名保留(避免断链)，H1 改为三层主题；§6 集中列出记忆源清单(robomimic/DreamGen过滤/SynGrasp-1B/Tesla影子/OSMO)
+- 同步更新 Embodied MOC 与 index 的条目描述。Lint 待验

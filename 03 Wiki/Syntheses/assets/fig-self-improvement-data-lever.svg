@@ -1,0 +1,84 @@
+<svg viewBox="0 0 680 368" xmlns="http://www.w3.org/2000/svg"><style>text{font-family:"Segoe UI","Microsoft YaHei","PingFang SC",sans-serif}.t{fill:#2C2C2A}.ts{fill:#5F5E5A}.th{fill:#888780}.amber{fill:#854F0B}.teal{fill:#0F6E56}.purple{fill:#3C3489}</style><rect width="680" height="368" fill="#FAF9F5"/>
+  <defs><marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+
+  <text x="24" y="22" class="t" font-size="15" font-weight="500">真机自演进的数据杠杆：少量人类信号 × 大量自主经验</text>
+  <text x="24" y="38" class="ts" font-size="9">面板 A 为概念示意（面积 = 累计数据量，纵轴已压缩）；面板 B 为已核实量级。质量信号（价值函数 / 奖励分类器 / 外部真值）是让自主经验可用的转换器。</text>
+
+  <!-- ============ Panel A: conceptual stacked composition over training ============ -->
+  <text x="24" y="62" class="t" font-size="10.5" font-weight="600">A · 数据构成随训练/部署进程（概念示意）</text>
+
+  <!-- axes -->
+  <line x1="46" y1="72" x2="46" y2="292" stroke="#D8D6CC" stroke-width="1"/>
+  <line x1="46" y1="292" x2="360" y2="292" stroke="#B7B5AA" stroke-width="1" marker-end="url(#arr)"/>
+  <text x="358" y="304" class="th" font-size="8.5" text-anchor="end">训练 / 部署进程 →</text>
+  <text x="40" y="74" class="th" font-size="8.5" text-anchor="end" transform="rotate(-90 40 74)"> </text>
+  <text x="38" y="182" class="th" font-size="8.5" text-anchor="middle" transform="rotate(-90 38 182)">累计数据量（示意）</text>
+
+  <!-- stacked bands, bottom→top: demos (amber), interventions (purple), autonomous (teal); 2px cream separators via stroke -->
+  <!-- demos: constant band, collected upfront: y 292..279 -->
+  <path d="M48 292 L352 292 L352 279 L60 279 L48 285 Z" fill="#FAEEDA" stroke="#E0B978" stroke-width="1.2"/>
+  <!-- interventions: cumulative grows then plateaus: bottom = demos top; top edge dips from 279 to ~265 then flat -->
+  <path d="M60 279 L352 279 L352 265 C 260 264, 160 267, 96 272 C 78 274, 66 276.5, 60 279 Z" fill="#EEEDFE" stroke="#9A93E0" stroke-width="1.2"/>
+  <!-- autonomous: superlinear growth: bottom = interventions top; top edge from ~276 at left to 92 at right -->
+  <path d="M60 277.5 C 66 275, 78 272.5, 96 270.5 C 160 265.5, 260 262.5, 352 263 L352 92 C 300 118, 220 176, 152 218 C 116 240, 84 262, 62 276.2 Z" fill="#E1F5EE" stroke="#7CCBB0" stroke-width="1.2"/>
+
+  <!-- direct labels -->
+  <text x="258" y="178" class="teal" font-size="10" font-weight="600">自主经验</text>
+  <text x="258" y="190" class="ts" font-size="8.5">免费；随部署自动增长（量的主体）</text>
+  <text x="64" y="254" class="purple" font-size="9" font-weight="600">人工干预</text>
+  <text x="64" y="264" class="ts" font-size="8">按需触发，价值密度最高</text>
+  <path d="M132 262 C 142 266, 148 270, 152 274" fill="none" stroke="#9A93E0" stroke-width="1" marker-end="url(#arr)"/>
+  <text x="120" y="288.5" class="amber" font-size="9" font-weight="600">演示种子</text>
+  <text x="176" y="288.5" class="ts" font-size="8">百条级，一次性冷启动</text>
+
+  <!-- annotation: intervention decay -->
+  <path d="M300 236 C 312 246, 320 254, 326 264" fill="none" stroke="#9A93E0" stroke-width="1.2" marker-end="url(#arr)"/>
+  <text x="188" y="224" class="purple" font-size="8.5">干预占比随策略变强而衰减 → ~0</text>
+  <text x="188" y="234" class="th" font-size="8">（HIL-SERL：1–2.5h 达近完美，已核实）</text>
+
+  <!-- right-edge ratio bracket -->
+  <line x1="356" y1="92" x2="356" y2="263" stroke="#0F6E56" stroke-width="1" opacity="0.55"/>
+  <line x1="356" y1="265" x2="356" y2="292" stroke="#3C3489" stroke-width="1" opacity="0.55"/>
+  <text x="362" y="180" class="teal" font-size="8" transform="rotate(90 362 180)" text-anchor="middle">自主</text>
+  <text x="362" y="279" class="purple" font-size="8" transform="rotate(90 362 279)" text-anchor="middle">人类</text>
+
+  <!-- ============ Panel B: verified magnitudes ============ -->
+  <text x="396" y="62" class="t" font-size="10.5" font-weight="600">B · 已核实的配方量级</text>
+
+  <!-- RoboCat log axis: episodes per new task -->
+  <text x="396" y="80" class="ts" font-size="9" font-weight="600">RoboCat（DeepMind 2023）· 每个新任务的 episode 数</text>
+  <line x1="408" y1="140" x2="648" y2="140" stroke="#B7B5AA" stroke-width="1"/>
+  <g class="th" font-size="8" text-anchor="middle">
+    <line x1="408" y1="140" x2="408" y2="144" stroke="#B7B5AA"/><text x="408" y="154">10¹</text>
+    <line x1="468" y1="140" x2="468" y2="144" stroke="#B7B5AA"/><text x="468" y="154">10²</text>
+    <line x1="528" y1="140" x2="528" y2="144" stroke="#B7B5AA"/><text x="528" y="154">10³</text>
+    <line x1="588" y1="140" x2="588" y2="144" stroke="#B7B5AA"/><text x="588" y="154">10⁴</text>
+    <line x1="648" y1="140" x2="648" y2="144" stroke="#B7B5AA"/><text x="648" y="154">10⁵</text>
+  </g>
+  <!-- demos interval 10^2..10^3 -->
+  <rect x="468" y="96" width="60" height="12" rx="4" fill="#FAEEDA" stroke="#E0B978" stroke-width="1.2"/>
+  <text x="468" y="91" class="amber" font-size="8.5">人类演示 100–1000 条</text>
+  <!-- autonomous point ~10^4 -->
+  <circle cx="588" cy="122" r="6" fill="#E1F5EE" stroke="#1D9E75" stroke-width="1.5"/>
+  <text x="578" y="125" class="teal" font-size="8.5" text-anchor="end">自主练习 平均 ~1 万次</text>
+  <text x="408" y="171" class="ts" font-size="8.5">⇒ 演示 : 自主 ≈ <tspan font-weight="600">1 : 10–100</tspan>（计数口径一致，已核实）</text>
+
+  <!-- fact rows for other works (different units -> not on the axis) -->
+  <line x1="396" y1="184" x2="656" y2="184" stroke="#E5E3D9" stroke-width="1"/>
+  <g font-size="8.5">
+    <text x="396" y="200" class="t" font-weight="600">HIL-SERL</text>
+    <text x="396" y="211" class="ts">全程真机交互仅 <tspan font-weight="600">1–2.5 小时</tspan> → 近完美成功率；少量演示 +</text>
+    <text x="396" y="221" class="ts">按需干预 + 二值奖励分类器（Science Robotics，已核实）</text>
+    <text x="396" y="240" class="t" font-weight="600">π*₀.6 Recap</text>
+    <text x="396" y="251" class="ts">演示+自主+干预<tspan font-weight="600">全量混训</tspan>（不筛选），value function 打</text>
+    <text x="396" y="261" class="ts">advantage；自主小时数未披露（13h espresso 连续运行展示）</text>
+    <text x="396" y="280" class="t" font-weight="600">Scanford 飞轮</text>
+    <text x="396" y="291" class="ts"><tspan font-weight="600">0 人类信号</tspan>；2 周自主部署 + 外部真值（图书馆书目）自动标注</text>
+  </g>
+
+  <!-- footer -->
+  <line x1="24" y1="316" x2="656" y2="316" stroke="#E5E3D9" stroke-width="1"/>
+  <text x="24" y="332" class="th" font-size="8">面板 A 曲线形状为概念示意（非实测），末端"自主:人类"高度比按线性纵轴压缩绘制（~7:1），真实量级差见面板 B（10–100:1）。</text>
+  <text x="24" y="344" class="th" font-size="8">来源：RoboCat arXiv:2306.11706 · HIL-SERL arXiv:2410.21845 · π*₀.6 Recap（vault 源笔记，小时数未披露）· Scanford arXiv:2511.19647。详见 §1.3 表。</text>
+  <text x="24" y="356" class="th" font-size="8">系统含义：自主经验免费，但给它打分的算力（价值函数推理/成功检测）是常驻负载；"何时请求干预" = 主动学习调度问题。</text>
+</svg>

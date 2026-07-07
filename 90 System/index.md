@@ -112,7 +112,7 @@
 - [[Embodied model function evolution - generalization as the master line]] — **具身模型功能演进重述**:端到端→大小脑协同→端云自闭环→**Agentic**,**以"泛化/可用性墙"为驱动**(泛化载体 模型→组合);含长程崩支点(p^N × 缺 L3)、例子池 + 脑/小脑配对表、可直接进汇报的论述。回应专家"需融入泛化不足"的反馈
 
 - [[Future embodied Agent framework - integrated view]] — **整合入口**:把功能演进(why)/ 家庭架构(what)/ 端云 co-evolution(how)/ 地基(capability⟂dependability)缝成一页;含分层架构图 + "云↔端两条通道"整合点
-- [[Real-robot data collection - teleop vs UMI-class, and the model-in-the-loop quality problem]] — **具身数据三层金字塔全景**(2026-07,deep-research+追问,按三层框架重组;文件名保留初版主题):三层特征对比→例子→趋势→评估体系→计算系统挑战五段式;UMI=桥、部署经验=第四类、阶段×数据矩阵、质量评估三代谱系+两级体系+A/B/C/D 辨析、昂贵 oracle 代理层级(L0–L3 评估栈)、供给侧五层优化(调度层空档=研究机会)、三层×算力形态收口;核实"星海图无 UMI 硬件产品";22 来源双路提取,对抗验证跳过,关键数字进汇报前需回读原文
+- [[Real-robot data collection - teleop vs UMI-class, and the model-in-the-loop quality problem]] — **具身数据三层金字塔全景**(2026-07,deep-research+追问,按三层框架重组;文件名保留初版主题):三层特征对比→例子→趋势→评估体系→计算系统挑战五段式;UMI=桥、部署经验=第四类、阶段×数据矩阵、质量评估三代谱系+两级体系+A/B/C/D 辨析、昂贵 oracle 代理层级(L0–L3 评估栈)、供给侧五层优化(调度层空档=研究机会)、三层×算力形态收口;核实"星海图无 UMI 硬件产品";22 来源双路提取;遗留未核实项已于 2026-07-07 定点核实归位(RoboMIND/OXE/ALOHA/GELLO/Helix/SynGrasp-1B/robomimic/DreamGen/OSMO),vendor 口径以行内标注为最终状态
 
 ## Maps
 - [[Home]] — top-level navigation page for the vault

@@ -626,3 +626,4 @@
 - Follow-up (同日): 应 Ethan 追问，把中层"资产→可重生成管线"压缩语展开成表内注——本体贬值机制、管线=源码/数据集=构建产物/改版=重编译类比、系统含义（rev 触发突发重生成负载、数据 CI/CD 谱系）、vendor 折扣
 - Follow-up (同日): 应 Ethan 追问补"中层 sim-to-real 六条趋势线"表内注（消解/校准/绕过/承认/融合/转岗：3DGS real-to-sim 资产化、可微系统辨识 D-REX/NeRD、世界模型产数据 DreamGen/Cosmos-Transfer、real 锚点混训、Real-is-Sim 动态孪生、仿真转岗评估器）+ "gap 换轴成算力问题"收口 + NVIDIA 栈垂直整合观察；2 轮 WebSearch 补源（DreamGen 2505.12705、Real-is-Sim 2504.03597 等），NeRD/D-REX 标搜索摘要级
 - Follow-up (同日): §2 增补"两级体系 + 昂贵 oracle 代理层级"节（Ethan 问"是否主要靠训练后评测判数据"）——回答：最终裁决是（全部公司用下游表现背书数据价值），但运营是两级（样本级门禁 / 聚合级训练裁决）；per-sample 模型判别唯一工业化处=Recap value function（训练一次判别器换 per-sample 推理）；三层裁决回路差异（底层最粗/中层唯一自闭环/顶层最贵）；QA 体系=多级代理缓存层级、相关性系数≈缓存一致性、调度目标=最小化顶层 oracle 调用
+- Follow-up (同日): §2 增补"各层判别好坏的具体例子"（Ethan 追问）——顶层判"演示对策略好不好"(人工核验/RINSE平滑度/DemInf互信息/CUPID influence/Recap advantage)、中层判"够不够真"(仿真自带成功标签/SIMPLER相关性=质检证书/WorldEval动作跟随性/DreamGen梦境过滤[记忆源])、底层判"能否转化"(工厂视频3%/Ego筛除96%/FastUMI SLAM门禁/Datacore置信度)；结论：三层"坏"定义不同→不存在统一质量分，判别成本不对称→QA基础设施形态迥异

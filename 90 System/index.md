@@ -93,6 +93,7 @@
 - [[GigaAI]] — 世界模型公司；GigaWorld-Policy（端到端 WAM，"训繁推简"）
 - [[Stanford Vision and Learning Lab]] — 斯坦福视觉/机器人学习实验室（含 Li Fei-Fei）；ReKep 来源组之一
 - [[Huawei]] — 昇腾（Ascend）AI 加速器；Ascend HiFloat8（FP8 数值格式设计路线）
+- [[TARS 它石智航]] — 中国具身；Human-centric 穿戴式离机数采（TARS-Vision/Glove + Datacore 数据引擎；WIYH VLTA 触觉数据集）**⚠️ 全 vendor/media 口径，无论文**
 
 ### Topics
 - [[Agent memory]] — topic page for memory as policy, decomposition, and self-managed memory in agent systems
@@ -111,6 +112,7 @@
 - [[Embodied model function evolution - generalization as the master line]] — **具身模型功能演进重述**:端到端→大小脑协同→端云自闭环→**Agentic**,**以"泛化/可用性墙"为驱动**(泛化载体 模型→组合);含长程崩支点(p^N × 缺 L3)、例子池 + 脑/小脑配对表、可直接进汇报的论述。回应专家"需融入泛化不足"的反馈
 
 - [[Future embodied Agent framework - integrated view]] — **整合入口**:把功能演进(why)/ 家庭架构(what)/ 端云 co-evolution(how)/ 地基(capability⟂dependability)缝成一页;含分层架构图 + "云↔端两条通道"整合点
+- [[Real-robot data collection - teleop vs UMI-class, and the model-in-the-loop quality problem]] — **真机数采调研**(2026-07,deep-research 工作流):遥操 vs UMI 类范式对比、质量评估三代谱系(规则→模型判别→质量条件化)、闭环数据价值度量的计算系统挑战(influence 算力墙/四层评估栈/数据引擎调度)、数据管线基础设施(LeRobot v3/Robo-DM/EAI-DM survey);核实"星海图无 UMI 硬件产品";22 来源双路提取,对抗验证阶段跳过(两来源抓取挂死),关键数字进汇报前需回读原文
 
 ## Maps
 - [[Home]] — top-level navigation page for the vault

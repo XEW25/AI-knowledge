@@ -612,3 +612,11 @@
 - Self-contained figure `assets/fig-future-embodied-agent-framework.svg` (layered architecture + two channels + foundation bar), house SVG style
 - Wired: index Syntheses + Embodied MOC Syntheses + Home key-syntheses (marked integrated entry); added 🧭 back-pointers from the 3 source syntheses (function-evolution=why / home-arch=what / co-evolution=how)
 - Confidence: model anchors (π / GR00T / GO-1 / Helix / ChemBot) verified; layered form + two-channel split + sublinear-cost mainline = Ethan+Ada forward judgment (flagged). Lint clean: 0 broken / 1 orphan (root AGENTS.md) / 1 dup (agents); 120 notes, 16 assets
+
+
+## [2026-07-07] synthesis | Real-robot data collection — teleop vs UMI-class + model-in-the-loop quality
+- Ran the deep-research workflow on Ethan's question (真机数采趋势/挑战 × 计算系统视角)。工作流两次在 WebFetch 上挂死（rai-inst.com 对非浏览器客户端 200+空 body；技术上是无超时兜底的连接挂起），第二次确认为确定性挂死后放弃重试：杀掉工作流，从 journal 抢救 45 份提取结果（~22 个独立来源 × 双路提取，215 条声明），缺失 2 来源用 curl 补查（一个 bot-blocked、一个正文仅 11 词，均无损失），由主会话完成综合
+- Created [[Real-robot data collection - teleop vs UMI-class, and the model-in-the-loop quality problem]]：两范式对比表（UMI $73 BOM/3× 吞吐/ATE 6.1mm vs AgiBot World 1M 轨迹/human-in-loop 核验）；质量评估三代谱系（规则 RINSE→模型判别 DemInf/CUPID/QoQ/DataMIL/Re-Mix→质量条件化 Recap/π0.7，后者接通 vault 既有 π 系列笔记）；闭环数据价值度量的三类计算系统负载（influence 近似算力墙、L0–L3 四层评估栈 AutoEval/SIMPLER/WorldEval 量化表、数据引擎调度）；数据管线基础设施（LeRobot v3/Robo-DM 50× 解码差距/EAI-DM survey）
+- **核实更正**（用户前提）：截至 2026-04 报道，星海图**无** UMI 类硬件产品，"UMI 数据"仅为其数据金字塔类别；GOD 数据集为 R1 Lite 单本体遥操。穿戴离机采集的中国代表是它石智航
+- New entity [[TARS 它石智航]]（全 vendor/media 口径，标注清楚）；[[Galaxea 星海图]] 增补数据战略节 + B+ 轮估值更新。Wired: Embodied MOC（Syntheses + Orgs）、index（Syntheses + Entities）
+- 置信度纪律：对抗验证阶段被跳过 → 笔记顶部与"未覆盖与存疑"节明确声明"关键数字进汇报前需回读原文"；secondary 来源全部标 media/vendor

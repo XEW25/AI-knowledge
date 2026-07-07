@@ -28,6 +28,7 @@ This map collects the vault's embodied-AI cluster: vision-language-action (VLA) 
 - [[Embodied model function evolution - generalization as the master line]] — 具身模型功能趋势(端到端→大小脑→端云→Agentic)重述,**以泛化为主线**;why long-horizon collapses (p^N × missing L3) + why Agentic (compositional reuse); 4-stage figure + brain/cerebellum examples
 
 - [[Future embodied Agent framework - integrated view]] — **整合入口**:why(泛化墙)/ what(分层架构)/ how(端云 co-evolution)/ 地基 四切面缝成单页 + 分层架构图 + "云↔端两条通道"
+- [[Real-robot data collection - teleop vs UMI-class, and the model-in-the-loop quality problem]] — **真机数采调研**(2026-07):遥操 vs UMI 类两范式对比(成本/吞吐/本体gap/SLAM误差 + AgiBot World/DROID/GOD/FastUMI-100K 规模表);质量评估三代谱系(规则→模型判别 DemInf/CUPID/QoQ→质量条件化 Recap/π0.7);**闭环数据价值度量的计算系统挑战**(influence 算力墙 / 四层评估栈 AutoEval→SIMPLER→WorldEval / 数据引擎调度);含"星海图无 UMI 硬件产品"核实。云③技能工厂的数据上游
 
 ### Sources — VLA models
 - π series (范式 A source): [[Physical Intelligence - pi0 a Vision-Language-Action Flow Model for General Robot Control|π₀]] · [[Physical Intelligence - pi0.5 a VLA with Open-World Generalization|π₀.5]] · [[Physical Intelligence - pi0.6 a VLA That Learns From Experience|π*₀.6]] · [[Physical Intelligence - pi0.7 a Steerable Generalist Robotic Foundation Model|π₀.7]] · [[Physical Intelligence - RL Tokens Precise Manipulation with Efficient Online RL|RL Tokens]]
@@ -52,7 +53,7 @@ This map collects the vault's embodied-AI cluster: vision-language-action (VLA) 
 - [[Zheng et al. - DyQ-VLA Temporal-Dynamic-Aware Quantization for Embodied Vision-Language-Action Models|DyQ-VLA]] · [[Zhang et al. - QuantVLA Scale-Calibrated Post-Training Quantization for Vision-Language-Action Models|QuantVLA]] · [[Wang et al. - Omega-QVLA Robust Quantization for Vision-Language-Action Models via Composite Rotation and Per-step Scaling|Ω-QVLA]] · [[Lin et al. - DuQuant Distributing Outliers via Dual Transformation Makes Stronger Quantized LLMs|DuQuant]]
 
 ### Entities
-- Orgs: [[Physical Intelligence (π)]] · [[NVIDIA]] · [[Figure AI]] · [[AgiBot 智元]] · [[Galaxea 星海图]] · [[Galbot 银河通用]] · [[DeepCybo]] · [[LimX Dynamics]] · [[ACE Robotics]] · [[AI2 Robotics]] · [[GigaAI]]
+- Orgs: [[Physical Intelligence (π)]] · [[NVIDIA]] · [[Figure AI]] · [[AgiBot 智元]] · [[Galaxea 星海图]] · [[Galbot 银河通用]] · [[TARS 它石智航]] · [[DeepCybo]] · [[LimX Dynamics]] · [[ACE Robotics]] · [[AI2 Robotics]] · [[GigaAI]]
 - People: [[Yann LeCun]] · [[Sergey Levine]] · [[Chelsea Finn]] · [[Li Fei-Fei]] · [[Song Han]]
 
 ## Narrative spine

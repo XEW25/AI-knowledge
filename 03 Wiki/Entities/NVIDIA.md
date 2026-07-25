@@ -23,6 +23,7 @@ NVIDIA **不是单纯的 VLA 玩家，而是横跨多流派的全栈玩家**（�
 ## 与知识库主题的关联
 
 - [[NVIDIA - GR00T N1 An Open Foundation Model for Generalist Humanoid Robots]] — 范式 B（cross-attention）工业代表，代码级核实
+- [[Visual token budget - pruning vs compression]] — NVIDIA 自家的 **EVS**（Efficient Video Sampling，arXiv:2510.14624）视频 token 剪枝法，先落 Nemotron Nano V2 VL，再用于 **Cosmos 3 Reasoner** 的 NIM 推理加速。⚠️ **已核实：Cosmos 3 技术报告全文 0 次提及 EVS** —— 它是部署层可开关旋钮，不是模型固有属性
 - [[Embodied Brain Models]] — 全栈玩家、范式 B、Predictive Spatial 流派
 - [[Home robot architecture - a hierarchical embodied agent]] — Jetson Thor 等端侧硬件决定小脑可行性
 - [[Huang et al. - ChemBot Long-Term Memory for VLA-based Agents]] — ChemBot 的 Skill-VLA 基于 GR00T

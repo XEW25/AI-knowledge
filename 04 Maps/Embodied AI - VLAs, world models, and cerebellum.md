@@ -14,6 +14,7 @@ This map collects the vault's embodied-AI cluster: vision-language-action (VLA) 
 - [[World-Action Models]] — video-backbone + action paradigm; 4-generation architecture evolution
 - [[JEPA]] — Joint-Embedding Predictive Architecture (LeCun): latent (non-generative) world-model framework; I-JEPA→V-JEPA→V-JEPA 2 / V-JEPA 2-AC / DINO-WM / PLDM / LeWM + anti-collapse spectrum
 - [[VLA quantization]] — low-bit edge deployment sub-cluster (why VLA quant ≠ LLM quant)
+- [[Visual token budget - pruning vs compression]] — 视觉 token 预算轴：剪枝（EVS）vs 压缩（π0.7 MEM）；为何视频理解侧与具身侧在同一根成本轴上收敛到相反解法。[[VLA quantization]] 的姊妹效率页
 - [[Memory in Embodied AI]] — implicit (procedural) vs explicit (episodic) memory across the two layers
 
 ### Topics

@@ -35,6 +35,7 @@ The vault's taxonomy, all grounded in code-level reading of open implementations
 
 ## Sub-topics (spokes)
 - [[VLA quantization]] — low-bit edge deployment; why VLA quant ≠ LLM quant (closed-loop error compounding, action-head sensitivity)
+- [[Visual token budget - pruning vs compression]] — 视觉 token 预算轴；**VLA 的输入结构（单帧 vs 历史帧）直接决定**视频理解侧的剪枝方法（EVS）基本不适用，而压缩类（π0.7 MEM）成为具身侧主流
 - [[World-Action Models]] — the video-backbone-plus-action variant
 - [[Memory in Embodied AI]] — implicit (edge, procedural) vs explicit (cloud, episodic) memory across VLA works
 - [[Embodied model function evolution - generalization as the master line]] — where the VLA paradigm is heading (端到端 → 大小脑 → 端云 → Agentic)

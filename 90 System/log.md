@@ -631,6 +631,20 @@
 - Follow-up (同日): 增补"训练阶段×数据层矩阵"（Ethan 问 AgiBot World/WIYH/GraspVLA/FastUMI-100K 归类与阶段映射）——四数据集恰各占一类（真机遥操/穿戴人类/仿真合成/UMI桥）；四段管线（VLM底座→具身预训练三层混吃·模仿目标→真机SFT→仿真RL吃环境交互·真机RL吃部署经验）；修正两个混淆（仿真数据主通道=模仿预训练非仿真RL；遥操数据集不喂真机RL）；判断：部署经验是唯一随保有量自动增长的数据类
 - Follow-up (同日): §3 新增 (d)"供给侧：为数据验证吞吐提速的训练管线优化"（Ethan 追问各公司有无专门优化）——五层哑铃形成熟度：I/O格式层(Robo-DM 50×/LeRobot v3 流式，证据最硬)、缩小oracle(冻结骨干+小头/小模型scaling代理)、验证折进训练(Recap/π0.7 消灭独立验证循环，最深)、仿真评估吞吐(万级并行+Tesla影子模式模板[存疑])、编排调度层(仅OSMO/重生成管线有痕迹——消融树调度/warm-start/增量估值近乎空白=空档)；标注研究机会：数据验证吞吐作为一等系统指标
 
+## [2026-07-25] concept | 视觉 token 预算：剪枝 vs 压缩（EVS × π0.7 MEM）
+- 起点：Ethan 问"Cosmos 3 是否用了 EVS"。库内 grep 全空（无 Cosmos 源笔记、0 处 EVS），外部核实后沉淀为新概念页 [[Visual token budget - pruning vs compression]]
+- **一手核实**：下载 Cosmos 3 技术报告 28 MB PDF 到 repo 外 temp，`pdftotext` 全文检索 —— **`EVS` / `Efficient Video Sampling` 0 命中**（唯一 "pruning" 命中是数据筛选，无关）。EVS 只见于 NVIDIA 开发者博客 + NIM 服务文档，作用于 **Reasoner（AR/VLM 塔）推理阶段**。结论：**部署层可开关旋钮，非模型固有属性**，引用须限定到 NIM 层。合规 >2 MB Raw 规则，未提交 PDF
+- EVS 论文（[arXiv:2510.14624](https://arxiv.org/abs/2510.14624)，NVIDIA，Bagrov 等）**逐表核实**，纠正二手摘要三处偏差：
+  - **position ID 结论是分情况的**，非"position-preserving 一律更优"。原文 §3.3 + Table 2 九组逐格计票：**plug-in 下 Sequential 胜 6/9；uptrain 下 Position-preserving 胜 7/9**。机理：模型预训练未见过带洞位置 ID，硬保留是 OOD 输入，须 uptrain 才转为收益
+  - **"4×" 是 LLM-only**。Table 6 自行换算：q=0.75 时 TTFT_llm 3.9×(7B)/4.1×(14B)，但 **TTFT_vlm 仅 1.78×/2.09×**，且模型越小越差 —— ViT 不省，原文 Future Work 自承 *"we pass the entire frame through the vision encoder and only perform masked selection before sending input to the language model"*
+  - **"无需重训"仅架构层成立**。Table 5 q=0.75：VideoMME plug-in **−6.85%**，uptrain（beta 分布采样 q）后 −2.83%；TempCompass/nv-Metropolis uptrain 后转正
+- ⚠️ **论文自相矛盾（已标存疑）**：§4.3 正文称 q=0.9 有 "13× TTFT reduction of LLM"，其 Table 6 实为 **8.3×(7B)/8.6×(14B)**，13× 要到 q=0.95。引用以 Table 6 为准
+- 页面主论点：**同一根 token 预算轴，视频理解侧收敛到剪枝、具身侧收敛到压缩**，因量级差三个数量级（原文：2 分钟 24 FPS = 200 万 token；VLA 3 帧×2 视角 ≈ 1–2k）。具身侧四解法（π0.7 MEM 固定预算 O(1) / action chunking 减次数 / WAM 三代丢视频分支 / LaWAM 跳出像素）无一是剪枝
+- 分析部分（页内明标"非论文结论"）：单帧 VLA 上 EVS 是 **no-op 而非精度下降**（T=1 无合法 t，M₀ 全保留）；失效诱因是"相机相对场景在动"而非"时间不连续"；不规则 Δt 破坏 position-preserving 的规则网格前提
+- **诚实记录反证**：论文 nv-Metropolis 明写 *"single **moving** camera per scene"*，EVS 在其上 q=0.75 plug-in 仅掉 1.28%（四 benchmark 最小），**削弱**"相机运动必然使 EVS 失效"的强断言。张力未解决，已入 Open questions
+- 论文 Future Work **点名机器人但作为未做方向**（流式关键帧 + KV-cache 跨调用复用 + 中间帧剪枝）—— 恰是绕开上述障碍的改造路径，已记为这条轴的移动方向
+- Wired: index Concepts；[[VLA quantization]] 姊妹页互链；[[World-Action Models]] / [[VLA - Vision-Language-Action Models]] / [[NVIDIA]] / Embodied MOC。**Cosmos 3 源笔记仍缺**（地图页 backlog 早已标记），本次未建悬空链接
+
 
 ## [2026-07-07] restructure | 具身数据 synthesis 按三层金字塔重组
 - 应 Ethan 要求把 [[Real-robot data collection - teleop vs UMI-class, and the model-in-the-loop quality problem]] 从"遥操 vs UMI 范式优先"重写为**三层数据金字塔五段式**：§1 特征对比(大表+UMI桥1.1+遥操vsUMI细表1.2+部署经验1.3+阶段×数据矩阵1.4) → §2 每层例子(顶层/桥/中层/底层四表+星海图核实框) → §3 每层趋势(卖里程→卖闭环 / 双引擎+可重生成管线+sim-to-real六线 / 穿戴式主动生产+可用率个位数;跨层meta) → §4 评估体系(定义收敛+三代谱系+两级体系+三层裁决回路+判别例子+A/B/C/D辨析+分层回答) → §5 计算系统挑战(oracle代理层级+L0–L3评估栈 / 闭环三负载 / 管线基础设施 / 供给侧五层 / **新增三层×算力形态收口表**：顶层贵在评估、中层贵在生成、底层贵在清洗)

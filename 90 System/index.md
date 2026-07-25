@@ -66,6 +66,7 @@
 - [[Embodied Cerebellum Models]] — **大脑页的对位页**：小脑（端侧）模型——多速率控制栈（50Hz VLA→1kHz 控制→40kHz 伺服）、小脑四种来源、边缘部署技术（量化/蒸馏/线性注意力/AOT/chunking）、可靠性"脊髓"层（骨架页）
 - [[Memory in Embodied AI]] — 隐式（程序性，端侧）vs 显式（episodic，云端）记忆的两层分工；各 VLA 工作的记忆状态表
 - [[VLA quantization]] — VLA-specific low-bit quantization sub-cluster: why it differs from LLM quant (closed-loop error compounding, action-head sensitivity), the DyQ-VLA (dynamic mixed precision) vs Ω-QVLA (uniform W4A4 rotation) contrast, route mapping, and the cited landscape
+- [[Visual token budget - pruning vs compression]] — 视觉 token 预算轴的两族解法：**剪枝**（EVS，原文逐表核实——position-ID 结论分情况、"4×"是 LLM-only、ViT 不省、论文 13× 自相矛盾）vs **压缩**（π0.7 MEM 固定预算 O(1)）；核心论点"视频理解侧收敛到剪枝、具身侧收敛到压缩，因量级差三个数量级"；含"Cosmos 3 技术报告 0 提 EVS，只是 NIM 部署层旋钮"的核实结论。[[VLA quantization]] 的姊妹效率页（压序列长度 vs 压权重位宽）
 
 ### Entities
 - [[Alex Zhang]] — author associated with the Mismanaged Geniuses Hypothesis

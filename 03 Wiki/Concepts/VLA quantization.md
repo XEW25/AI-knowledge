@@ -65,6 +65,7 @@ VLA-specific: **EaqVLA** (Jiang et al., arXiv:2505.21567 — encoding-aligned qu
 
 ## Related
 - [[Model quantization]] — parent topic (routes, LLM/FP8 context)
+- [[Visual token budget - pruning vs compression]] — **姊妹效率轴**：压**输入序列长度**（EVS 剪枝 / π0.7 MEM 压缩）而非权重位宽；两者正交，可叠加
 - [[Zheng et al. - DyQ-VLA Temporal-Dynamic-Aware Quantization for Embodied Vision-Language-Action Models]]
 - [[Xu et al. - QVLA Not All Channels Are Equal in Vision-Language-Action Models Quantization]]
 - [[Zhang et al. - QuantVLA Scale-Calibrated Post-Training Quantization for Vision-Language-Action Models]]

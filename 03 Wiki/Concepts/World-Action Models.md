@@ -66,5 +66,6 @@ World-Action Models（WAM）是一类从预训练视频生成 backbone 初始化
 - [[GigaWorld Team - GigaWorld-Policy An Efficient Action-Centered World-Action Model]] — 第三代（causal mask 硬隔离 + 推理丢分支）
 - [[Bi et al. - Motus A Unified Latent Action World Model]] — 第四代（时间步调度，模式可切换）；同属 latent-action 谱系
 - [[Chen et al. - LaWAM Latent World Action Models for Efficient Dynamics-Aware Robot Policies]] — 第五代（隐空间子目标，单次非迭代；冻结 DINOv3 + LAM-decoder 当世界模型，230M，比像素 WAM 快 ~24×）
+- [[Visual token budget - pruning vs compression]] — 本页三/四/五代的"推理时要不要生成视频"演进，是具身侧在**视觉 token 预算轴**上的压缩派答案（对照视频理解侧的 EVS 剪枝派）
 - [[Embodied Brain Models]] — WAM 作为 Predictive Spatial × VLA 嫁接；范式 A 的 MoT 扩展
 - [[Huang et al. - ReKep Spatiotemporal Reasoning Keypoint Constraints for Robotic Manipulation]]

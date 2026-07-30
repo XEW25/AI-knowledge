@@ -665,3 +665,11 @@
 - 接线:[[Task decomposition]] 新增"**训练时拆解(课程生成)**"轴(此前光谱全是推理时拆解);[[Cloud-edge co-evolving embodied agent - a continuous-evolution framework|端云 co-evolution]] **云③技能工厂**补"课程生成"这一环(替掉逐任务手工 dense reward 这项线性人力成本 → 服务线性→亚线性主线);Embodied MOC 新增 "Sources — skill acquisition / training methodology" 小节;index Raw + Sources
 - 开源:**LIBERO+ 仓库公开**(fheravi/LIBERO-plus, 2★, license 未标注);**LEACL 自身 pipeline 未见明确发布**。Cited-but-not-ingested 记入:CurricuLLM(ICRA 2025)、LEAGUE/LEAGUE++、Text2Reward、ARCHIE、IKER、Eurekaverse + ACL 侧(APT-Gen/ALP-GMM/PLR/ADR/SPDL/TeachMyAgent)
 - 填补空缺:此前全库 "curriculum"/"sparse reward" **零命中**。Lint 干净:0 broken-A,新笔记零断链;125 notes
+
+
+## [2026-07-30] refine | LEACL 定位 + 技能供给成本结构(teleop vs sim RL)
+- 起因:用户指出这篇读起来"和 VLA 背景配不上",并追问"VLA 在 LIBERO 已 97–99%,那这么做的意义是什么"。补两处正面论述(此前笔记只有限定条款,没把"它的战场在哪"讲透)
+- **LEACL 源笔记新增「定位:它的战场是零演示,不是 LIBERO 榜分」**:两 setting 的输入差异(VLA = 每任务几十条人类演示 + 3B 预训练 vs LEACL = 零演示零预训练,只要任务描述+仿真器+成功判据);**有意义的 delta 不是 89% vs 98%,而是 0% → 60–90%**;"移除人力"的五级链条(纯稀疏 0% → 演示(人力线性)→ 手工 dense reward(不稳,T5=0.0/±50.6)→ LLM 生成奖励(错位)→ LEACL(无人工且不写奖励));并明确按**方向性证据而非性能结果**使用(privileged state / 产出非可部署技能 / 依赖谓词词表 + 成功判据 / v1 小规模)
+- **记入一般判断**:"benchmark 分数高"≠"问题解决了"——LIBERO 的饱和建立在**演示数据被无偿假定存在**之上,把演示拿掉立刻回 0%。**⇒ VLA 的进步不会自动降低技能获取成本**,那是一条独立且基本未解的战线(这解释了为何技能工厂目前只能写"teleop 为主要示范源")
+- **co-evolution 框架 云③ 新增「技能供给的成本结构:teleop(人力线性) vs sim RL(算力)」小节**:两路线的成本性质与上限对照(BC 受示范者水平限制 vs RL 直接优化真实目标可超越);**库内先例** = [[Qi et al. - Humanoid-GPT (AstraBrain-WBC) Scaling Data and Structure for Zero-Shot Motion Tracking|Humanoid-GPT]] 从数百 RL 专家蒸馏(零人类演示)⇒ "sim RL 训专家→蒸馏部署"已被验证,LEACL 攻其第一步;**适用边界**(需可仿真 + 成功判据可定义 → 刚体/明确目标适用,形变/流体/新奇物体受限);**前瞻判断 = 双轨供给**,亚线性成立程度 ≈ sim RL 能吃下的比例,"把新技能化归为可判定的仿真任务"成为技能工厂的关键工程能力
+- 这是技能工厂第一次有明确的**供给侧成本论证**(此前只有"模仿优先 + RL refinement"的做法陈述,没有成本结构分析)。Lint 干净(0 broken-A)

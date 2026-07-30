@@ -53,6 +53,9 @@ This map collects the vault's embodied-AI cluster: vision-language-action (VLA) 
 ### Sources — VLA quantization
 - [[Zheng et al. - DyQ-VLA Temporal-Dynamic-Aware Quantization for Embodied Vision-Language-Action Models|DyQ-VLA]] · [[Zhang et al. - QuantVLA Scale-Calibrated Post-Training Quantization for Vision-Language-Action Models|QuantVLA]] · [[Wang et al. - Omega-QVLA Robust Quantization for Vision-Language-Action Models via Composite Rotation and Per-step Scaling|Ω-QVLA]] · [[Lin et al. - DuQuant Distributing Outliers via Dual Transformation Makes Stronger Quantized LLMs|DuQuant]]
 
+### Sources — skill acquisition / training methodology
+- [[Heravi et al. - LEACL LLM-Enhanced Automatic Curriculum Learning for RL in Long-Horizon Manipulation|LEACL]] — LLM 生成**任务空间 + 难度排序**(而非 dense reward)喂给现成 ACL,长程操控**只用稀疏奖励**训练(UT Austin / Peter Stone, 2026)。技能工厂"新专家怎么训"的一环;**实测反证:拆解+稀疏奖励≈0%,段内还需课程**
+
 ### Entities
 - Orgs: [[Physical Intelligence (π)]] · [[NVIDIA]] · [[Figure AI]] · [[AgiBot 智元]] · [[Galaxea 星海图]] · [[Galbot 银河通用]] · [[TARS 它石智航]] · [[DeepCybo]] · [[LimX Dynamics]] · [[ACE Robotics]] · [[AI2 Robotics]] · [[GigaAI]]
 - People: [[Yann LeCun]] · [[Sergey Levine]] · [[Chelsea Finn]] · [[Li Fei-Fei]] · [[Song Han]]

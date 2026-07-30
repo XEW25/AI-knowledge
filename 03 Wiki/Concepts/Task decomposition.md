@@ -38,6 +38,13 @@ Task decomposition appears in many forms:
 
 接口形式的光谱：约束函数（ReKep）←→ 紧凑 token（RL Tokens）←→ 自然语言子任务指令（ChemBot）
 
+### 训练时拆解（课程生成）——另一条轴
+上面全是**推理时**拆解（运行时把任务分给不同模块执行）。同一内核还有另一种用法：**在训练时**把任务拆开，用来构造**课程**，让 RL 学得动。
+
+- **[[Heravi et al. - LEACL LLM-Enhanced Automatic Curriculum Learning for RL in Long-Horizon Manipulation|LEACL]]**（Heravi et al., UT Austin/Peter Stone, 2026）：LLM 把长程任务拆成 **PDDL 子任务规格**，再为每个子任务生成 **参数化任务空间 + 难度排序**，交给现成 ACL 算法**只用稀疏奖励**训练。接口 = **PDDL 规格 + 参数化难度**。
+- 相邻：**CurricuLLM**（ICRA 2025）— LLM 出子任务序列后**生成 reward code**（LEACL 正是要绕开这一步）。
+- **关键边界条件（LEACL 实测）**：**拆解 + 稀疏奖励 ≈ 0% 成功率**——拆解把长程变短程，但不自动让子任务**可学**；接触丰富的子任务即便 horizon 很短，稀疏奖励下仍学不动。即**拆解解决长度/信用分配，不解决探索**；段内还需课程。详见 [[Task Decomposition as OOD Mitigation]]。
+
 ## Design questions
 Important design questions include:
 - What decomposition language is available to the model?

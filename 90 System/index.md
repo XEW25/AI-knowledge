@@ -5,6 +5,7 @@
 
 ## Raw
 - [[2026-04-11 - Andrej Karpathy - LLM Wiki]] — raw capture of the original `llm-wiki.md` idea document
+- [[2026-07-30 - Heravi et al. - LEACL LLM-Enhanced Automatic Curriculum Learning for RL in Long-Horizon Manipulation]] — URL-only raw capture (PDF 6.14 MB > 2 MB); 已核实事实 + 结果表 + 一处原文数字不一致
 
 ## Sources
 - [[Andrej Karpathy - LLM Wiki]] — source note on the LLM Wiki pattern proposed by Andrej Karpathy
@@ -42,6 +43,7 @@
 - [[AgiBot - BFM-2 Motion-Between Whole-Body Motion Foundation Model]] — AgiBot 智元's **运动小脑** (generative whole-body-control FM; two-stage "Motion-Between" + DOF Feather Motion Generator; models the full-body dynamics state-space distribution → generates a trajectory from *any* state to *any* target → disturbance rejection / balance recovery / get-up). **⚠️ vendor PR-only: no paper, no code, no params disclosed** — the least-verifiable of the L2 cerebellum FMs (contrast Humanoid-GPT). Closed-loop only at the control/recovery level (L1), not cognitive
 - [[Maes et al. - LeWorldModel (LeWM) Stable End-to-End JEPA from Pixels]] — **LeCun 等的极简端到端 JEPA 世界模型**(arXiv:2603.19312):仅两损失(下一步 latent 预测 + **SIGReg** 高斯正则,可证防塌缩),无 EMA/stop-grad/预训练 encoder/重建/奖励;超参 6→1 vs PLDM。**~15M 单卡**,latent 规划比 DINO-WM **快 ~48×**(token 少 ~200×),Push-T/OGBench-Cube 固定 FLOPs 胜出;latent 编码物理量 + 违反预期(surprise)检测。开源。归 Predictive Spatial / 潜在世界模型;**边缘 WM 轻量候选**(对照 Kairos 像素 WM)。PDF 全文自读核实
 - [[Chen et al. - LaWAM Latent World Action Models for Efficient Dynamics-Aware Robot Policies]] — **隐空间 World-Action Model**(arXiv:2606.15768;清华/北大等 + 无问芯穹):在冻结 **DINOv3** latent 空间训 latent-action model,**把其 decoder 复用成世界模型(LaWM,230M)**,单次前向出"隐视觉子目标"喂 Alternate-DiT 动作专家。**比像素 WAM 世界建模参数 -95%、延迟 -24×(187ms)**,LIBERO 98.6%/RoboTwin 91.22%(**标准榜**)。WAM 第五代(跳出像素空间);JEPA/DINO 隐预测 + latent-action 谱系交汇。代码未见明确开源。PDF 自读核实
+- [[Heravi et al. - LEACL LLM-Enhanced Automatic Curriculum Learning for RL in Long-Horizon Manipulation]] — **LLM 增强的自动课程学习**(arXiv:2607.23515;UT Austin LARG / **Peter Stone** 等,2026-07-26)。核心创新 = **换掉 LLM 的输出目标**:不写 dense reward(LEAGUE++/Text2Reward/CurricuLLM 路线),而是生成 **ACL 缺的任务规格——参数化任务空间 + 难度排序**(PDDL 子任务 → Python 生成函数),再由现成 ACL(ADR/TeachMyAgent)**只用稀疏完成奖励** + PPO 训练。5 个 LIBERO+ 长程任务:**胜专家手工 dense reward 4/5**(后者在 T5 崩到 0.0、方差 ±50.6),人类课程仍胜 3/5 但 **T3 被反超**。**⚠️ 低维状态 PPO、非像素非 VLA、非标准 LIBERO 套件 → 分数不可与 LaWAM/G0.5/Motus 横比**;**⚠️ 原文正文 32.8% 与表内 11.8% 不一致(存疑)**。**关键反证:任务拆解+稀疏奖励≈0%——拆解解决长度/信用分配,不解决探索**。填补本库"课程学习/技能训练方法学"空缺;接 [[Cloud-edge co-evolving embodied agent - a continuous-evolution framework|云③技能工厂]]。HTML 全文自读核实
 
 ## Wiki
 

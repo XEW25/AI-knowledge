@@ -297,7 +297,7 @@ per-sample 模型判别唯一工业化处 = 部署经验数据（Recap value fun
 - [[AgiBot 智元]] · [[Galaxea 星海图]] · [[Galbot 银河通用]] · [[TARS 它石智航]] · [[Physical Intelligence (π)]] · [[NVIDIA]]
 - [[AgiBot - GO-1 ViLLA Generalist Embodied Foundation Model|GO-1]] · [[Galaxea - G0 Dual-System VLA Model|G0]] — 两个顶层数据集的下游模型
 - [[Bi et al. - Motus A Unified Latent Action World Model|Motus]] — 六层数据金字塔（三层框架的学术精细版）
-- 未来页：[[Robot data engine]]（数据引擎证据继续累积后可独立成 concept 页）
+- [[Robot data engine]] — **本页的概念层收口**（已建）：数据集 vs 引擎的判据、引擎四部件、"昂贵 oracle 的多级代理层级"＋调度目标、生产型 vs 自演进型两形态、两个异构性、研究机会
 
 ## tags
 

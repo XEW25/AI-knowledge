@@ -59,6 +59,7 @@
 - [[3D Spatial Representation]] — 理想 3D 空间表征的必要性、特征、语言类比，及 open research question
 - [[Object-Centric Representation]] — 以物体为基本单元的场景表示方法，支持组合泛化
 - [[Task Decomposition as OOD Mitigation]] — 把 OOD 任务拆成分布内子任务的跨簇论点（ReKep / RL Tokens / ChemBot / MGH）；[[Task decomposition]] 的 OOD 视角
+- [[Robot data engine]] — **数据引擎概念页**：数据集 vs 引擎的判据、四部件（产出/加工/判别/评估）、核心结构"**昂贵 oracle 的多级代理层级 → 调度目标=最小化顶层 oracle 调用**"、生产型 vs 自演进型两形态、质量度量与算力瓶颈两个异构性、研究机会（为数据验证优化的调度=公开空白）
 - [[Keypoint-based Manipulation]] — 以语义 3D 关键点表示场景 + 约束定义操控任务（ReKep 范式）
 - [[Constrained Optimization for Robot Control]] — 把任务写成目标+约束再求解动作（vs 学习策略）；ReKep 的"执行半"
 - [[VLA - Vision-Language-Action Models]] — **base concept / hub** for the VLA family: definition, boundaries (vs WAM / motion controller), architecture axes (actor-vs-encoder, Paradigm A/B), and the vault's VLA instances

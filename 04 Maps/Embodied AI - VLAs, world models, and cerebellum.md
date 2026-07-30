@@ -17,6 +17,8 @@ This map collects the vault's embodied-AI cluster: vision-language-action (VLA) 
 - [[Visual token budget - pruning vs compression]] — 视觉 token 预算轴：剪枝（EVS）vs 压缩（π0.7 MEM）；为何视频理解侧与具身侧在同一根成本轴上收敛到相反解法。[[VLA quantization]] 的姊妹效率页
 - [[Memory in Embodied AI]] — implicit (procedural) vs explicit (episodic) memory across the two layers
 
+- [[Robot data engine]] — 数据引擎:数据集 vs 引擎、"昂贵 oracle 的多级代理层级"(调度目标 = 最小化顶层 oracle 调用)、生产型 vs 自演进型、成本从人力→算力
+
 ### Topics
 - [[Spatial Intelligence for Embodied AI]] — 3D representation, spatial modality, predictive spatial models
 - [[Model quantization]] — parent of the VLA-quant sub-cluster

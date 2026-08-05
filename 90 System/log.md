@@ -683,3 +683,12 @@
 - 接线:综述末尾"未来页"标注改为实链(标注已建);co-evolution 的"技能供给成本结构"节加概念层指针;index Concepts;Embodied MOC Concepts
 - **自己踩了一次 colon/filename 坑并即时修正**:该综述 H1 已改成"Embodied data — 三层数据金字塔…"但**文件名仍是旧的** `Real-robot data collection - teleop vs UMI-class...`;初稿按标题链接会断,已改为按文件名 + 别名,并在 Related 里就地标注该页"改版未改名,链接须用文件名"以免后人再踩
 - **Lint 回到完全干净基线:0 broken-A / 0 broken-B / 1 orphan(根 AGENTS.md) / 1 dup(agents)**;126 notes, 17 assets。至此全库无悬空链接
+
+
+## [2026-07-30] deepen | Task decomposition 训练时拆解:补 PDDL 符号层与 sparse/dense/ACL 三方关系
+- 用户(VLA 背景)追问"PDDL 规格子集是什么""dense vs 稀疏奖励什么区别"——原节只写了 LEACL 的机制与结论,缺经典 RL/规划侧的背景。补两小节进 [[Task decomposition]] 的"训练时拆解(课程生成)"
+- **背景一:为什么训练时拆解要落到符号规格上** — `τ=⟨M,F,R,P,I,G⟩` 构件 + `Open(drawer,0.3)` 实例;**关键连接:`I` 定义 RL 环境 reset 分布、`G` 定义成功判据 ⇒ 一份 PDDL 规格实质是在定义一个 RL 环境**。**决定性理由:稀疏奖励需要机器可判定的成功条件**——自然语言"抽屉开了"仿真器无法求值,`Open(drawer,0.3)` 可以;没有符号层就无法自动发奖励,整套稀疏 RL 跑不起来(故让 LLM 输出形式语言是工程必需,代价是需 reflection 纠语法)
+- **"参数化任务空间 = 规格子集"就是难度旋钮**:谓词参数化(`open(object)`→`open(object,?o)`,LIBERO+ 的改动)+ LLM 写 Python 生成函数,其**值域 𝒯ᵢ⊂𝒯 = 同一子任务的全部难度变体**(柜子贴夹爪+开 0.05m ↔ 柜子远+全关+开 0.4m),ACL 在子集内按水平采样
+- **背景二:sparse / dense / ACL 三方关系** — 稀疏=无偏但探索会死(纯稀疏基线全 0.0%);dense=有梯度但是"人对什么算进步的猜测",三个坑(设计细节极敏感:夹爪高度 vs 物体高度、碗 vs 番茄酱瓶 / 权重难平衡 / **诱导 sloppy 行为:增量进展但精度不足以满足目标谓词合取**)
+- **收口洞见(记入引用块)**:**dense reward = 改造奖励制造梯度(引入偏置);ACL = 不动奖励,改造任务难度制造成功(奖励保持无偏)**。学习信号来自难度调度而非奖励塑形 ⇒ 同时拿到 dense 的可学性 + sparse 的无偏性,解释了 LEACL "更省人力且成功率更高"(胜专家 dense reward 4/5)这个反直觉结果
+- 现在这节可自足阅读/对外讲解,不必回查论文。Lint 干净

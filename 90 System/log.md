@@ -848,3 +848,25 @@
 - 官方 randomized 主要覆盖背景/纹理、杂物、光照、头部相机位移、桌面高度与实验性本体随机化；官方通用配置未提供质量/摩擦/阻尼/接触刚度或控制延迟/丢帧等字段
 - 文档改为五 profile：`official_clean` / `official_randomized` 保证外部可比；`internal_visual_hard` 主要复用 YAML；`internal_physics_hard` 需在 reset/asset load 扩展 SAPIEN 参数；`internal_control_hard` 需在 policy–environment wrapper 注入延迟、丢帧、action repeat 与传感器不同步
 - 三类内部 hard 优先采用单因素实验；只在最终综合压力测试增加不可归因的 `mixed-hard`
+
+
+## [2026-08-06] ingest ×2 + framework | Being 团队的范式迁移:Being-0(agent 框架)与 Being-H0.7(latent WAM)
+- **触发**:Ethan 问"Being-0 算 Agent 系统还是模型方案设计",继而问"Being 最新架构是不是推翻了这种范式"。两问都需读原文,遂一并 ingest 两篇 + 记录判断
+- **[[Being-0 - a Humanoid Robotic Agent with VLMs and Modular Skills|Being-0]]**(arXiv:2503.12533,2025-03;HTML 正文自读)
+  - **血统是 LLM agent**:框架**改编自 Cradle**(做开放世界游戏/软件操作的 GPT-4o agent 框架)——原话 "we adapt the Cradle framework to build a generalist agent for humanoid robots"
+  - **分层归属**:FM = **现成 GPT-4o(云)** / Agent 框架 = 现成 / **Connector = 自训**(VideoLLaMA2 微调,训练数据 = 室内导航第一视角图 + 语言指令 + 物体标签 + bbox) / 技能库 = **遥操 + 模仿学习**(ALOHA 系方法)获得
+  - **为什么必须训中间层**(核心论证):① GPT-4o 云端延迟高,而**人形双足本身不稳、需频繁调整运动指令做误差修正**,开环序列不行;② GPT-4o **3D 场景理解差**("failing to estimate the direction and depth of navigation targets")→ 技能规划出错。训完 Connector **板载推理 ~1 秒**
+  - **pose adjustment**:除 bbox 外还预测**机器人相对物体的最佳对齐方向**,偏了触发复合调整;抓取 **+0.4** 成功率。**⇒ 与 [[Zhang et al. - Harness VLA Steering Frozen VLAs into Reliable Manipulation Primitives via Memory-Guided Agents|Harness VLA]] 的 re-staging 独立收敛**(2025-03 vs 2026-07,不同团队/路线,同一机制:"交棒前先把机器人摆到对下游技能有利的位姿")
+  - **部署边界极简**:"all components, **except the FM**, deployable on low-cost onboard devices" ⇒ **只有 FM 在云**,比本库整合视图更激进且**真机验证过**
+  - **结果**:长程 **84.4%**;无 Connector 移动速度差 **4.2×**、远距导航全失败;**没有任何固定相机俯仰角能同时兼顾导航与操作**(主动相机全任务满分);导航 同房间 1.0 / 未见布局 −0.2 / 跨房间 0.8
+  - **分类学(回答 Ethan 的问题)**:落在**"纯 harness"与"模型方案"之间的第三格 —— "harness + 训练的粘合层"**(同格:HELM 的 SV)。**⇒ 纯 harness 有天花板:基座在某个具体能力上不行时,prompt/记忆/检索补不上,必须训**。按 load-bearing 原则,Connector **用训练而非 prompt 来承重**。**对本库启示:"计划级接口"可能不能只是协议,可能得是一个训练出来的翻译器**
+- **[[BeingBeyond - Being-H0.7 a Latent World-Action Model from Egocentric Videos|Being-H0.7]]**(arXiv:2605.00078,2026-04;HTML 自读)
+  - **给 [[World-Action Models]] 第五代补第二个独立实例** ⇒ 此前仅 LaWAM 一例,**单例撑不住代际划分,现在成立**
+  - **双重诊断**:VLA 的**稀疏动作监督 → shortcut mapping**(学不到 dynamics/contact/task-progress);像素 WAM 的**未来帧生成是"costly and indirect substrate for control"**
+  - **机制**:多模态上下文与带噪动作之间插一组 **learnable latent query** 当推理接口;**未来知情双分支** —— prior(可部署)vs posterior(仅训练,未来观测经**冻结 ViT + Perceiver resampler** 压成 K 个嵌入替换 query);两支共享 context/backbone/动作通路(**单次前向**),在 latent 位置**逐点隐状态对齐** + **防 latent collapse 正则**;**推理丢弃 posterior、无视觉 rollout**。**本质 = privileged distillation**,与 [[JEPA]] 防塌缩谱系同源
+  - **第五代内部分两支**(已写入 WAM 概念页):**隐子目标支**(LaWAM,显式产未来观测特征当子目标)vs **隐推理支**(Being-H0.7,无显式子目标,把未来蒸进 latent query)
+  - 骨干 InternVL3.5(理解)+ Qwen3(动作),建在 Being-H0.5 上,人类+机器人混合数据(UniHand 2.0 格式)。**六仿真 benchmark 总体 SOTA/平均排名最高**、**LIBERO-plus 微调后 84.8%**、**灵巧人形 49.2%**、真机跨本体(ARX 为主)
+- **⚠️ 范式迁移的核实结果**:**Being-H0.7 全文 0 次提及 Being-0 / agent framework / Connector / skill library / GPT-4o**。团队轨迹:agent 框架(2025-03)→ VLA(2025-07)→ 跨本体 VLA(2026-01)→ **latent WAM**(2026-04),**一年出头从"编排现成 FM+技能"走到"自造端到端基座"**
+- **写入 [[Embodied model function evolution - generalization as the master line]] 新增「反方向的证据点」节**:同一现象两种归因(**系统结构** vs **表征学习**),Being 与 [[Galaxea - G0.5 Autoregressive VLM-as-Actor VLA|Galaxea G0→G0.5]] 并列为"系统派 vs 模型派钟摆"的证据。**但公平标注三条**:① Being-0 的论证(误差累积+模块延迟)**没被驳倒,只是被绕开**(单体策略无多模块延迟);② Being-H 修的恰是 Being-0 里用现成方法凑的技能库(H0 卖点="需要少得多的遥操演示")⇒ 可读作"先搭系统再补最弱层";③ 两层历史上交替推进,非零和
+- **⇒ 对本页主线的修正(重要)**:"泛化载体走向组合"应表述为**方向性判断而非既成事实**;当前模型层仍在快速兑现收益。且与 Harness VLA 不矛盾——后者证明的是"**在给定模型上**组合能榨出 +38.6pp",而非"组合优于把模型做强"
+- Lint 干净:0 broken;141 notes

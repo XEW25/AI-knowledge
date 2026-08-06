@@ -62,6 +62,27 @@
 
 > 具身模型的功能演进,本质是**一场与"泛化-可用性"墙的持续战斗**:端到端把能力做出来,却要靠**逐场景真机 RL + 遥操**才可用(成本线性、不可持续);大小脑让语义先泛化;端云自闭环把逐场景适配变便宜、变持续;但只要**泛化的载体还是"一个要被逐场景适配的模型"**,就逃不出线性成本。**具身 Agentic 系统换掉了泛化的载体——从"适配模型"到"组合技能"**:用专家技能库承载可复用的"可用性",用 Agent 框架做跨场景重规划,才把适配成本掰成亚线性,真正做到**可用且可规模化**。
 
+## ⚠️ 反方向的证据点:系统派 vs 模型派的钟摆(2026-08 记录)
+
+本页主线是**泛化载体从「模型」走向「组合」**。但有团队在用行动给出**相反的瓶颈判断**,应如实记录:
+
+| 团队 | 轨迹 | 方向 |
+|---|---|---|
+| **BeingBeyond** | [[Being-0 - a Humanoid Robotic Agent with VLMs and Modular Skills\|Being-0]](2025-03,**分层 agent 框架**)→ Being-H0(VLA)→ H0.5(跨本体 VLA)→ [[BeingBeyond - Being-H0.7 a Latent World-Action Model from Egocentric Videos\|Being-H0.7]](2026-04,**latent WAM**) | **组合 → 模型** |
+| **Galaxea** | [[Galaxea - G0 Dual-System VLA Model\|G0]](双系统)→ [[Galaxea - G0.5 Autoregressive VLM-as-Actor VLA\|G0.5]](统一 AR) | **分离 → 统一** |
+
+**Being 的案例最直接**:**Being-H0.7 全文 0 次提及自家 Being-0 / agent framework / Connector / skill library**(已核实)。同一个"长程做不好"的现象,同一团队一年内给了相反归因——
+
+- **Being-0**:← FM 与技能之间有鸿沟(**系统结构**问题)⇒ 加训练的中间层
+- **Being-H0.7**:← 稀疏动作监督诱导 **shortcut mapping**,策略没学到 dynamics/contact/task-progress 表征(**表征学习**问题)⇒ 单个策略内部加 latent 世界建模
+
+**但要公平(避免过度解读)**:
+1. Being-0 的论证(误差累积 + 模块延迟不一)**没有被驳倒,只是被绕开**——单体策略压根没有多模块延迟问题。
+2. Being-H 修的恰恰是 Being-0 里**用现成方法(遥操+模仿)凑出来的技能库**(H0 的卖点即"**需要少得多的遥操演示**")⇒ 也可读作"**先搭系统,再回头把最弱的一层做扎实**",而非否定系统层。
+3. 两层历史上是**交替推进**的,不是零和。
+
+**⇒ 对本页主线的修正**:"泛化载体走向组合"应表述为**一个方向性判断而非既成事实**;当前**模型层仍在快速兑现收益**,组合层的相对价值取决于模型层何时进入平台期。这也与 [[Zhang et al. - Harness VLA Steering Frozen VLAs into Reliable Manipulation Primitives via Memory-Guided Agents|Harness VLA]] 的证据不矛盾——后者证明的是"**在给定模型上**,组合能榨出 +38.6pp",而非"组合优于把模型做强"。
+
 ## 与库内资产的关系
 
 - **Agentic 终点 = 两轴图的 L3**(小脑多专家库 + 大脑编排)+ **[[Cloud-edge co-evolving embodied agent - a continuous-evolution framework|端云 co-evolution 框架]]**;本页是把 **功能趋势 / 两轴 L3 / co-evolution** 用"泛化"串成一条因果链。

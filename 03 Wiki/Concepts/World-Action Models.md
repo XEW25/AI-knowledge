@@ -42,7 +42,11 @@ World-Action Models（WAM）是一类从预训练视频生成 backbone 初始化
 ### 第五代:Latent-Subgoal(跳出像素空间)
 - **连视频生成 backbone 都不要了**:前四代都保留一个视频生成模型(只争论推理时跑不跑);LaWAM 改用**冻结视觉 encoder(DINOv3)+ latent-action-model 的 decoder**,在 latent 空间**单次前向**解出"未来观测特征 = 隐视觉子目标",喂 Alternate-DiT 动作专家。
 - 即把"world"从"视频"重定义为"latent 特征":世界建模参数从 5B 级降到 **230M**、延迟降 ~**24×**(187ms),而 LIBERO/RoboTwin **标准榜**不输 3.5–5.5B 大模型。
-- 代表:[[Chen et al. - LaWAM Latent World Action Models for Efficient Dynamics-Aware Robot Policies|LaWAM]](2026)。对照:π0.7(像素子目标、由单独迭代模型产)、LDA-1B(DINO latent 但联合扩散去噪、迭代)。
+- 代表:[[Chen et al. - LaWAM Latent World Action Models for Efficient Dynamics-Aware Robot Policies|LaWAM]](2026)、**[[BeingBeyond - Being-H0.7 a Latent World-Action Model from Egocentric Videos|Being-H0.7]]**(2026-04,BeingBeyond)。对照:π0.7(像素子目标、由单独迭代模型产)、LDA-1B(DINO latent 但联合扩散去噪、迭代)。
+- **⚠️ 两个独立实例 ⇒ 代际划分成立**(此前仅 LaWAM 一例,单例撑不住一个代)。Being-H0.7 的诊断与本代论点逐字吻合:*"pixel-space prediction is a **costly and indirect substrate for control**, as it may model visual details irrelevant to action generation"*。
+- **但第五代内部已分两支**(latent 的用法不同):
+  - **隐子目标支**(LaWAM):复用 latent-action-model 的 decoder,**显式产出"未来观测特征"**当子目标,喂给动作专家。
+  - **隐推理支**(Being-H0.7):在多模态上下文与带噪动作之间插一组 **learnable latent query** 当推理接口;训练时用**未来知情的 posterior 分支**(未来观测经冻结 ViT + Perceiver resampler 压成 K 个嵌入替换 query)与 prior 分支做**隐状态逐点对齐**;**推理时丢弃 posterior、无任何视觉 rollout**。**无显式子目标**,本质是 **privileged distillation**(posterior 看未来、prior 只凭当下把它对齐出来),因而也须**防 latent collapse**——与 [[JEPA]] 谱系同源。
 > 注:LaWAM 突破了本页"WAM = 视频 backbone + 动作"的原定义(见开头"边界澄清")——它是**隐空间 WAM**,把 world 从像素移到 latent。
 
 ## 与其他路线对比

@@ -53,6 +53,7 @@ This map collects the vault's embodied-AI cluster: vision-language-action (VLA) 
 - [[ACE Robotics - Kairos 3.0 a Real-Time Generative Video World Model|Kairos 3.0]] — edge video world model
 - [[GigaWorld Team - GigaWorld-Policy An Efficient Action-Centered World-Action Model|GigaWorld-Policy]] — 训繁推简
 - [[Maes et al. - LeWorldModel (LeWM) Stable End-to-End JEPA from Pixels|LeWM]] — LeCun 等;极简端到端 **JEPA 世界模型**(15M、单卡,latent 规划比 DINO-WM 快 ~48×);潜在世界模型路线,边缘 WM 轻量候选
+- [[BeingBeyond - Being-H0.7 a Latent World-Action Model from Egocentric Videos|Being-H0.7]] — **第五代 WAM 的第二个独立实例**(BeingBeyond,2026-04):latent query 当推理接口 + **未来知情的 prior/posterior 双分支对齐**(privileged distillation),**推理时无视觉 rollout**;六个仿真 benchmark 总体 SOTA、LIBERO-plus 微调后 84.8%、灵巧人形 49.2%;InternVL3.5 + Qwen3,人类+机器人混合数据预训练。诊断 VLA 的**稀疏动作监督 → shortcut mapping**
 - [[Chen et al. - LaWAM Latent World Action Models for Efficient Dynamics-Aware Robot Policies|LaWAM]] — **隐空间 World-Action Model**(冻结 DINOv3 + 把 LAM-decoder 复用成 230M 世界模型,单次出隐子目标喂动作专家);比像素 WAM 快 ~24×,LIBERO 98.6%/RoboTwin 91.22%(标准榜)
 
 ### Sources — VLA quantization
@@ -63,6 +64,7 @@ This map collects the vault's embodied-AI cluster: vision-language-action (VLA) 
 - [[Agia et al. - Sentinel Runtime Monitoring of Consistency and Progress for Generative Policies|Sentinel]] — Stanford 系;**失败分类学先于方法**:erratic(时间敏感但视觉细微)用 **STAC**(时序动作自一致性 + MMD,**策略无关、成本可忽略**,99% 检出)、task-progression(视觉明显但时间自洽)用**零样本 VLM**(抽帧视频+时限,每 episode 查 2 次)。并行 **>97%** 检出、**+18%** vs 单用;**真机 95%**。⚠️ 证伪"看采样方差"(是被击败的 baseline)、证伪"必须采失败样本"(校准只需成功 rollout)
 
 ### Sources — embodied harness / agentic scaffolding
+- [[Being-0 - a Humanoid Robotic Agent with VLMs and Modular Skills|Being-0]] — **分层具身 agent 框架**(框架改编自 LLM-agent 的 **Cradle**):GPT-4o(云) + **自训 Connector**(VideoLLaMA2 微调,板载 ~1s) + 遥操/模仿获得的技能库;全尺寸人形长程 **84.4%**。分类学落在"**harness + 训练的粘合层**"(纯 harness 与模型方案之间);**pose adjustment 与 Harness VLA 的 re-staging 独立收敛**;**只有 FM 在云**的极简边界。**⚠️ 团队后续已转向端到端基座模型,该框架未见延续**
 - [[Zeng et al. - HELM Harness-Enhanced Long-horizon Memory for VLA Manipulation|HELM]] — 清华+阿里;**harness 直接套在 VLA 上**(VLA 仍是主执行者,对照 Harness VLA 把 VLA 降级成 primitive)。诊断三缺口 **memory / verification / recovery**,各配一个学出的组件:EMM(CLIP 索引关键帧)、**SV**(记忆条件化的**执行前**失败预测,12ms/步)、HC(**用历史关键帧当视觉目标让 VLA 把世界开回去**的回滚 + HELM-Fwd 前向变体)。**LIBERO-LONG 58.4→81.5%(+23.1pp),而 4× 长上下文只买到 +5.4pp** ⇒ **记忆 ≠ 更长上下文**
 - [[Zhang et al. - Harness VLA Steering Frozen VLAs into Reliable Manipulation Primitives via Memory-Guided Agents|Harness VLA]] — **清华等,2026-07**;把**冻结 π0.5** 降级成一个 primitive(`vla_act`)+ 固定小解析原语库,由 agentic planner 用 JSON 编排;planner 下发 **(prompt, 终止判据 τ)**,失败则 **re-staging 重选交棒点**;双记忆(任务解法骨架 + 成功规则/失败模型)。**不动权重** LIBERO-Pro **+38.6pp**。本库 [[Harness design]] 概念的**首个学术量化证据** + [[Alex Zhang - The Mismanaged Geniuses Hypothesis|MGH]] 的具身验证。**⚠️ 全仿真、成功判据依赖仿真 oracle**(源笔记有"真机无法实现的技术点"专章)
 

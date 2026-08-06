@@ -909,3 +909,11 @@
 - **与 [[Physical Intelligence - pi0.6 a VLA That Learns From Experience|π*₀.6 Recap]] 的对照**:同为"价值函数把部署经验转成训练信号",但**时间尺度不同** —— Recap 是**离线/车队级/事后**,FAR 是**在线/单机/就在这一集内**。⇒ 同一思想的两个尺度,正好对应框架的**演进通道(慢)**与**运行时通道(快)**
 - **留白**:① +17.6% 里 FCPA 与扰动各占多少(即"改策略"是否必要,还是扰动就够)② 价值函数**恰恰在 OOD 失败状态上被调用**,可靠性存疑——能否用 FAIL-Detect 那类 OOD 分数加护栏 ③ **测试时更新的权重如何回流云端**(FAR 只做单机闭环,无车队聚合)④ 与 B2FF 组合:**先换目标(零物理代价)、不行再改策略**是否构成自然的恢复升级阶梯
 - Lint 干净:0 broken;144 notes
+
+
+## [2026-08-06] synthesis | ESAS-RoboTwin：从公开开发回归到私有系统验收
+- 更新 [[Embodied simulation benchmark suite for systems optimization]] 至 v0.2，将 RoboTwin 使用方式拆成两层：开发团队运行官方全 50 任务 × clean/randomized；评估团队维护 ESAS（Embodied System Acceptance Suite）中的私有 `ESAS-RoboTwin`。
+- 将原 `RoboTwin-System-10` 降级为按能力覆盖选择的早期 `Capability-Stress` / 快速诊断候选；记录 Motus 自训 π0.5 的地板、天花板与协议边界，不再把它视为经精度分布校准的最终验收集。
+- 冻结 ESAS-RoboTwin 五轴结构：Canonical / Visual / Physics / Control / Compound；前三个压力轴优先做单因素实验，Compound 只用于最终综合压力。
+- 建立 Public Dev → Private Validation → Sealed Final Holdout 的数据隔离，以及聚合反馈、提交频率限制、实例轮换和版本哈希等防过拟合治理。
+- 最终验收采用相同隐藏 episodes 上的 reference–candidate 配对非劣性检验；先运行 100 episodes/task，对临界项顺序扩样至 300–500。

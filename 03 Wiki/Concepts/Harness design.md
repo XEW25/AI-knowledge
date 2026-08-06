@@ -50,6 +50,10 @@ Harness design is closely connected to:
 
 It is a useful concept for understanding when capability gains come from better scaffolding rather than only from better base models, and when platform abstractions should be designed to outlast any single harness implementation.
 
+> **溯源（本页的证据基础）**：本页综合自**两篇 Anthropic 工程博客**，同日（2026-04-12）ingest——核心论点 / 部件清单 / **load-bearing** 来自 [[Prithvi Rajasekaran - Harness design for long-running application development]]；**meta-harness + session/harness/sandbox 三层**来自 [[Anthropic - Scaling Managed Agents Decoupling the brain from the hands]]。⚠️ 二者均为**厂商工程案例文章，非同行评审、无对照实验**（两篇源笔记各自已标注此局限），且**库内无学术性 harness/scaffolding 文献**。"脚手架 vs 基座模型"这一论点与 [[Alex Zhang - The Mismanaged Geniuses Hypothesis|MGH]] 同源。
+>
+> **具身侧展开**：[[Embodied failure detection]] — harness 的一个部件在具身场景的具体化（环境不报错 ⇒ 自己造 exception），也是 load-bearing 原则的一次应用。
+
 ## Open questions
 - Which harness components generalize across domains?
 - How do we tell whether a harness component is still load-bearing for a newer model?

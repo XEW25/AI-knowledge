@@ -17,6 +17,7 @@ This map collects the vault's embodied-AI cluster: vision-language-action (VLA) 
 - [[Visual token budget - pruning vs compression]] — 视觉 token 预算轴：剪枝（EVS）vs 压缩（π0.7 MEM）；为何视频理解侧与具身侧在同一根成本轴上收敛到相反解法。[[VLA quantization]] 的姊妹效率页
 - [[Memory in Embodied AI]] — implicit (procedural) vs explicit (episodic) memory across the two layers
 
+- [[Embodied failure detection]] — **具身环境不报错 ⇒ harness 要自己造 exception**：四类失败 × 三个时机 × 七种机制（成本排序）+ 检测器也会过期（load-bearing）+ 漏报/误报代价不对称（仿真里不存在的 trade-off）
 - [[Robot data engine]] — 数据引擎:数据集 vs 引擎、"昂贵 oracle 的多级代理层级"(调度目标 = 最小化顶层 oracle 调用)、生产型 vs 自演进型、成本从人力→算力
 - [[Real-robot evaluation]] — **真机评测作为测量学**([[Robot data engine]] 的姊妹页:oracle 视角 vs 测量仪器视角):可比 vs 可信矛盾、三条判据(任务 vs 条件 / 复位成本第二维 / 难度校准 40–70%)、8 条运动能力轴、统计功效现实、指标四层分层
 

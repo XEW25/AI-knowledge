@@ -713,3 +713,18 @@
 - **⚠️ 核实状态(两页页首均已标注)**:本轮引用的外部 benchmark 全部来自 **WebSearch/WebFetch 摘要器,未对照原文核实**——RoboDojo(arXiv 2607.04434,五维/18 real tasks/10 trials/三人双盲/π0.5 12.8% vs 人类 100%)、ATOM-Bench(arXiv 2606.16826,motor×instruction atoms/30+24/单臂双臂配对赛道/AS+CFS)、PhAIL(arXiv 2605.29710,time-to-success CDF+HRT+KS)、NVIDIA RoboLab(Clopper-Pearson 数字、三 competency、措辞三档)。**按 reliability discipline 未建 02 Sources 源笔记**——数字要引用前须回读原文
 - **待办**:① 上述四个外部源值得正式 ingest 成 source note(尤其 RoboDojo 和 ATOM-Bench);② **ATOM-Bench"强原子技能不可靠地迁移到留出组合任务"是给 [[Task Decomposition as OOD Mitigation]] 的第二个反证**(LEACL 给的是"拆解不解决探索",这条给的是"原子会了不等于组合会")——该页修正应加一句"**也不自动解决组合**",待回读原文后回填;③ 子问题 ②(初始状态可复现性)与 ③(打分细则)尚未展开,而所有配对统计都建立在 ② 之上
 - Lint 干净:**0 broken-A / 0 broken-B / 1 orphan(根 AGENTS.md) / 1 dup(agents)** —— 与既有基线一致;128 notes, 17 assets
+
+## [2026-08-06] concept | Embodied failure detection — harness 侧失败检测的设计空间
+- **触发**:讨论"具身 Agent 系统 vs LLM Agent 系统"时,Ethan 追问"失败检测 harness 侧具体能做什么"。此前这条线散在三处——[[Home robot architecture - a hierarchical embodied agent|dependability 脚手架]](只列研究线,未组织成设计空间)、[[Robot data engine]](质量信号视角)、[[Harness design]](通用 harness),无收口页
+- **核心命题**:LLM agent 的失败信号是**免费**的(exception / traceback / 测试红绿,离散且可靠);**具身环境不报错** ⇒ 具身 harness 的一项本职工作是"**给自己造 exception**"。且这些机制**绝大多数不动策略权重** ⇒ 是三条提升途径里**最便宜的一条**(不要数据/不要训练/不要新硬件)
+- **维度一 · 四类失败**:执行失败(本体可测,覆盖最好)/ **语义失败**(抓错物体、假成功 — 扰动场景主因,最难)/ **进展停滞**(长程最常见、最易漏,但检测极便宜)/ **不可逆事件**(检测到已晚 ⇒ 必须前置预防)。**现有工作多只覆盖第一类**
+- **维度二 · 三个时机**:事前(唯一能挡不可逆)/ 事中(**必须端侧、断网可用**)/ 事后(回合级裁决 → 喂学习与记忆)。直接映射云-端分层与延迟预算
+- **七种机制(按成本排序)**:①前/后置条件契约(只用本体可测量:夹爪宽度、**末端移动时物体是否跟随**、力阈值、关节位移=PDDL 谓词那套)②停滞/no-progress 超时(**性价比最高**)③**策略自身分歧信号**(多采样 action chunk 看方差 — π 系 flow matching 天然可多采;零额外模型零标注;= FAIL-Detect 2503.08558 / Sentinel 2410.04640 线)④预期-实测 assertion(调用前声明预期后置状态,VLM 核对)⑤**学出的判别器**(AutoEval 微调 PaliGemma 与人工 Pearson 0.942 / HIL-SERL 二值奖励分类器 / Recap value function — 三者皆"训一次、之后 per-sample 只花推理"的**买断制**;真实门槛 = 需采失败样本)⑥不确定→求助(KnowNo 2307.01928,把"检测失败"**前移**为"失败前求助")⑦世界模型行动前验证(World Action Verifier 2604.01985 / Ctrl-World 2510.10125)+ 端侧安全脊髓(CBF/SHIELD 2505.11494) — 最贵,**只对不可逆动作开**
+- **落地优先级(分析判断)**:先 **1+2+3** — 零标注、零训练、可端侧、断网可用,即可吃掉**执行失败 + 进展停滞**两大类,而这两类正是长程 p^N 崩塌的主要贡献者;⑤有标注成本列第二步
+- **两个设计原则(本页原创贡献)**:
+  ① **检测器本身就是 harness 组件 ⇒ 同样适用 load-bearing 原则** — 每个检测器都编码"策略在这里不可靠"的假设;策略变强后会从"救命"退化为"添乱"(无谓重试),应**可度量贡献、可退役**。**目前无任何工作这么做(研究机会)**
+  ② **漏报/误报代价不对称,且方向会翻转** — 长程里漏报(该停没停)代价远大于误报(错误沿链传播,正是 p^N 机制)⇒ 应偏保守;但真机重试有物理成本(时间/磨损/反复接触可能损坏)⇒ 又不能太保守。**该 trade-off 在仿真里根本不存在(重试免费),故现有工作全未处理**。给出真实目标函数:最小化(漏报传播代价 + 误报物理代价)
+- **最有价值的推论(闭环)**:机制⑤训出的判别器**同时就是数据引擎的质量信号** ⇒ **做失败检测与做数据飞轮是同一件事的两面**(能判断"这次做成了吗"的东西,正好能判断"这条轨迹值不值得学")。已在 [[Robot data engine]] 加"与失败检测的同构"一节双向互指
+- **顺带补溯源**:回应 Ethan 追问"harness 理念来自哪",给 [[Harness design]] 加溯源块 —— 明确综合自**两篇 Anthropic 工程博客**(同日 2026-04-12 ingest;核心论点/部件清单/**load-bearing** 来自 Rajasekaran 篇,**meta-harness + session/harness/sandbox 三层**来自 Scaling Managed Agents 篇),并如实标注 **⚠️ 二者均为厂商工程案例文章、非同行评审无对照实验(两篇源笔记各自已自标此局限),且库内无学术性 harness/scaffolding 文献**;补链 [[Alex Zhang - The Mismanaged Geniuses Hypothesis|MGH]](此前"脚手架 vs 基座模型"论点未直接链源)
+- 接线:Embodied MOC Concepts、index Concepts、Home robot architecture 的"关键 meta 判断"处加展开指针。⚠️ **Harness VLA(2607.08448)本页以纯文本引用(尚未 ingest)**,避免制造悬空链接
+- Lint 干净:**0 broken-A / 0 broken-B / 1 orphan / 1 dup**;129 notes, 17 assets

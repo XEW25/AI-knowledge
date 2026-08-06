@@ -60,6 +60,7 @@
 - [[Object-Centric Representation]] — 以物体为基本单元的场景表示方法，支持组合泛化
 - [[Task Decomposition as OOD Mitigation]] — 把 OOD 任务拆成分布内子任务的跨簇论点（ReKep / RL Tokens / ChemBot / MGH）；[[Task decomposition]] 的 OOD 视角
 - [[Robot data engine]] — **数据引擎概念页**：数据集 vs 引擎的判据、四部件（产出/加工/判别/评估）、核心结构"**昂贵 oracle 的多级代理层级 → 调度目标=最小化顶层 oracle 调用**"、生产型 vs 自演进型两形态、质量度量与算力瓶颈两个异构性、研究机会（为数据验证优化的调度=公开空白）
+- [[Embodied failure detection]] — **具身失败检测的设计空间**（harness 侧收口；此前散在 dependability 脚手架 / 数据引擎 / harness 三处）。核心命题：**LLM agent 的 exception 是免费的，具身环境不报错 ⇒ harness 必须自己造 exception**。两个组织维度：**四类失败**（执行 / 语义 / 进展停滞 / 不可逆——现有工作多只覆盖第一类）× **三个时机**（事前防不可逆·事中端侧实时·事后云端裁决）；**七种机制按成本排序**（前后置条件契约 / 停滞超时 / 策略自身分歧 / 预期-实测 assertion / 学出的判别器 / 不确定求助 / 世界模型验证+安全脊髓），落地优先级 **1+2+3**（零标注零训练可端侧，吃掉执行失败+进展停滞两大类）。两个设计原则：**检测器也会过期**（load-bearing，目前无人做=研究机会）、**漏报/误报代价不对称且仿真里不存在**。推论：**判别器 = 数据引擎的质量信号 ⇒ 失败检测与数据飞轮是同一件事的两面**
 - [[Real-robot evaluation]] — **真机评测作为测量学**（2026-08-06；[[Robot data engine]] 的姊妹页，边界=oracle 视角 vs 测量仪器视角）：核心矛盾"**仿真可比不可信 / 真机可信不可比**"；三条判据（**任务 vs 条件**、**复位成本是与能力覆盖正交的第二维**、**难度校准到 40–70%**）；能力轴（8 条运动轴按"质变点"划分 + 指令/结构/泛化轴用 condition 实现）；统计现实（Clopper-Pearson，±10pp→±2pp 需 15× rollouts；二元化每次 rollout 只带回 1 bit）；**指标四层分层**（验收/检测/诊断/硬约束——只有验收需要绝对阈值）+ 平滑度的方向性漏洞（"什么都不做最平滑"）+ time-to-success CDF 严格包含成功率；外部框架对照（RoboDojo/ATOM-Bench/RoboLab/PhAIL/RoboArena）。**⚠️ 外部 benchmark 数字均来自 WebFetch 摘要器，未对照原文核实**
 - [[Keypoint-based Manipulation]] — 以语义 3D 关键点表示场景 + 约束定义操控任务（ReKep 范式）
 - [[Constrained Optimization for Robot Control]] — 把任务写成目标+约束再求解动作（vs 学习策略）；ReKep 的"执行半"

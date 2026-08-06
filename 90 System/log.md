@@ -894,3 +894,18 @@
 - **留白**:B2FF 把触发外置、Sentinel/FAIL-Detect 专做检测 ⇒ **两者是天然互补组合而无人做过**;另记一条 open question:这套"钉死条件槽"能否迁到 **WAM 的 latent 子目标**(LaWAM 隐视觉子目标 / Being-H0.7 latent query)⇒ **在 latent 空间恢复**,比像素更便宜
 - **未核实**:基座 VLA 具体身份(通篇泛称 foresight-driven VLA);代码发布情况
 - Lint 干净:0 broken;142 notes
+
+
+## [2026-08-06] ingest | FAR:恢复四格补齐 + 本库第一个闭合"恢复→数据→改进"环的工作
+- **触发**:Ethan 指出 FAR 用在线学习做重试修正,"猜中了在线学习和失败重试两个领域" —— 判断成立,它确实落在两条线的交叉点
+- **[[FAR - Failure-Aware Retry for Test-Time Recovery and Continual Policy Improvement|FAR]]**(arXiv:2607.01111;raw = URL-only,HTML 自读)。⚠️ **作者与机构未在提取中定位**
+- **问题诊断(准)**:失败状态**很少被离线演示覆盖、对预训练策略是 OOD** ⇒ **朴素重试只重复同样的错误**;且现有恢复方法**多依赖人工介入**,FAR 定位于**自主**
+- **四部件**:① **IQL** 价值学习,同训 `Q_φ` 与 `V_ψ`,用**时序价值差定位失败诱因动作**;② **FCPA**(Failure-Contrastive Preference Adaptation)——失败经验构**偏好数据**(失败动作为负例 + 替代正例),**测试时更新策略**;③ **轻量动作扰动**——FCPA **受限于离线策略的 support**,扰动才能在 OOD 状态扩 support(仿真中**简单高斯扰动通常足够**);④ **成功恢复轨迹进 replay buffer** → 持续改进,原文:"provide supervision on **hard states where the initial policy fails**, improving both policy robustness **and value estimation** over time"
+- **结果**:仿真 **+17.6%** / 真机 **+11.7%**(vs 标准 diffusion policy);**"enables recovery without environment resets"**;**reset budget 与 timestep budget 两种预算下数据效率均显著提升**;3 sim benchmark/9 任务(50 ep、**≤5 次尝试**、3 seeds)+ **7-DoF xArm** 3 任务(20 ep、≤3 次尝试)。⚠️ **未用 LIBERO/CALVIN/RoboCasa**(0 命中),横向可比性弱
+- **核实过程的一个小坑**:`LoRA` 全文 22 次命中,一度以为是方法组件;**回读上下文发现全在参考文献,方法中未使用**(我的行长过滤器漏判)。⇒ **词频命中 ≠ 方法组件**,又一次"先看上下文再下结论"
+- **恢复设计空间由三格扩到四格**(写入 [[Embodied failure detection]]):Harness VLA 改**物理位形** / HELM 改**世界状态** / B2FF 改**目标** / **FAR 改策略本身**。**前三格都冻结策略、在"绕过"其不足;FAR 在"修正"它** ⇒ 取舍:**冻结 = 零训练成本、行为可预测;更新 = 能真正学会,但有在线训练与稳定性风险**
+- **最有价值的一点:本库第一个闭合的环**。此前框架有**运行时通道(恢复)**与**演进通道(经验↑/技能↓)**,但**无任何工作把两者接起来**。FAR 的环:失败 → 价值差定位 → 偏好适配+扰动 → **恢复成功** → 轨迹进 replay buffer → 持续改进(**价值估计一并变好**,自举)
+- **对 [[Robot data engine]] 的含义**:数据引擎页指出自演进型引擎的本质是"**质量信号提取**",且**双组分杠杆**里人类信号是支点。**FAR 用 IQL 学出的价值函数替掉了这个支点** ⇒ **双组分杠杆存在可自主化的子类**。且它自动产出的"成功恢复轨迹"**按定义落在策略失败分布上** —— 正是数据引擎页判定"价值密度最高"的那类数据,而这里是**自主**产生的。对"人类注意力是真正稀缺资源"是**正面缓解而非推翻**(仍需可靠的价值函数)
+- **与 [[Physical Intelligence - pi0.6 a VLA That Learns From Experience|π*₀.6 Recap]] 的对照**:同为"价值函数把部署经验转成训练信号",但**时间尺度不同** —— Recap 是**离线/车队级/事后**,FAR 是**在线/单机/就在这一集内**。⇒ 同一思想的两个尺度,正好对应框架的**演进通道(慢)**与**运行时通道(快)**
+- **留白**:① +17.6% 里 FCPA 与扰动各占多少(即"改策略"是否必要,还是扰动就够)② 价值函数**恰恰在 OOD 失败状态上被调用**,可靠性存疑——能否用 FAIL-Detect 那类 OOD 分数加护栏 ③ **测试时更新的权重如何回流云端**(FAR 只做单机闭环,无车队聚合)④ 与 B2FF 组合:**先换目标(零物理代价)、不行再改策略**是否构成自然的恢复升级阶梯
+- Lint 干净:0 broken;144 notes

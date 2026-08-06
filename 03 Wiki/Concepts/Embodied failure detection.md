@@ -126,15 +126,20 @@ Harness VLA 列的 τ 四种形式，逐个看真机可行性：
 
 剩下的真实成本是**阈值标定**（"力矩超过多少算接触"）——但它**按本体一次性标定，不随任务数增长**（同 [[Real-robot evaluation]] 里"阈值来自本体规格书，不来自评测设计"）。
 
-## 检测之后：恢复的三格设计空间
+## 检测之后：恢复的四格设计空间
 
-本页主体讲**检测**；检测到之后**怎么恢复**是另一个设计空间。同一个目标（把策略拉回它的能力域），已有三种改法——**改的东西不同，真机代价差别很大**：
+本页主体讲**检测**；检测到之后**怎么恢复**是另一个设计空间。同一个目标（把策略拉回它的能力域），已有四种改法——**改的东西不同，代价与风险差别很大**：
 
-| 工作 | 改什么 | 机制 | 真机代价 |
-|---|---|---|---|
-| [[Zhang et al. - Harness VLA Steering Frozen VLAs into Reliable Manipulation Primitives via Memory-Guided Agents\|Harness VLA]] | **机器人的物理位形** | re-staging：改 approach pose / viewpoint / 局部摆位，把机器人送进 VLA 能力域 | 要真移动：时间、磨损 |
-| [[Zeng et al. - HELM Harness-Enhanced Long-horizon Memory for VLA Manipulation\|HELM]] | **世界状态** | 取 EMM 里的历史关键帧当视觉目标，prompt "return to the state shown" 让 VLA **把世界开回去** | 要真开回去；"回得去吗"存疑（作者自列局限） |
-| [[Shin et al. - B2FF Failure Recovery for VLA Policies via Pre-Imagined Milestone Selection\|B2FF]] | **喂给策略的目标** | 从**执行前预想**的 milestone bank 里选一个，**钉死为固定 future-image 条件**，只对动作去噪 | **零物理代价** |
+| 工作 | 改什么 | 机制 | 策略 | 代价 |
+|---|---|---|---|---|
+| [[Zhang et al. - Harness VLA Steering Frozen VLAs into Reliable Manipulation Primitives via Memory-Guided Agents\|Harness VLA]] | **机器人的物理位形** | re-staging：改 approach pose / viewpoint / 局部摆位，把机器人送进 VLA 能力域 | 冻结 | 要真移动：时间、磨损 |
+| [[Zeng et al. - HELM Harness-Enhanced Long-horizon Memory for VLA Manipulation\|HELM]] | **世界状态** | 取 EMM 里的历史关键帧当视觉目标，prompt "return to the state shown" 让 VLA **把世界开回去** | 冻结 | 要真开回去；"回得去吗"存疑 |
+| [[Shin et al. - B2FF Failure Recovery for VLA Policies via Pre-Imagined Milestone Selection\|B2FF]] | **喂给策略的目标** | 从**执行前预想**的 milestone bank 选一个，**钉死为 future-image 条件**，只对动作去噪 | 冻结 | **零物理代价** |
+| [[FAR - Failure-Aware Retry for Test-Time Recovery and Continual Policy Improvement\|FAR]] | **策略本身** | IQL 价值差定位失败动作 → **偏好适配（FCPA）** + 轻量动作扰动扩 support | **测试时更新** | 在线训练与稳定性风险 |
+
+> **前三格在"绕过"策略的不足，第四格在"修正"它。** 取舍很清楚：**冻结 = 零训练成本、行为可预测；更新 = 能真正学会，但引入在线训练与稳定性风险**（灾难性遗忘、被单次失败带偏）。
+>
+> **FAR 还闭合了一个此前空缺的环**：恢复尝试**本身产出训练信号**——失败 → 定位失败动作 → 适配 + 探索 → **恢复成功的轨迹进 replay buffer** → 持续改进（**价值估计也一并变好**）。这是本库第一个把**运行时通道（恢复）**与**演进通道（经验↑）**接起来的工作，且**全程自主**（用学出的价值函数替掉了"人来标哪一步错了"）。详见 [[Robot data engine]] 的质量信号讨论。
 
 > **由此得出的一条判断**：**动作头的"能力域"不只由当前状态定义，还由你给它的目标定义** —— `p(success | o₀, goal)` 是**两个变量**的函数。⇒ **恢复分布内性有两条路：移动机器人，或者换个目标。** 后者在真机上更便宜，这补上了本页"真机重试有物理成本"讨论里缺的一半。
 >

@@ -870,3 +870,27 @@
 - **写入 [[Embodied model function evolution - generalization as the master line]] 新增「反方向的证据点」节**:同一现象两种归因(**系统结构** vs **表征学习**),Being 与 [[Galaxea - G0.5 Autoregressive VLM-as-Actor VLA|Galaxea G0→G0.5]] 并列为"系统派 vs 模型派钟摆"的证据。**但公平标注三条**:① Being-0 的论证(误差累积+模块延迟)**没被驳倒,只是被绕开**(单体策略无多模块延迟);② Being-H 修的恰是 Being-0 里用现成方法凑的技能库(H0 卖点="需要少得多的遥操演示")⇒ 可读作"先搭系统再补最弱层";③ 两层历史上交替推进,非零和
 - **⇒ 对本页主线的修正(重要)**:"泛化载体走向组合"应表述为**方向性判断而非既成事实**;当前模型层仍在快速兑现收益。且与 Harness VLA 不矛盾——后者证明的是"**在给定模型上**组合能榨出 +38.6pp",而非"组合优于把模型做强"
 - Lint 干净:0 broken;141 notes
+
+
+## [2026-08-06] ingest | B2FF:"在条件空间恢复" —— 恢复设计空间补齐第三格
+- **触发**:Ethan 问"什么叫把 milestone 图像作为 fixed future-image anchor?怎么 anchor 进去的?visual-foresight VLA 是以这帧图为基础开始推理吗?那不会不准确吗?" —— 三问全是机制细节,读原文后 ingest
+- **[[Shin et al. - B2FF Failure Recovery for VLA Policies via Pre-Imagined Milestone Selection|B2FF]]**(arXiv:2606.09258,2026-06-08;**首尔大 Byoung-Tak Zhang 组** + 延世 + 崇实;raw = URL-only,HTML 自读)
+- **"anchor"的确切含义(回答问题1)**:基座是 **foresight-driven VLA**,正常时**联合生成「子目标图像 + 动作」**;恢复时把未来图像那一路的变量**钉死(clamp)**为选中的 milestone,**只对动作去噪** —— 论文称 **action-only denoising**:
+  `π(v_t, a_t | I, o_t)` (正常) vs `π(a_t | I, o_t ; v_t ← v*)` (恢复)
+- **不是"以那帧图为基础推理"(回答问题2)**:**`o_t`(当前偏离观测)始终在条件中**;被替换的是**策略自己预测的未来**,不是当前状态。策略同时看"我在哪"与"该去哪",生成动作把两者接起来
+- **"不会不准确吗"(回答问题3)——这正是立论**:偏离后 `o_t` 落在不熟悉状态空间,从 OOD 观测**重新预测未来**本身就不可靠("direct re-planning frequently **destabilizes action sequences**")。⇒ **宁可要不精确但在分布内的目标**,因为动作头只被训练过朝熟悉的未来行动。原文金句:**"need not pixel-match the failed observation, but it must contain a milestone that provides a useful action-guiding condition"** ⇒ **milestone 不是预测,是靶子**
+- **"对不上"由 selector 兜**:`v* = argmax F_φ(ṽ | o_f, H_f, C_f)` —— 打分**条件含当前失败观测**+历史+**局部候选集**(非整个 bank)⇒ 挑"从我现在这个烂状态出发**最够得着的**"熟悉未来,这就是 recoverability 的含义。实现:冻结 tokenizer → 投影器 → **Perceiver 注意力** → MLP 打分头;训练三阶段 = **TCN 时间对比学习**做进度初始化 → **对每个候选真跑一遍 action-only denoising 收反事实标签** → 监督 warm-start + **one-step actor-critic 式微调**
+- **bank 构造**:执行前从**干净初始观测**递归查询**冻结 VLA 的 future-image 边缘分布** ⇒ 存下的都是"策略在正常状态下会想象出的未来",**天然在分布内**
+- **结果**:failure-injected LIBERO **56.3%→74.0%(+17.7pp)**,**不微调低层动作生成器**;真机三任务(堆叠/pick-and-place/关抽屉并放置),"lightweight selector tuning"后迁移成立
+- **⚠️ 两条必记前提**:① 主结果在 **controlled recovery timing**(触发与注入扰动对齐)下取得,在线变体仅用本体感知历史估计;原文明说 **"We treat trigger estimation as an interchangeable entry point"** ⇒ **它解决"怎么恢复",不解决"何时恢复"**;② **明确不处理语义失败**(任务理解错/物体 grounding 错)**与不可逆失败**(离开工作空间/不可逆环境改变)
+- **写入 [[Embodied failure detection]] 新增「检测之后:恢复的三格设计空间」**:
+  | 工作 | 改什么 | 真机代价 |
+  |---|---|---|
+  | Harness VLA | **物理位形**(re-staging) | 要真移动:时间、磨损 |
+  | HELM | **世界状态**(历史关键帧当视觉目标开回去) | 要真开回去,"回得去吗"存疑 |
+  | **B2FF** | **喂给策略的目标** | **零物理代价** |
+- **由此得出的判断(本库综合)**:**动作头的能力域不只由当前状态定义,还由你给它的目标定义** —— `p(success | o₀, goal)` 是**两个变量**的函数 ⇒ **恢复分布内性有两条路:移动机器人,或换个目标**。后者真机更便宜,补上了此前"真机重试有物理成本"讨论缺的一半
+- **外部对本库分类学的独立印证**:B2FF 的适用边界(只处理可恢复偏离,不碰语义/不可逆)与本库**四类失败**及**失败可逆性**判据**逐条对齐**
+- **留白**:B2FF 把触发外置、Sentinel/FAIL-Detect 专做检测 ⇒ **两者是天然互补组合而无人做过**;另记一条 open question:这套"钉死条件槽"能否迁到 **WAM 的 latent 子目标**(LaWAM 隐视觉子目标 / Being-H0.7 latent query)⇒ **在 latent 空间恢复**,比像素更便宜
+- **未核实**:基座 VLA 具体身份(通篇泛称 foresight-driven VLA);代码发布情况
+- Lint 干净:0 broken;142 notes

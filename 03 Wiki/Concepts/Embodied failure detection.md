@@ -126,6 +126,22 @@ Harness VLA 列的 τ 四种形式，逐个看真机可行性：
 
 剩下的真实成本是**阈值标定**（"力矩超过多少算接触"）——但它**按本体一次性标定，不随任务数增长**（同 [[Real-robot evaluation]] 里"阈值来自本体规格书，不来自评测设计"）。
 
+## 检测之后：恢复的三格设计空间
+
+本页主体讲**检测**；检测到之后**怎么恢复**是另一个设计空间。同一个目标（把策略拉回它的能力域），已有三种改法——**改的东西不同，真机代价差别很大**：
+
+| 工作 | 改什么 | 机制 | 真机代价 |
+|---|---|---|---|
+| [[Zhang et al. - Harness VLA Steering Frozen VLAs into Reliable Manipulation Primitives via Memory-Guided Agents\|Harness VLA]] | **机器人的物理位形** | re-staging：改 approach pose / viewpoint / 局部摆位，把机器人送进 VLA 能力域 | 要真移动：时间、磨损 |
+| [[Zeng et al. - HELM Harness-Enhanced Long-horizon Memory for VLA Manipulation\|HELM]] | **世界状态** | 取 EMM 里的历史关键帧当视觉目标，prompt "return to the state shown" 让 VLA **把世界开回去** | 要真开回去；"回得去吗"存疑（作者自列局限） |
+| [[Shin et al. - B2FF Failure Recovery for VLA Policies via Pre-Imagined Milestone Selection\|B2FF]] | **喂给策略的目标** | 从**执行前预想**的 milestone bank 里选一个，**钉死为固定 future-image 条件**，只对动作去噪 | **零物理代价** |
+
+> **由此得出的一条判断**：**动作头的"能力域"不只由当前状态定义，还由你给它的目标定义** —— `p(success | o₀, goal)` 是**两个变量**的函数。⇒ **恢复分布内性有两条路：移动机器人，或者换个目标。** 后者在真机上更便宜，这补上了本页"真机重试有物理成本"讨论里缺的一半。
+>
+> **B2FF 的适用边界正好复述了本页的四类失败**（作者自陈）：只处理**可恢复的偏离**（任务仍物理可行、物体仍可观测可达、技能已具备）；**不处理语义失败**（任务理解错、物体 grounding 错）与**不可逆失败**（离开工作空间、不可逆的环境改变）。⇒ 外部工作对本页分类学的一次独立印证。
+>
+> **⚠️ 检测与恢复是可分离的**：B2FF 明确把恢复触发估计当作"**可替换的入口**"（主结果在**受控触发时机**下取得）。⇒ 本页的检测机制与上表的恢复机制**是天然互补的组合，而目前没有工作把两者接起来**。
+
 ## 主动探测（active probing）：harness 特有的一招
 
 前六种机制都是**被动观察**。harness 还能做一件模型做不到的事——**主动改变观测来消除歧义**：

@@ -58,6 +58,7 @@
 - 数据新鲜度与**本体演进耦合**:硬件改版 → 真机数据贬值;仿真管线可重跑但触发**突发式重生成 GPU 负载**。
 
 ## Related
+- [[Real-robot evaluation]] — **姊妹页,边界须分清**:本页把评测当**被调用的 oracle**(怎么少调用它:代理层级、吞吐);那页把评测当**被设计的测量仪器**(调用一次能买到多少信息:任务覆盖、样本量、指标信息密度)。同一优化问题的两项——最小化调用次数 × 最大化单次信息产出
 - [[Real-robot data collection - teleop vs UMI-class, and the model-in-the-loop quality problem|三层数据金字塔综述(Embodied data)]] — **本页的证据基座**(三层特征/例子/趋势、质量评估三代、L0–L3 评估栈、计算系统四大挑战、完整 Sources)。⚠️ 注意其**文件名仍是旧标题**(改版未改名),链接须用文件名
 - [[Cloud-edge co-evolving embodied agent - a continuous-evolution framework]] — 云③技能工厂(供给侧成本结构)/ 云④验证门
 - [[Future embodied Agent framework - integrated view]] — 数据引擎是其 "how(持续演进)" 切面的物质基础

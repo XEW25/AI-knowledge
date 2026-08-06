@@ -18,6 +18,7 @@ This map collects the vault's embodied-AI cluster: vision-language-action (VLA) 
 - [[Memory in Embodied AI]] — implicit (procedural) vs explicit (episodic) memory across the two layers
 
 - [[Robot data engine]] — 数据引擎:数据集 vs 引擎、"昂贵 oracle 的多级代理层级"(调度目标 = 最小化顶层 oracle 调用)、生产型 vs 自演进型、成本从人力→算力
+- [[Real-robot evaluation]] — **真机评测作为测量学**([[Robot data engine]] 的姊妹页:oracle 视角 vs 测量仪器视角):可比 vs 可信矛盾、三条判据(任务 vs 条件 / 复位成本第二维 / 难度校准 40–70%)、8 条运动能力轴、统计功效现实、指标四层分层
 
 ### Topics
 - [[Spatial Intelligence for Embodied AI]] — 3D representation, spatial modality, predictive spatial models
@@ -31,6 +32,7 @@ This map collects the vault's embodied-AI cluster: vision-language-action (VLA) 
 - [[Embodied model function evolution - generalization as the master line]] — 具身模型功能趋势(端到端→大小脑→端云→Agentic)重述,**以泛化为主线**;why long-horizon collapses (p^N × missing L3) + why Agentic (compositional reuse); 4-stage figure + brain/cerebellum examples
 
 - [[Future embodied Agent framework - integrated view]] — **整合入口**:why(泛化墙)/ what(分层架构)/ how(端云 co-evolution)/ 地基 四切面缝成单页 + 分层架构图 + "云↔端两条通道"
+- [[Real-robot eval bench - task suite design and setup checklist]] — **⚠️ 团队专属、有时效**：[[Real-robot evaluation]] 在具体机械臂平台（单臂+双臂 / π0 微调）上的落地清单——8 轴覆盖诊断、Tier 0/1 任务集、抽屉任务专章（自复位 ⇒ 高精度回归探针）、按 roadmap 挂载、立即可做五件事
 - [[Real-robot data collection - teleop vs UMI-class, and the model-in-the-loop quality problem]] — **具身数据三层金字塔全景**(2026-07,多轮追问后按三层框架重组):顶层真机遥操/中层仿真合成/底层人类行为数据的**特征对比→例子→趋势→评估体系→计算系统挑战**五段式;UMI=桥(判据=动作空间)、第四类=部署经验、阶段×数据矩阵;质量评估三代谱系+两级体系+A/B/C/D 机制辨析;**昂贵 oracle 代理层级**(L0–L3 评估栈)+供给侧五层优化(调度层空档=研究机会)+三层×算力形态收口表;含"星海图无 UMI 硬件产品"核实。云③技能工厂的数据上游
 
 ### Sources — VLA models

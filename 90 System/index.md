@@ -60,6 +60,7 @@
 - [[Object-Centric Representation]] — 以物体为基本单元的场景表示方法，支持组合泛化
 - [[Task Decomposition as OOD Mitigation]] — 把 OOD 任务拆成分布内子任务的跨簇论点（ReKep / RL Tokens / ChemBot / MGH）；[[Task decomposition]] 的 OOD 视角
 - [[Robot data engine]] — **数据引擎概念页**：数据集 vs 引擎的判据、四部件（产出/加工/判别/评估）、核心结构"**昂贵 oracle 的多级代理层级 → 调度目标=最小化顶层 oracle 调用**"、生产型 vs 自演进型两形态、质量度量与算力瓶颈两个异构性、研究机会（为数据验证优化的调度=公开空白）
+- [[Real-robot evaluation]] — **真机评测作为测量学**（2026-08-06；[[Robot data engine]] 的姊妹页，边界=oracle 视角 vs 测量仪器视角）：核心矛盾"**仿真可比不可信 / 真机可信不可比**"；三条判据（**任务 vs 条件**、**复位成本是与能力覆盖正交的第二维**、**难度校准到 40–70%**）；能力轴（8 条运动轴按"质变点"划分 + 指令/结构/泛化轴用 condition 实现）；统计现实（Clopper-Pearson，±10pp→±2pp 需 15× rollouts；二元化每次 rollout 只带回 1 bit）；**指标四层分层**（验收/检测/诊断/硬约束——只有验收需要绝对阈值）+ 平滑度的方向性漏洞（"什么都不做最平滑"）+ time-to-success CDF 严格包含成功率；外部框架对照（RoboDojo/ATOM-Bench/RoboLab/PhAIL/RoboArena）。**⚠️ 外部 benchmark 数字均来自 WebFetch 摘要器，未对照原文核实**
 - [[Keypoint-based Manipulation]] — 以语义 3D 关键点表示场景 + 约束定义操控任务（ReKep 范式）
 - [[Constrained Optimization for Robot Control]] — 把任务写成目标+约束再求解动作（vs 学习策略）；ReKep 的"执行半"
 - [[VLA - Vision-Language-Action Models]] — **base concept / hub** for the VLA family: definition, boundaries (vs WAM / motion controller), architecture axes (actor-vs-encoder, Paradigm A/B), and the vault's VLA instances
@@ -116,6 +117,7 @@
 - [[Embodied model function evolution - generalization as the master line]] — **具身模型功能演进重述**:端到端→大小脑协同→端云自闭环→**Agentic**,**以"泛化/可用性墙"为驱动**(泛化载体 模型→组合);含长程崩支点(p^N × 缺 L3)、例子池 + 脑/小脑配对表、可直接进汇报的论述。回应专家"需融入泛化不足"的反馈
 
 - [[Future embodied Agent framework - integrated view]] — **整合入口**:把功能演进(why)/ 家庭架构(what)/ 端云 co-evolution(how)/ 地基(capability⟂dependability)缝成一页;含分层架构图 + "云↔端两条通道"整合点
+- [[Real-robot eval bench - task suite design and setup checklist]] — **⚠️ 团队专属、有时效的可执行清单**（2026-08-06，[[Real-robot evaluation]] 的落地面）：桌面机械臂（单臂+双臂）、π0 微调平台上的评测任务集设计——现状诊断（8 轴覆盖 2.5 条，**双臂同步闭链是最大空白**）、Tier 0 回归底座 5 任务 / Tier 1 补空白 4 任务、抽屉任务专章（**自复位 ⇒ 唯一能拿到 n=300+ 的高精度回归探针**；把手类型=第一难度旋钮；v0→v3 升级路径吃到轴 8；三个坑：柜体固定/力矩保护单列/硬件漂移）、按 roadmap 挂载（推理优化/架构设计/仿真优化跑什么不跑什么）、立即可做五件事。**换本体或改 roadmap 后需重审**
 - [[Real-robot data collection - teleop vs UMI-class, and the model-in-the-loop quality problem]] — **具身数据三层金字塔全景**(2026-07,deep-research+追问,按三层框架重组;文件名保留初版主题):三层特征对比→例子→趋势→评估体系→计算系统挑战五段式;UMI=桥、部署经验=第四类、阶段×数据矩阵、质量评估三代谱系+两级体系+A/B/C/D 辨析、昂贵 oracle 代理层级(L0–L3 评估栈)、供给侧五层优化(调度层空档=研究机会)、三层×算力形态收口;核实"星海图无 UMI 硬件产品";22 来源双路提取;遗留未核实项已于 2026-07-07 定点核实归位(RoboMIND/OXE/ALOHA/GELLO/Helix/SynGrasp-1B/robomimic/DreamGen/OSMO),vendor 口径以行内标注为最终状态
 
 ## Maps

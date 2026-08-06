@@ -19,6 +19,17 @@
 
 > **Harness VLA**（[2607.08448](https://arxiv.org/abs/2607.08448)，*尚未 ingest*）的 Global Memory 恰好各覆盖一条：*"夹爪闭合但物体没跟着末端动 → 判为空抓"*（执行失败）与 *"不要仅凭视觉接近就判定完成"*（它称 **false visual success**，属语义失败）。第三、四类基本没碰。
 
+### ⚠️ 为什么必须有多个检测器：分层依据是三维，不只是成本
+[[Agia et al. - Sentinel Runtime Monitoring of Consistency and Progress for Generative Policies|Sentinel]] 的实测把这件事讲全了（它两个检测器**并行**跑，检出 >97% 未知失败，比单用任一个 **+18%**）：
+
+| 维度 | erratic failures（行为紊乱） | task progression failures（不推进） |
+|---|---|---|
+| **检测成本** | STAC 可忽略 | VLM 贵 |
+| **干预紧迫性** | **需立即干预** | 不需要（每 episode 查 2 次即可） |
+| **信号模态**（最本质） | 在**动作空间**明显、**视觉上细微**（VLM 仅 77% TPR） | 在**视觉上明显**（停滞/偏离）、**动作空间上自洽**（STAC 仅 44% TPR） |
+
+> **第三维才是"不能只用一个检测器"的根本原因**：两类失败**在不同的表征空间里才可见**。成本与紧迫性只决定"放在哪个频率层"，**模态互补决定"必须有两个"**。
+
 ## 维度二：什么时候检测（决定放云还是放端）
 
 | 时机 | 作用 | 延迟预算 | 部署位置 |
@@ -47,11 +58,33 @@
 
 **2｜停滞检测.** 动作在发、状态不变 = 卡住。**性价比最高的一个**：几乎不要钱，却吃掉长程任务里最大的静默失败源。建议**每个 primitive 都带 no-progress 超时**。
 
-**3｜策略自身的信号（免费且被低估）.** 不动权重就能拿到：**多采样 action chunk 看分歧**（π 系是 flow matching，天然可多采；分歧大 = 策略在此不确定）；连续两次推理的 chunk 抖动 = 状态模糊。即 **FAIL-Detect**（2503.08558）与 **Sentinel**（2410.04640）那条运行时监控线。零标注、与策略同源、可端侧。
+**3｜策略自身的信号（免费且被低估）.** 不动权重就能拿到，零标注、与策略同源、可端侧。两条已验证的做法：
+
+- **STAC（时序动作自一致性）** — [[Agia et al. - Sentinel Runtime Monitoring of Consistency and Progress for Generative Policies|Sentinel]] 的核心。生成式策略每 `k` 步重规划但预测 `h` 步（`k<h`）⇒ **t 与 t+k 两次预测在时间上重叠**；比较两个分布在重叠窗口上的**统计距离** `D(π̄_t, π̃_{t+k})`。原理：策略相当于内含一个世界模型，**分布内它会同意自己刚才的预测，OOD 时会自我矛盾**。检出 **99% 的 erratic 失败**，成本可忽略，**策略无关**。
+- **学出的密度/不确定性信号 + OOD 框架** — **FAIL-Detect**（2503.08558，*摘要级*）把策略输入输出**蒸馏成标量信号**（刻画 epistemic uncertainty），按**序贯 OOD 检测**处理；结论是 **learned 信号优于 post-hoc 信号**（其 flow-based 密度估计器最好）。
+
+> ⚠️ **两个必须记住的更正**（否则会走弯路）：
+> 1. **不是"看单时刻采样方差"**。朴素的 **Diffusion Output Variance**（对 B 条采样算方差）在 Sentinel 里是**被 STAC 击败的 baseline**，且原文指出它"does not quantify epistemic model uncertainty"。**关键在跨时刻的自一致性，不在单时刻的离散度。**
+> 2. **必须用分布距离，不能比均值**。生成式策略是多模态的（同任务多种合法解法）；消融显示**用非统计距离（如 min. distance）比 baseline 还差**，正因为它抹掉了多模态性。实现用 **MMD + RBF 核**。
+>
+> **代价**：STAC 依赖 chunk 重叠结构，对 horizon 敏感（k=2→TPR 61%，k=4→78%，**k=8/h=16→95%**）；单步策略或 `k=h` 不适用。
+
+**3′｜⚠️ 机制③ 与机制⑥ 是一条流水线，不是两个并列项.** 正确结构是：
+
+```
+信号提取（STAC / 学出的密度估计 / 本体量）
+      ↓
+conformal prediction 校准
+      ↓
+有保证的决策（报警 → 重试；或 → 求助人类）
+```
+**CP 是把原始分数变成"有统计保证的决策"的连接组织**，KnowNo（语义/规划层）、FAIL-Detect（执行监控层）、STAC（动作一致性层）用的是**同一套机器、施加在不同层次**。⇒ **CP 的 α 就是本页"漏报/误报权衡"那个原则的可调旋钮**：你选定容许误报率，它给统计保证。（如何按"漏报传播代价 vs 误报物理代价"来定 α，是开放问题。）
 
 **4｜预期-实测核对.** planner 调用前**显式声明预期后置状态**，调用后用 VLM 核对——本质是给具身动作加 **assertion**，把隐式判断变成可检查断言。
 
-**5｜学出来的判别器（替代仿真器成功判据的正解）.** 真机化必须补的一环，本库已有三个可参照形态：**VLM 成功判别器**（AutoEval 微调 PaliGemma，与人工 **Pearson 0.942**）、**二值奖励分类器**（HIL-SERL，遥操采正负样本）、**value function**（[[Physical Intelligence - pi0.6 a VLA That Learns From Experience|π*₀.6 Recap]] 打 advantage）。三者都是"**训一次判别器、之后 per-sample 只花推理**"的**买断制**（[[Robot data engine]] 的 C 类），这是工业上唯一跑得起的形态。真实门槛 = **要采失败样本**。
+**5｜学出来的判别器（替代仿真器成功判据的正解）.** 真机化必须补的一环，本库已有三个可参照形态：**VLM 成功判别器**（AutoEval 微调 PaliGemma，与人工 **Pearson 0.942**）、**二值奖励分类器**（HIL-SERL，遥操采正负样本）、**value function**（[[Physical Intelligence - pi0.6 a VLA That Learns From Experience|π*₀.6 Recap]] 打 advantage）。三者都是"**训一次判别器、之后 per-sample 只花推理**"的**买断制**（[[Robot data engine]] 的 C 类），这是工业上唯一跑得起的形态。
+
+> ⚠️ **"必须采失败样本"这个门槛被证伪了（2026-08 修正）**：**FAIL-Detect** 整篇就在论证 *"detect failures **without failure data**"*——只用成功数据训练；[[Agia et al. - Sentinel Runtime Monitoring of Consistency and Progress for Generative Policies|Sentinel]] 的 STAC 校准集同样**只需少量成功 rollout**。代价是问题被弱化为**"是否偏离训练分布"**（OOD ≠ 一定失败），但对**冷启动**极有价值：一条失败样本都没有时也能先跑起来。⇒ 上面三个"需正负样本"的形态是**更强但更贵**的一档，不是唯一入口。
 
 **6｜不确定 → 求助.** **KnowNo**（conformal prediction，2307.01928）给出有统计保证的"我不确定"，触发人工介入。价值在于把"检测失败"**前移**为"失败前求助"；并直接接上 [[Robot data engine]] 的结论——**人类注意力才是稀缺资源，优化目标是每次求助的信息量，不是数据量**。
 

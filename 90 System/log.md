@@ -765,6 +765,20 @@
 从抽象说法收紧为:**能力画像的本质 = 这个技能的「能力域」边界在哪**(`p(success|o₀)` 中什么样的 `o₀` 能成);⇒ **大脑的工作 = 把系统送进能力域再交棒**;落地形态**不是数值向量**而是成功规则+失败模型+解法骨架(空间参数须标为参考场景绑定);**补一个此前遗漏的维度:失败后果是否可逆**(决定能否自主重试)
 
 - 接线:Embodied MOC 新增 "Sources — embodied harness / agentic scaffolding" 小节、index Raw+Sources。Lint 干净:**0 broken-A / 0 broken-B / 1 orphan / 1 dup**;131 notes, 17 assets
+
+## [2026-08-06] ingest + correct | Sentinel:失败检测的真实机制(并修正三处我编的说法)
+- **触发**:Ethan 追问"FAIL-Detect 具体怎么用策略自身信号做失败检测""和不确定求助有无关联",继而追问 STAC 与 VLM 的具体机制。**我此前只从 dependability 表里引用这两篇、从未读过**,给出的"多采样 action chunk 看方差"是**自己的推断**。读原文后发现说错了 ⇒ 本条含三处更正
+- **Ingest [[Agia et al. - Sentinel Runtime Monitoring of Consistency and Progress for Generative Policies|Sentinel]]**(arXiv:2410.04640,Agia/Sinha/Pavone/Bohg 等;raw = URL-only,**HTML 全文自读**含附录 prompt 模板)
+- **STAC 真实机制**:生成式策略每 `k` 步重规划但预测 `h` 步(`k<h`)⇒ **t 与 t+k 的 chunk 时间重叠**;STAC = 两分布在重叠窗口上的**统计距离** `D(π̄_t, π̃_{t+k})`,用 **MMD+RBF** 经验近似。**假设(原文)**:策略相当于"possessing an **internal world model**",分布内则它会同意自己刚才的预测,OOD 时**自我矛盾**。⇒ 测的是**跨时刻自一致性**,不是单时刻不确定度。**策略无关**、成本可忽略、校准只需少量成功 rollout、附录有 **conformal 保证 + 证明**
+- **VLM 监控**:**不微调**,零样本 prompt 现成闭源模型(GPT-4o / Claude 3.5 Sonnet / Gemini 1.5 Pro,同一套 prompt);**输入 = 抽帧视频**(~1Hz,ν∈{1,2})+ 任务描述 + **时间限制 + 已用时间**;prompt **三段式强制自问自答**(Questions→Answers→Analysis,显式要求对比已用/限时 + "除非不太可能完成否则别判失败"防误报);**每 episode 仅查 2 次**、**非阻塞 API**
+- **结果**:STAC 检出 erratic **99%**;Sentinel 并行 **>97%**、比单用任一 **+18%**;task-progression 上 STAC 单独仅 **44% TPR**、组合 **93% TPR**(FPR 仅 +7%);erratic 上 VLM 仅 **77% TPR** 且慢;**真机 Push Chair 总准确率 95%**(VLM 真机 90/100,优于仿真)
+- **⚠️ 更正一(机制③的描述是错的)**:我写的"多采样看方差"——**朴素的 Diffusion Output Variance 恰恰是 Sentinel 里被 STAC 击败的 baseline**,原文并指出它"does not quantify epistemic model uncertainty"。且消融显示**用非统计距离(min. distance)比 baseline 还差**,因为抹掉了动作多模态性 ⇒ **必须用分布距离**。已改写机制③并加"两个必须记住的更正"框
+- **⚠️ 更正二(③ 与 ⑥ 不是并列)**:实为**一条流水线** —— 信号提取 → **conformal prediction 校准** → 有保证的决策(报警/求助)。**CP 是共同连接组织**:KnowNo(语义层)、FAIL-Detect(执行监控层)、STAC(动作一致性层)是同一套机器施加在不同层次;**CP 的 α 就是本页"漏报/误报权衡"原则的可调旋钮**(如何按代价选 α 列为 open question)
+- **⚠️ 更正三(机制⑤门槛过强)**:我标的"真实门槛=要采失败样本"被证伪 —— FAIL-Detect 整篇论证 *"detect failures **without failure data**"*(仅用成功数据),STAC 校准同样只需成功 rollout。代价是问题弱化为"是否偏离训练分布"(OOD ≠ 一定失败),但**对冷启动极有价值**。已改为"需正负样本的是更强但更贵的一档,不是唯一入口"
+- **新增结论(本轮最有价值)**:**分层依据是三维,不只是成本** —— 检测成本 × 干预紧迫性 × **信号模态**。第三维最本质:erratic 在**动作空间**明显而**视觉细微**(VLM 77%),task-progression 在**视觉明显**而**动作空间自洽**(STAC 44%)⇒ **两类失败在不同表征空间才可见,这才是"必须有两个检测器"的根本原因**;成本与紧迫性只决定放哪个频率层。已写入维度一之后
+- **旁证**:Sentinel 独立验证了本库此前推导的三层频率分工(便宜的管时间敏感、贵的管不时间敏感),且**失败检测这条线的真机成熟度高于 harness 编排那条线**(Sentinel 真机 95% vs Harness VLA 全仿真)
+- **FAIL-Detect 仍为摘要级**(2503.08558,未读全文,页内已标注)——值得单独 ingest
+- 接线:Embodied MOC 新增 "Sources — failure detection / runtime monitoring" 小节、index Raw+Sources。Lint 干净:0 broken;133 notes
 ## [2026-08-06] synthesis | 面向具身计算系统优化的仿真评测套件 v0.1
 - **触发**：Ethan 明确问题不是“如何评价仿真器”，而是团队优化具身 Agent、VLA 推理、渲染、物理和 3DGS 后，应该用哪些仿真任务判断端到端精度是否退化，以及 π0.5 与任务配置如何标准化
 - 新建 [[Embodied simulation benchmark suite for systems optimization]]：提出“**共同核心回归集 + 优化点专项集**”，而非所有优化共用一张总榜

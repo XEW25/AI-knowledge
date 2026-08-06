@@ -58,6 +58,9 @@ This map collects the vault's embodied-AI cluster: vision-language-action (VLA) 
 ### Sources — VLA quantization
 - [[Zheng et al. - DyQ-VLA Temporal-Dynamic-Aware Quantization for Embodied Vision-Language-Action Models|DyQ-VLA]] · [[Zhang et al. - QuantVLA Scale-Calibrated Post-Training Quantization for Vision-Language-Action Models|QuantVLA]] · [[Wang et al. - Omega-QVLA Robust Quantization for Vision-Language-Action Models via Composite Rotation and Per-step Scaling|Ω-QVLA]] · [[Lin et al. - DuQuant Distributing Outliers via Dual Transformation Makes Stronger Quantized LLMs|DuQuant]]
 
+### Sources — failure detection / runtime monitoring
+- [[Agia et al. - Sentinel Runtime Monitoring of Consistency and Progress for Generative Policies|Sentinel]] — Stanford 系;**失败分类学先于方法**:erratic(时间敏感但视觉细微)用 **STAC**(时序动作自一致性 + MMD,**策略无关、成本可忽略**,99% 检出)、task-progression(视觉明显但时间自洽)用**零样本 VLM**(抽帧视频+时限,每 episode 查 2 次)。并行 **>97%** 检出、**+18%** vs 单用;**真机 95%**。⚠️ 证伪"看采样方差"(是被击败的 baseline)、证伪"必须采失败样本"(校准只需成功 rollout)
+
 ### Sources — embodied harness / agentic scaffolding
 - [[Zhang et al. - Harness VLA Steering Frozen VLAs into Reliable Manipulation Primitives via Memory-Guided Agents|Harness VLA]] — **清华等,2026-07**;把**冻结 π0.5** 降级成一个 primitive(`vla_act`)+ 固定小解析原语库,由 agentic planner 用 JSON 编排;planner 下发 **(prompt, 终止判据 τ)**,失败则 **re-staging 重选交棒点**;双记忆(任务解法骨架 + 成功规则/失败模型)。**不动权重** LIBERO-Pro **+38.6pp**。本库 [[Harness design]] 概念的**首个学术量化证据** + [[Alex Zhang - The Mismanaged Geniuses Hypothesis|MGH]] 的具身验证。**⚠️ 全仿真、成功判据依赖仿真 oracle**(源笔记有"真机无法实现的技术点"专章)
 

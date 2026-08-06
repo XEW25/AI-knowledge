@@ -182,6 +182,9 @@ Accuracy depends on *how* a source is read. Prefer the most faithful access avai
 - For code or architecture claims, read the actual repository.
 - State confidence in the note, matched to the method used (e.g., `代码核实` / `已核实` / `vendor-reported` / `存疑` / `未逐行核实`) so a reader can tell what backed each claim.
 - Cautionary pattern: a claim that a model "outperforms X" can hide that there is no quantitative table (only a qualitative figure) — confirm the table exists before recording a comparative claim.
+- **Cautionary pattern — architecture match ≠ validated.** A system paper's component list (layers, "agent harness", "skill library", "edge-cloud split") is cheap to write and costs no evidence, so it can align perfectly with a framework you already hold while the paper validates none of it. **Before ranking or recommending a system paper, ask what the quantitative results are actually measured on**, not what the architecture diagram shows. Check the evaluation section first, the architecture second.
+  - Concrete tells: a system named "robotic/embodied X" whose benchmarks are all QA or memory (LoCoMo / OpenEQA / NExT-QA); the only embodied benchmark is **self-introduced** and reported on a "subset" without numbers; `success rate` absent from the paper; the trained models turn out to be a writer/answerer rather than any controller; arXiv class is cs.AI/cs.CL rather than cs.RO.
+  - Record the split explicitly in the note: **what the architecture claims** vs **what the numbers cover**. Cite such work for its architecture, never as system-level performance evidence.
 
 ## Naming guidance
 

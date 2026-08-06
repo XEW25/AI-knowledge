@@ -823,6 +823,18 @@
 - **⚠️ 局限**:纯仿真无真机(而回滚可行性恰是真机问题);**SV 需失败标签**(50K 三元组)—— 与 [[Xu et al. - FAIL-Detect Uncertainty-Aware Runtime Failure Detection for Imitation Learning Policies|FAIL-Detect]] 的"**只用成功数据**"形成直接对比,冷启动成本更高;基座主要 OpenVLA(自回归),对 flow-matching/diffusion 未验证
 - **同族待 ingest(搜索级,已记入源笔记 open questions)**:测试时采样+验证一族(**RoboMonkey** / **RoVer** 2510.10975 / **MG-Select** 2510.05681 ICLR26 verifier-free 用内部 KL / **DREAM-Chunk** 2606.18589)、冻结 VLA 恢复一族(**B2FF** 2606.09258 —— **在子目标空间 re-staging**,给 VLA 一张熟悉的未来图像而非移动机器人 / **ReCoVLA** / **FAR**)、世界模型当 harness 一族(**Ctrl-World** 2510.10125 ICLR26,**库内已引用但无笔记**,想象中 rollout 排序策略、合成轨迹 SFT +44.7% / **PiL-World** / VLAW / WMPO)
 - Lint 干净:0 broken;137 notes
+
+## [2026-08-06] verify + framework | RoboOS 核实 → 识别"第三条通道"空缺;并把"架构吻合≠已验证"写进核实纪律
+- **背景(一次值得记的连环纠错)**:把搜索范围从 "harness" 扩到"具身 Agent 框架/系统"后找到一批系统,我**基于搜索摘要**把 **ABot-AgentOS** 排第一(因其组件清单与本框架逐条吻合:agent harness / skill runner / 端云双 LLM)。**Ethan 质疑"它训的都是语言模型、评测都是语言任务"** —— 核实后**质疑成立**
+- **ABot-AgentOS 核实结论**(arXiv:2607.10350,**AMAP CV Lab 高德**,**cs.AI**):训练的是 **Writer / Answerer** 模型(记忆写入+问答,非控制器);量化全在 **LoCoMo 87.5 / OpenEQA 59.9 / Mem-Gallery 88.6 / NExT-QA 76.5 / EgoLife** 等**记忆与 QA benchmark**;唯一具身评测是**自建的 EmbodiedWorldBench**(`NPC`×23、`Unreal`×4 ⇒ **Unreal 仿真场景**,任务为导航/物体搜索/NPC 对话,**非操控**),且只跑 **"initial subset"、摘要未给数字**;`real robot`/`LIBERO`/`CALVIN`/`robot arm` 全 0 命中。**架构描述属实**(Agent Harness 三件套、Skill Runner、端侧 Tiny LLM 按需升级云端 Large LLM 均在 §2.2)⇒ **架构真实、具身实证薄**,只能当**架构参考**
+- **⇒ 新增核实纪律条款(写入 [[90 System/AGENTS]] Reliability discipline)**:**"架构吻合 ≠ 已验证"** —— 系统论文的组件清单**写起来不花任何证据成本**,可以与你已有的框架完美对齐而全无验证。**排序/推荐系统类论文前,先问"量化结果究竟测在什么任务上",再看架构图**。附具体识别信号(名字带 robotic/embodied 但 benchmark 全是 QA/记忆;唯一具身 benchmark 是自建且只报 subset;全文无 success rate;训练的是 writer/answerer 而非控制器;arXiv 分类 cs.AI/cs.CL 而非 cs.RO),并要求笔记里**显式分开记录"架构声称什么"与"数字覆盖什么"**
+- **RoboOS 核实**(arXiv:2505.03673 v2):架构与真机为真 —— Brain-Cerebellum 分层(**它自己就用这个说法**)+ RoboBrain(MLLM 大脑)+ Cerebellum Skill Library + **Real-Time Shared Memory**(多智能体状态时空同步);真机覆盖**单臂/双臂/人形/轮式**,场景餐厅/家庭/超市;自称首个开源同类系统。**⚠️ 但 `success rate` 全文 0 命中**——量化集中在**大脑模型 RoboBrain 的四项 benchmark**(多机规划=**工具调用 AR**,每场景 200 条生成样本 / Where2Place pointing / AGD20K affordance / ShareRobot trajectory)+ FlagScale 推理效率;**真机为定性演示**。⇒ 同一模式的较轻版本,**引架构可、勿引为系统级性能证据**
+- **对本框架的真实增量(本轮最有价值)——识别出缺失的第三条通道**:此前两条通道都是**云↔端**,**框架隐含单机**;多台机器人**同时在同一物理世界协作同一任务**时需要**共享且一致的世界状态**,这在"单机+云"里不存在。写入 [[Future embodied Agent framework - integrated view]] 新增小节,含三通道性质对照表:
+  - 运行时(云↔端,低频,**可断**,传计划/观测)/ 演进(云↔车队,离线,**完全可断**,传能力画像)/ **协同(端↔端,实时,最不能断,传共享世界状态)**
+  - **⚠️ 与四约束之一直接冲突**:"断网必须能活"在协同场景下**只能降级为"退回各自单机作业"**,而非维持协作 —— 本框架此前未处理的设计张力
+- **能力画像的第二种用途**(写入 [[Cloud-edge co-evolving embodied agent - a continuous-evolution framework]]):从**单机能力域判断**扩展到**车队级能力路由**("派哪台机器人去做",对应 RoboOS 的 topology-aware 子任务分配);⇒ 要求画像**跨本体可比**,对"接口契约共版本化"提出更强要求(不只两侧对齐,而是**全车队对齐**)
+- **定位观察**:RoboOS 自己也用 "Brain-Cerebellum",故该隐喻非本库独有;但本库版本是**部署驱动的可证伪定义**(云=脑/端=小脑),而非神经科学类比 —— 对外讲时值得强调这一区别
+- 两篇均**未建源笔记**(证据强度不足以支撑独立笔记),以行内引用 + 证据限定出现。Lint 干净:0 broken;137 notes
 ## [2026-08-06] synthesis | 面向具身计算系统优化的仿真评测套件 v0.1
 - **触发**：Ethan 明确问题不是“如何评价仿真器”，而是团队优化具身 Agent、VLA 推理、渲染、物理和 3DGS 后，应该用哪些仿真任务判断端到端精度是否退化，以及 π0.5 与任务配置如何标准化
 - 新建 [[Embodied simulation benchmark suite for systems optimization]]：提出“**共同核心回归集 + 优化点专项集**”，而非所有优化共用一张总榜

@@ -173,7 +173,7 @@
 ## Related
 
 - [[Real-robot evaluation]] — **本页的概念层母页**：判据、能力轴定义、统计现实、指标分层
-- [[Robot data engine]] — 评测作为 oracle 的一面
+- [[Robot data engine]] — 评测作为金标准的一面
 - [[Real-robot data collection - teleop vs UMI-class, and the model-in-the-loop quality problem]] — L0–L3 评估栈
 - [[VLA quantization]] — 推理优化那条线的对象
 - [[Physical Intelligence - pi0 a Vision-Language-Action Flow Model for General Robot Control]] — 微调基座

@@ -18,8 +18,8 @@ This map collects the vault's embodied-AI cluster: vision-language-action (VLA) 
 - [[Memory in Embodied AI]] — implicit (procedural) vs explicit (episodic) memory across the two layers
 
 - [[Embodied failure detection]] — **具身环境不报错 ⇒ harness 要自己造 exception**：四类失败 × 三个时机 × 七种机制（成本排序）+ 检测器也会过期（load-bearing）+ 漏报/误报代价不对称（仿真里不存在的 trade-off）
-- [[Robot data engine]] — 数据引擎:数据集 vs 引擎、"昂贵 oracle 的多级代理层级"(调度目标 = 最小化顶层 oracle 调用)、生产型 vs 自演进型、成本从人力→算力
-- [[Real-robot evaluation]] — **真机评测作为测量学**([[Robot data engine]] 的姊妹页:oracle 视角 vs 测量仪器视角):可比 vs 可信矛盾、三条判据(任务 vs 条件 / 复位成本第二维 / 难度校准 40–70%)、8 条运动能力轴、统计功效现实、指标四层分层
+- [[Robot data engine]] — 数据引擎:数据集 vs 引擎、"昂贵金标准的多级代理层级"(调度目标 = 最小化顶层金标准调用)、生产型 vs 自演进型、成本从人力→算力
+- [[Real-robot evaluation]] — **真机评测作为测量学**([[Robot data engine]] 的姊妹页:金标准视角 vs 测量仪器视角):可比 vs 可信矛盾、三条判据(任务 vs 条件 / 复位成本第二维 / 难度校准 40–70%)、8 条运动能力轴、统计功效现实、指标四层分层
 
 ### Topics
 - [[Spatial Intelligence for Embodied AI]] — 3D representation, spatial modality, predictive spatial models
@@ -34,7 +34,7 @@ This map collects the vault's embodied-AI cluster: vision-language-action (VLA) 
 
 - [[Future embodied Agent framework - integrated view]] — **整合入口**:why(泛化墙)/ what(分层架构)/ how(端云 co-evolution)/ 地基 四切面缝成单页 + 分层架构图 + "云↔端两条通道"
 - [[Real-robot eval bench - task suite design and setup checklist]] — **⚠️ 团队专属、有时效**：[[Real-robot evaluation]] 在具体机械臂平台（单臂+双臂 / π0 微调）上的落地清单——8 轴覆盖诊断、Tier 0/1 任务集、抽屉任务专章（自复位 ⇒ 高精度回归探针）、按 roadmap 挂载、立即可做五件事
-- [[Real-robot data collection - teleop vs UMI-class, and the model-in-the-loop quality problem]] — **具身数据三层金字塔全景**(2026-07,多轮追问后按三层框架重组):顶层真机遥操/中层仿真合成/底层人类行为数据的**特征对比→例子→趋势→评估体系→计算系统挑战**五段式;UMI=桥(判据=动作空间)、第四类=部署经验、阶段×数据矩阵;质量评估三代谱系+两级体系+A/B/C/D 机制辨析;**昂贵 oracle 代理层级**(L0–L3 评估栈)+供给侧五层优化(调度层空档=研究机会)+三层×算力形态收口表;含"星海图无 UMI 硬件产品"核实。云③技能工厂的数据上游
+- [[Real-robot data collection - teleop vs UMI-class, and the model-in-the-loop quality problem]] — **具身数据三层金字塔全景**(2026-07,多轮追问后按三层框架重组):顶层真机遥操/中层仿真合成/底层人类行为数据的**特征对比→例子→趋势→评估体系→计算系统挑战**五段式;UMI=桥(判据=动作空间)、第四类=部署经验、阶段×数据矩阵;质量评估三代谱系+两级体系+A/B/C/D 机制辨析;**昂贵金标准代理层级**(L0–L3 评估栈)+供给侧五层优化(调度层空档=研究机会)+三层×算力形态收口表;含"星海图无 UMI 硬件产品"核实。云③技能工厂的数据上游
 
 ### Sources — VLA models
 - π series (范式 A source): [[Physical Intelligence - pi0 a Vision-Language-Action Flow Model for General Robot Control|π₀]] · [[Physical Intelligence - pi0.5 a VLA with Open-World Generalization|π₀.5]] · [[Physical Intelligence - pi0.6 a VLA That Learns From Experience|π*₀.6]] · [[Physical Intelligence - pi0.7 a Steerable Generalist Robotic Foundation Model|π₀.7]] · [[Physical Intelligence - RL Tokens Precise Manipulation with Efficient Online RL|RL Tokens]]

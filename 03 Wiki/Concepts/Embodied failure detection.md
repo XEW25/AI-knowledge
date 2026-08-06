@@ -47,7 +47,7 @@
 
 **4｜预期-实测核对.** planner 调用前**显式声明预期后置状态**，调用后用 VLM 核对——本质是给具身动作加 **assertion**，把隐式判断变成可检查断言。
 
-**5｜学出来的判别器（替代仿真 oracle 的正解）.** 真机化必须补的一环，本库已有三个可参照形态：**VLM 成功判别器**（AutoEval 微调 PaliGemma，与人工 **Pearson 0.942**）、**二值奖励分类器**（HIL-SERL，遥操采正负样本）、**value function**（[[Physical Intelligence - pi0.6 a VLA That Learns From Experience|π*₀.6 Recap]] 打 advantage）。三者都是"**训一次判别器、之后 per-sample 只花推理**"的**买断制**（[[Robot data engine]] 的 C 类），这是工业上唯一跑得起的形态。真实门槛 = **要采失败样本**。
+**5｜学出来的判别器（替代仿真器成功判据的正解）.** 真机化必须补的一环，本库已有三个可参照形态：**VLM 成功判别器**（AutoEval 微调 PaliGemma，与人工 **Pearson 0.942**）、**二值奖励分类器**（HIL-SERL，遥操采正负样本）、**value function**（[[Physical Intelligence - pi0.6 a VLA That Learns From Experience|π*₀.6 Recap]] 打 advantage）。三者都是"**训一次判别器、之后 per-sample 只花推理**"的**买断制**（[[Robot data engine]] 的 C 类），这是工业上唯一跑得起的形态。真实门槛 = **要采失败样本**。
 
 **6｜不确定 → 求助.** **KnowNo**（conformal prediction，2307.01928）给出有统计保证的"我不确定"，触发人工介入。价值在于把"检测失败"**前移**为"失败前求助"；并直接接上 [[Robot data engine]] 的结论——**人类注意力才是稀缺资源，优化目标是每次求助的信息量，不是数据量**。
 

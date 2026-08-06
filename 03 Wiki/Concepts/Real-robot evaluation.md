@@ -10,9 +10,9 @@
 
 | | [[Robot data engine]] | 本页 |
 |---|---|---|
-| 评测的角色 | **被调用的 oracle** | **被设计的测量仪器** |
+| 评测的角色 | **被调用的金标准** | **被设计的测量仪器** |
 | 关心 | 怎么少调用它（代理层级 L0–L3、缓存一致性、吞吐） | 调用一次能买到多少信息（任务覆盖、样本量、指标信息密度） |
-| 目标函数 | 最小化顶层 oracle 调用次数 | 最大化单次调用的信息产出 |
+| 目标函数 | 最小化顶层金标准调用次数 | 最大化单次调用的信息产出 |
 
 这是同一个优化问题的两项。[[Real-robot data collection - teleop vs UMI-class, and the model-in-the-loop quality problem|数据金字塔那页]] §5.1 的 L0–L3 评估栈属于前者；**本页不重复它**。
 
@@ -204,7 +204,7 @@ PhAIL（⚠️ 未核实）把 **time-to-success CDF** 当评测原语。关键�
 
 ## Related
 
-- [[Robot data engine]] — 评测作为 oracle 的一面（代理层级、调度目标）
+- [[Robot data engine]] — 评测作为金标准的一面（代理层级、调度目标）
 - [[Real-robot data collection - teleop vs UMI-class, and the model-in-the-loop quality problem]] — L0–L3 评估栈的出处
 - [[Real-robot eval bench - task suite design and setup checklist]] — 本页框架在具体机械臂平台上的落地清单（团队专属，有时效）
 - [[VLA quantization]] — 量化评测该测什么

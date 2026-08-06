@@ -728,3 +728,12 @@
 - **顺带补溯源**:回应 Ethan 追问"harness 理念来自哪",给 [[Harness design]] 加溯源块 —— 明确综合自**两篇 Anthropic 工程博客**(同日 2026-04-12 ingest;核心论点/部件清单/**load-bearing** 来自 Rajasekaran 篇,**meta-harness + session/harness/sandbox 三层**来自 Scaling Managed Agents 篇),并如实标注 **⚠️ 二者均为厂商工程案例文章、非同行评审无对照实验(两篇源笔记各自已自标此局限),且库内无学术性 harness/scaffolding 文献**;补链 [[Alex Zhang - The Mismanaged Geniuses Hypothesis|MGH]](此前"脚手架 vs 基座模型"论点未直接链源)
 - 接线:Embodied MOC Concepts、index Concepts、Home robot architecture 的"关键 meta 判断"处加展开指针。⚠️ **Harness VLA(2607.08448)本页以纯文本引用(尚未 ingest)**,避免制造悬空链接
 - Lint 干净:**0 broken-A / 0 broken-B / 1 orphan / 1 dup**;129 notes, 17 assets
+
+## [2026-08-06] maintenance | 术语去黑话:oracle → 各自的实际所指
+- **触发**:Ethan 问"啥是 oracle,你一直在提";听完解释后判断"**不如直接换成它代表的意思,用太多术语会让文档变得晦涩难懂**"。采纳
+- **换之前先发现的问题**:同一个词在库里其实指了**三件不同的事**——① 数据质量语境 = "全训练+真机评测"这个昂贵权威判定;② HarnessVLA 语境 = 仿真器给的成功判据;③ "oracle object coordinates" = 仿真器内部真值状态。**一词多指正是它让人卡壳的原因**,所以换成各自所指反而更准确,不只是更通俗
+- **替换方案**:数据质量/评测语境统一为「**金标准**」(它本来就是"其余一切都在近似的权威参照",中文技术写作里通用、无需解释,且天然支撑"代理/缓存层级"的说法);[[Embodied failure detection]] 里 HarnessVLA 那处换成实际所指「**仿真器成功判据**」
+- **范围**:**25 处 / 7 个文件** —— [[Robot data engine]](4)、[[Real-robot evaluation]](3)、[[Embodied failure detection]](1)、[[Real-robot data collection - teleop vs UMI-class, and the model-in-the-loop quality problem|三层数据金字塔综述]](8)、[[Real-robot eval bench - task suite design and setup checklist]](1)、Embodied MOC(4)、index(4)。脚本替换 + 逐行 diff 目视核对,顺带吸掉中英混排空格
+- **`90 System/log.md` 未改** —— append-only 历史,与此前 colon-title 链接修复时同一原则:历史条目保留当时的措辞
+- **保留一处术语指针**(经用户口味权衡后的折中):[[Robot data engine]] 定义处加行内小注"(权威但贵到调不起的那个判定;文献中多称 *oracle*)" —— 让读者能按论文里的说法反查,但正文不再依赖该词。若嫌多余可删
+- Lint 干净:0 broken-A / 0 broken-B / 1 orphan / 1 dup

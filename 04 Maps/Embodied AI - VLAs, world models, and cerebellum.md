@@ -63,6 +63,7 @@ This map collects the vault's embodied-AI cluster: vision-language-action (VLA) 
 - [[Agia et al. - Sentinel Runtime Monitoring of Consistency and Progress for Generative Policies|Sentinel]] — Stanford 系;**失败分类学先于方法**:erratic(时间敏感但视觉细微)用 **STAC**(时序动作自一致性 + MMD,**策略无关、成本可忽略**,99% 检出)、task-progression(视觉明显但时间自洽)用**零样本 VLM**(抽帧视频+时限,每 episode 查 2 次)。并行 **>97%** 检出、**+18%** vs 单用;**真机 95%**。⚠️ 证伪"看采样方差"(是被击败的 baseline)、证伪"必须采失败样本"(校准只需成功 rollout)
 
 ### Sources — embodied harness / agentic scaffolding
+- [[Zeng et al. - HELM Harness-Enhanced Long-horizon Memory for VLA Manipulation|HELM]] — 清华+阿里;**harness 直接套在 VLA 上**(VLA 仍是主执行者,对照 Harness VLA 把 VLA 降级成 primitive)。诊断三缺口 **memory / verification / recovery**,各配一个学出的组件:EMM(CLIP 索引关键帧)、**SV**(记忆条件化的**执行前**失败预测,12ms/步)、HC(**用历史关键帧当视觉目标让 VLA 把世界开回去**的回滚 + HELM-Fwd 前向变体)。**LIBERO-LONG 58.4→81.5%(+23.1pp),而 4× 长上下文只买到 +5.4pp** ⇒ **记忆 ≠ 更长上下文**
 - [[Zhang et al. - Harness VLA Steering Frozen VLAs into Reliable Manipulation Primitives via Memory-Guided Agents|Harness VLA]] — **清华等,2026-07**;把**冻结 π0.5** 降级成一个 primitive(`vla_act`)+ 固定小解析原语库,由 agentic planner 用 JSON 编排;planner 下发 **(prompt, 终止判据 τ)**,失败则 **re-staging 重选交棒点**;双记忆(任务解法骨架 + 成功规则/失败模型)。**不动权重** LIBERO-Pro **+38.6pp**。本库 [[Harness design]] 概念的**首个学术量化证据** + [[Alex Zhang - The Mismanaged Geniuses Hypothesis|MGH]] 的具身验证。**⚠️ 全仿真、成功判据依赖仿真 oracle**(源笔记有"真机无法实现的技术点"专章)
 
 ### Sources — skill acquisition / training methodology

@@ -806,6 +806,23 @@
 - **⑥ TSM 消融(对能力画像这条线最有用)**:LIBERO-Pro Goal 严格零样本撤掉 TSM,得 **31.0%(Pos-S)/79.0%(Task-T)**,**仍胜 Cap-X 25.6%/16.8%** ⇒ **记忆是加成不是必需;基座 planner 决定"没有记忆时的地板"**
 - **回填到 [[Cloud-edge co-evolving embodied agent - a continuous-evolution framework|co-evolution 框架]] 的能力画像段**:① 画像是**增量可测量的组件**而非系统前提;② 随基座变强其边际价值可能下降(**load-bearing**);③ **载体是文本而非权重**的双面代价 —— 零训练成本/可读可编辑/**可直接复制到另一台机器人(车队共智的极便宜通道)**,但受上下文限制、**软约束不保证遵守**、**无法像权重那样插值泛化**
 - Lint 干净:0 broken;135 notes
+
+## [2026-08-06] ingest | HELM:"harness 直接建在 VLA 上"这一类的代表
+- **触发**:Ethan 问"有没有不是 planner+原子原语、而是直接在 VLA/WA 上建 harness 的工作"。搜索发现这是**一整簇**(四类:包住执行环 / 测试时采样+验证 / 冻结 VLA 上的失败恢复 / 世界模型当 harness),先 ingest 最直接的一篇
+- **[[Zeng et al. - HELM Harness-Enhanced Long-horizon Memory for VLA Manipulation|HELM]]**(arXiv:2604.18791 v1,2026-04-20,cs.LG;**清华 + 阿里** + 蚌埠学院;raw = URL-only,HTML 正文自读)
+- **与 [[Zhang et al. - Harness VLA Steering Frozen VLAs into Reliable Manipulation Primitives via Memory-Guided Agents|Harness VLA]] 的关键分野**:同样是冻结 VLA + 记忆 + 验证 + 恢复,但**VLA 的角色相反** —— HELM 里 VLA **仍是主执行者**(harness 只补它缺的),Harness VLA 里 VLA 被**降级成原语库里的一个 primitive**。两篇合看说明"具身 harness"是**正在成形的方法族**,不是孤例
+- **立论(硬对照实验)**:LIBERO-SPATIAL(2.3 subgoal)91.2% vs LIBERO-LONG(5.8 subgoal)**58.4%**;**把上下文 H=8→32(4×)只涨到 63.8%(+5.4pp)**,余 17.7pp 无法解释 ⇒ **缺的不是窗口长度,是执行环三个缺口**
+- **三缺口(失败分类学)**:**memory**(丢弃已完成子目标证据;原文实例"**t=47 时想不起 t=12 已把杯子放进柜子,于是重做一遍、污染任务状态**" ⇒ 这里的"阶段"= **subgoal**,失败模式是"忘了已经干过"而非"忘了要干什么")/ **verification**(反应式提动作,执行前无检查,不可行抓取/抓错物体/越工作空间**静默执行并传播**)/ **recovery**(在被污染状态上继续 → 跨子目标级联)
+- **EMM**:CLIP ViT-B/32 索引的 key-value;value 含关键帧/活动子目标/**完成状态**/时间步/状态 delta。写于**子目标完成 / 检测到失败 / 每 20 步 checkpoint**;top-**3** 检索后**序列化成结构化文本追加进 VLA 的语言输入**;超 50 条按子目标压缩
+- **SV(核心贡献)**:`P(fail_t | o_t, a_t, g_t, M_t)` —— **记忆条件化的执行前失败预测**。3 层 MLP[1024→512→256→1],输入 = 当前观测 CLIP embedding **拼 top-1 记忆 key** + 投影动作 + 子目标文本;50K 三元组(**y=1 若 5 步内失败**),BCE pos-weight 4.0,**单卡 A100 ~2h**;θ_v=0.65,**12 ms/步**。**去掉记忆 AUROC 0.847→0.791**;论文明说 MLP 是**为低延迟刻意选的**,消融证明**关键是记忆增强的输入而非容量**
+  - **金句(全篇最深)**:"whether an action is valid often depends on **what has already been completed** — placing an object that was already placed is a failure **regardless of current visual feasibility**" ⇒ **把前置条件从几何可行性提升到任务状态语义**;纯几何前置条件根本表达不了"这东西已经放过了"
+- **HC 怎么回滚(回答 Ethan 的问题)**:维护 **subgoal 栈**(初始由**提示 VLA 自己分解任务**)+ **completion detector**(与 SV 同架构、训练在完成标签上)。触发 `p_fail>θ_v` 或完成检测判负 → ① 从 EMM 取最近 checkpoint/success 条目 → ② 发**目标条件化恢复序列**,prompt = **"return to the state shown"** → ③ **失败 subgoal 重新压回栈** → ④ 失败条目入上下文;**最多 3 次**
+  - ⚠️ **"回滚"不是仿真器 reset,而是拿历史关键帧当视觉目标、让 VLA 自己把世界开回去** —— **由策略执行的物理回归**,故原则上真机可行但受"回得去吗"限制。论文自列 **"rollback feasibility in real-world settings"** 为局限,并给 **HELM-Fwd 前向恢复变体**(从当前受损状态生成前向计划)。**直接对应本库"失败可逆性"判据**
+- **结果**:**58.4%→81.5%(+23.1pp)**;SV +8.4pp > rule verifier +6.8pp,ensemble +9.5pp 但**需 5× 推理成本**;SV 去记忆退化 6.1pp;**F_R 降幅最大 82%,由 rollback 驱动**;评测 LIBERO-LONG(500 ep)/ CALVIN ABC→D / **LIBERO-Recovery(本文发布的扰动注入恢复评测协议)**;9 个 baseline 含 oracle memory、long-context、same-budget LoRA
+- **对本库最有价值的三点**:① **SV = 我们此前推演的"前置守卫"的已实现版本**,且比设想更进一步(必须条件化于任务历史);② **"记忆 ≠ 更长上下文"的定量证据**(4× 上下文 +5.4pp vs 结构化记忆 +23.1pp)—— 可直接引进 [[Memory in Embodied AI]];③ 三缺口 memory/verification/recovery 与本库 [[Embodied failure detection]] 的"四类失败 × 三个时机"可对齐,且指出 **memory 是事前与事后共同依赖的上下文底座**(本库此前没有这一层)
+- **⚠️ 局限**:纯仿真无真机(而回滚可行性恰是真机问题);**SV 需失败标签**(50K 三元组)—— 与 [[Xu et al. - FAIL-Detect Uncertainty-Aware Runtime Failure Detection for Imitation Learning Policies|FAIL-Detect]] 的"**只用成功数据**"形成直接对比,冷启动成本更高;基座主要 OpenVLA(自回归),对 flow-matching/diffusion 未验证
+- **同族待 ingest(搜索级,已记入源笔记 open questions)**:测试时采样+验证一族(**RoboMonkey** / **RoVer** 2510.10975 / **MG-Select** 2510.05681 ICLR26 verifier-free 用内部 KL / **DREAM-Chunk** 2606.18589)、冻结 VLA 恢复一族(**B2FF** 2606.09258 —— **在子目标空间 re-staging**,给 VLA 一张熟悉的未来图像而非移动机器人 / **ReCoVLA** / **FAR**)、世界模型当 harness 一族(**Ctrl-World** 2510.10125 ICLR26,**库内已引用但无笔记**,想象中 rollout 排序策略、合成轨迹 SFT +44.7% / **PiL-World** / VLAW / WMPO)
+- Lint 干净:0 broken;137 notes
 ## [2026-08-06] synthesis | 面向具身计算系统优化的仿真评测套件 v0.1
 - **触发**：Ethan 明确问题不是“如何评价仿真器”，而是团队优化具身 Agent、VLA 推理、渲染、物理和 3DGS 后，应该用哪些仿真任务判断端到端精度是否退化，以及 π0.5 与任务配置如何标准化
 - 新建 [[Embodied simulation benchmark suite for systems optimization]]：提出“**共同核心回归集 + 优化点专项集**”，而非所有优化共用一张总榜

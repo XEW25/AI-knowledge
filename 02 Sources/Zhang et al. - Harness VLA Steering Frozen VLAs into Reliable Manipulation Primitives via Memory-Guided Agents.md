@@ -24,6 +24,46 @@
 
 被包的冻结 VLA 三选一：**π0.5-SFT**（LIBERO/LIBERO-Pro）、**RLDX-1**（RoboCasa365）、**LingBot-VLA**（RoboTwin C2R）。
 
+## planner 是什么：现成的编码 agent，零微调
+
+> "Harness VLA (Codex) and Harness VLA (CC) denote the same harness instantiated with **Codex and Claude Code planners**, respectively; CC abbreviates Claude Code."
+
+**两个通用编码 agent 产品**（OpenAI **Codex** / Anthropic **Claude Code**），共享同一套 harness、记忆接口、原语库、冻结 VLA 接口与评测协议，**只差 planner backbone**。
+
+**⚠️ 两个 headline 数字来自不同实例**（引用时须注明）：
+
+| Benchmark | Codex | Claude Code | headline 取自 |
+|---|---|---|---|
+| LIBERO-Pro | 72.1% | **82.4%** | **CC**（+38.6pp vs RATS 43.8%） |
+| RoboCasa365 | **55.4%** | 48.6% | **Codex**（+25.4pp vs RLDX-1 30.0%） |
+| RoboTwin C2R | 58.0% | 58.4% | 两者接近（直连 LingBot-VLA 50.4%） |
+| 标准 LIBERO | — | **96.0%**（384/400） | vs 冻结 RLinf 95.3%（不退化） |
+
+### 为什么能用编码 agent：把机器人控制包装成文件 REPL
+附录 A 的 **File-Mediated REPL Protocol**：一个长期运行的 environment worker 持有实时仿真状态，planner **只通过文件**与之交互——
+1. planner 写一条 JSON 命令到 `command.json`（primitive 名 + 关键字参数）
+2. 等 driver 完成（`done_NN.flag` / `log_NN.json` / benchmark 特定终止文件）
+3. 读新的 `state_NN.json`、`log_NN.json`、images、depth maps、**world maps**
+4. 据新证据决定下一条命令
+
+**planner 不接触特权仿真状态、物体位姿或控制器内部。** 原文点睛：
+
+> **"every primitive call is treated as an experiment whose result must be observed before the next command is issued."**
+
+⇒ 把"操作机器人"变成"读写文件"，通用编码 agent 无需机器人专用改造即可上手；且这句"每次调用都是一次实验"与 [[Embodied failure detection]] 的**主动探测**是同一心智模型。
+
+## 感知：RGB 管语义，深度 + world map 管度量
+
+planner **重度依赖多模态通道**——原文："the **RGB image supports qualitative scene reasoning**（杂乱程度、语义身份），while the **co-aligned depth map and proprioception supply metric spatial data** for precise localization."
+
+环境暴露 `o_t = (RGB, 共对齐的度量深度图, 本体状态)`。因**禁止拿物体坐标**，prompt 给了一套定位规程：
+
+> ① 从 RGB 识别目标物体/固定物/目标面/关系地标 → ② 在其**可见表面挑像素** → ③ 用像素**索引预计算的 world map** → ④ **多采几个稳定像素，取稳健统计量（通常中位数）** → ⑤ **避开**边缘、物体轮廓、桌缝、孔洞、反光、背景 → ⑥ 机器人/相机/物体/底盘/固定物/**抓取状态**一变就**重新定位**
+
+> **设计要点（本库判断）**：**把"精确 3D 定位"这件 VLM 做不好的事，降级成"指几个像素"这件 VLM 做得还行的事**——语义由 VLM 出，精度由深度图 + world map 出，**VLM 只负责指哪儿、不负责算坐标**。这正是它能用通用编码 agent 当 planner 的前提。第 ④⑤ 条则是在**用采样与拒绝规则补偿单点深度的不可靠**。
+>
+> ⚠️ **隐藏的真机成本**：整套定位**高度依赖深度质量**，而真机深度有空洞、反光失效、标定漂移 —— 这是下文"真机无法实现"表第 6 条的具体化，且比"成功判据"更容易被忽略。
+
 ## 关键机制
 
 ### τ：planner 下发的"终止判据"
@@ -47,7 +87,29 @@ primitive 终止后引擎回传 `o_{t+1}` + robot state + **execution / diagnost
 ### 两个记忆
 - **Task Specific Memory**：程序性 JSONL trace（primitive 调用顺序）+ 语义 JSON 摘要（为何有效 / 要避免什么）。关键：trace 是**任务级解法骨架，不是开环轨迹**；**空间参数被当作 reference-scene binding，部署时必须重新接地**。
 - **Global Memory**：任务无关的 **success rules + failure models**。例：*"夹爪闭合但物体没跟着末端动 → 判为空抓 → 重新定位并重新摆位再试"*、*"不要仅凭视觉接近就判定完成"*（原文称 **false visual success**）。
-- **迭代式构建**：记忆在交互中写入而非事后；**refine 而非累积**（更短/更可靠的 trace 替换旧的，失败观测保留为约束）。
+- **迭代式构建**：记忆在交互中写入而非事后；**refine 而非累积**（更短/更可靠的 trace 替换旧的，失败观测保留为约束）。每执行完一个 primitive，planner 读新观测 + 诊断记录，把结果分类为 **progress / 可恢复失败 / 不可恢复失败**。
+
+### "学习工具的适用范围"具体指什么
+原文两处：harness *"**learns the operating range** of these fixed primitives from task-specific execution traces, global success rules, and failure models"*；*"teaches the planner the operating range of each fixed primitive: **which subproblems should be handled analytically, when `vla_act` is appropriate, and how failed contact attempts should be re-staged**."*
+
+⇒ "适用范围"拆成**三个可回答的问题**，各由一个记忆件承担：
+
+| 问题 | 由谁回答 |
+|---|---|
+| 哪些子问题该交给**解析式**原语？ | GM 成功规则（分工原则） |
+| **何时**该调 `vla_act`？ | GM 成功规则 + TSM trace（本任务中 VLA 的插入点） |
+| 失败的接触尝试**怎么重新摆位**？ | GM 失败模型（症状→诊断→恢复） |
+
+> **⚠️ 这里的 "learn" 不是训练，是累积+检索（零梯度）**。三层全都没训练：解析式原语 *"require no training data"*；VLA 全程冻结（*"no additional training or adaptation"*）；**planner 就是现成的 Codex / Claude Code，零微调**。产出物是 JSONL trace 与自然语言规则，被读回 planner 上下文——更像**给自己写文档**，而非学习算法。
+>
+> **论文自列为局限并指出方向**：*"limited by an **open feedback loop** between the high-level planner and low-level VLA... the system **lacks joint fine-tuning via environmental rewards and human preferences**—an issue necessitating future sample-efficient reinforcement learning (e.g., **GRPO**)."*
+>
+> **性质与代价**：不进权重 ⇒ 零训练成本、可读可编辑、**文本可直接复制到另一台机器人**（对车队共智是极便宜的共享通道）；但受上下文窗口限制、检索质量决定一切、**软约束不保证被遵守**、且经验**无法像权重那样插值泛化**到未见表述。对应本库"软契约 vs 硬契约"的取舍。
+
+### 记忆到底贡献了多少：TSM 消融
+在 LIBERO-Pro Goal 上**撤掉 TSM 检索**做严格零样本：成绩为 **31.0%（位置交换）/ 79.0%（指令重定向）**，**仍胜过 Cap-X 的 25.6% / 16.8%**。
+
+> **双向结论（对能力画像这条线很关键）**：**记忆是加成，不是必需**；**基座 planner 的能力决定"没有记忆时的地板"**。⇒ 能力画像是一个**增量可测量的组件**，而非系统能否运转的前提；且随基座模型变强，其边际价值可能下降——又一次 **load-bearing** 判断（见 [[Harness design]]）。
 
 ## Results
 | Benchmark | 结果 |

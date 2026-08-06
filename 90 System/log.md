@@ -795,6 +795,17 @@
 - **CP 的第三个落点确认**:本文 related work **自己就把 KnowNo 归为 CP 的另一应用**(为 LLM planner 的动作构造不确定性集合、有歧义时请求人工)⇒ 印证"KnowNo(语义层)/ STAC(动作一致性层)/ FAIL-Detect(执行监控层)是同一套机器施加在不同层次"
 - **两篇姊妹工作的互补性未被任何一方测过**(logpZO 强在 erratic/OOD、Sentinel 的 VLM 强在 task-progression)——已列为两篇源笔记的 open question
 - Lint 干净:0 broken-A / 0 broken-B / 1 orphan / 1 dup;135 notes
+
+## [2026-08-06] deepen | Harness VLA 回填五处(planner 身份 / 感知管线 / 零训练 / TSM 消融)
+连续追问("planner 是什么模型""是不是没真正训练""需要多模态吗""observation 是仿真图像吗")逼出的五处核实,原源笔记均缺。
+- **① planner = 现成编码 agent,零微调** —— **Codex**(OpenAI)与 **Claude Code**(CC)两个实例,共享同一 harness/记忆接口/原语库/冻结 VLA 接口/评测协议,**仅 backbone 不同**
+- **② ⚠️ 两个 headline 数字来自不同实例**(此前我写成同一套结果,不准确):LIBERO-Pro **82.4% 用 CC**(+38.6pp vs RATS),RoboCasa365 **55.4% 用 Codex**(+25.4pp vs RLDX-1);RoboTwin C2R 两者接近(58.0/58.4);标准 LIBERO CC 96.0%(384/400)vs 冻结 RLinf 95.3%
+- **③ File-Mediated REPL Protocol**(附录 A):environment worker 持有实时仿真态,planner **只通过文件**交互(写 `command.json` → 等 `done_NN.flag` → 读 state/log/images/depth/**world maps**),**不接触特权状态/物体位姿/控制器内部**。原文点睛:"**every primitive call is treated as an experiment whose result must be observed before the next command is issued**" —— 与 [[Embodied failure detection]] 的**主动探测**同一心智模型。⇒ **把"操作机器人"包装成"读写文件",通用编码 agent 无需机器人专用改造即可上手**,这才是它能用 Codex/CC 的真正原因
+- **④ 感知管线(重度多模态)**:**RGB 管语义**(杂乱/身份)、**共对齐深度图 + 本体感知管度量**。因禁止拿物体坐标,prompt 给六条定位规程(RGB 识别 → 可见表面挑像素 → 索引**预计算 world map** → **多采取中位数** → 避开边缘/孔洞/反光/背景 → 状态一变即重定位)。**本库判断**:这是**把"精确 3D 定位"这件 VLM 做不好的事,降级成"指几个像素"这件 VLM 做得还行的事** —— 语义由 VLM 出、精度由深度出,**VLM 只指哪儿不算坐标**;④⑤ 两条是在用采样/拒绝规则补偿单点深度不可靠。**⚠️ 隐藏真机成本:整套定位高度依赖深度质量**(真机有空洞/反光失效/标定漂移),比"成功判据"更易被忽略
+- **⑤ "learn 适用范围"的准确含义**:拆成**三个可回答的问题**(哪些子问题走解析式 / 何时调 `vla_act` / 失败怎么重摆位),分别由 GM 成功规则、GM+TSM trace、GM 失败模型承担。**且 learn ≠ 训练**:三层全零梯度(解析式原语 "require no training data"、VLA 冻结、planner 无微调);论文**自列为局限**并指向未来 **GRPO**("open feedback loop""lacks joint fine-tuning")
+- **⑥ TSM 消融(对能力画像这条线最有用)**:LIBERO-Pro Goal 严格零样本撤掉 TSM,得 **31.0%(Pos-S)/79.0%(Task-T)**,**仍胜 Cap-X 25.6%/16.8%** ⇒ **记忆是加成不是必需;基座 planner 决定"没有记忆时的地板"**
+- **回填到 [[Cloud-edge co-evolving embodied agent - a continuous-evolution framework|co-evolution 框架]] 的能力画像段**:① 画像是**增量可测量的组件**而非系统前提;② 随基座变强其边际价值可能下降(**load-bearing**);③ **载体是文本而非权重**的双面代价 —— 零训练成本/可读可编辑/**可直接复制到另一台机器人(车队共智的极便宜通道)**,但受上下文限制、**软约束不保证遵守**、**无法像权重那样插值泛化**
+- Lint 干净:0 broken;135 notes
 ## [2026-08-06] synthesis | 面向具身计算系统优化的仿真评测套件 v0.1
 - **触发**：Ethan 明确问题不是“如何评价仿真器”，而是团队优化具身 Agent、VLA 推理、渲染、物理和 3DGS 后，应该用哪些仿真任务判断端到端精度是否退化，以及 π0.5 与任务配置如何标准化
 - 新建 [[Embodied simulation benchmark suite for systems optimization]]：提出“**共同核心回归集 + 优化点专项集**”，而非所有优化共用一张总榜

@@ -802,3 +802,9 @@
 - 冻结第一版 π0.5-LIBERO reference：官方 30k checkpoint、BF16、action horizon 10、flow steps 10、replan 5、224×224、两视角、50 rollouts/task、seed 7、四套件 timeout；外部事实均回读 OpenPI / RoboTwin / BEHAVIOR / ManiSkill 官方代码或文档
 - 关键方法：环境 seed 与 π0.5 flow noise seed 双冻结；reference/candidate 做逐 episode 配对；Canonical 与 Stress 分开；物理引擎同时用固定 action trace、scripted controller、π0.5 闭环三种方式归因
 - **状态**：v0.1 讨论稿。待冻结 RoboTwin-System-10、BEHAVIOR-Core-20、算力预算、各 benchmark 的 π0.5 checkpoint、非劣性阈值与 trace 格式
+
+## [2026-08-06] deepen | RoboTwin 官方两档 vs 内部三类 hard
+- **澄清**：RoboTwin 2.0 官方 benchmark / leaderboard 只有 `demo_clean` 与 `demo_randomized` 两档；此前提出的 `visual-hard / physics-hard / control-hard` 是为了系统优化归因而设计的**团队内部扩展**，不是官方现成配置
+- 官方 randomized 主要覆盖背景/纹理、杂物、光照、头部相机位移、桌面高度与实验性本体随机化；官方通用配置未提供质量/摩擦/阻尼/接触刚度或控制延迟/丢帧等字段
+- 文档改为五 profile：`official_clean` / `official_randomized` 保证外部可比；`internal_visual_hard` 主要复用 YAML；`internal_physics_hard` 需在 reset/asset load 扩展 SAPIEN 参数；`internal_control_hard` 需在 policy–environment wrapper 注入延迟、丢帧、action repeat 与传感器不同步
+- 三类内部 hard 优先采用单因素实验；只在最终综合压力测试增加不可归因的 `mixed-hard`

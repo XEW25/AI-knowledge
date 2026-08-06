@@ -77,16 +77,87 @@
 
 这十个任务是**本库提出的内部回归集**，不是 RoboTwin 官方命名的独立套件。后续应冻结任务版本、修复补丁、资产 hash 和 task config。
 
-RoboTwin 2.0 官方完整平台包含 50 个双臂任务、五类本体，并以 clean / domain-randomized 两档评测（[官方任务页](https://robotwin-platform.github.io/doc/tasks/)）。论文标准是每任务用 50 条 clean demonstrations 训练，Easy 与 Hard 各评测 100 次；Hard 包含杂乱场景、光照、背景纹理与桌面高度随机化（[论文](https://arxiv.org/abs/2506.18088)、[配置文档](https://robotwin-platform.github.io/doc/usage/configurations.html)）。
+#### 官方档位与内部扩展的边界
 
-内部标准不应直接照搬一个混合 Hard 档，而应拆成：
+RoboTwin 2.0 官方完整平台包含 50 个双臂任务、五类本体；官方 benchmark / leaderboard 实际提供两档（[官方任务页](https://robotwin-platform.github.io/doc/tasks/)）：
 
-- `clean`
-- `visual-hard`：背景、纹理、光照、相机、遮挡、干扰物
-- `physics-hard`：质量、摩擦、阻尼、接触与关节参数
-- `control-hard`：控制频率、动作延迟、观测延迟、噪声
+- `demo_clean`：Clean / Easy
+- `demo_randomized`：Domain-randomized / Hard
 
-这样才能判断渲染、物理和运行时优化分别导致了什么退化。
+论文标准是每任务用 50 条 clean demonstrations 训练，Easy 与 Hard 各评测 100 次（[论文](https://arxiv.org/abs/2506.18088)）。官方公开的 domain-randomization 字段包括：
+
+- `random_background`
+- `cluttered_table`
+- `clean_background_rate`
+- `random_head_camera_dis`
+- `random_table_height`
+- `random_light`
+- `crazy_random_light_rate`
+- `random_embodiment`（实验性，尚未完全支持）
+
+因此官方 `demo_randomized` 主要是**视觉外观 + 相机 + 场景杂乱度 + 桌面几何**的综合随机化；公开通用配置里没有质量、摩擦、关节阻尼、接触刚度、控制延迟或丢帧等标准字段（[官方配置文档](https://robotwin-platform.github.io/doc/usage/configurations.html)）。它不应被解释成完整的“视觉 + 物理 + 控制”随机化。
+
+为兼顾官方可比性与内部归因，`RoboTwin-System-10` 应保留五个明确命名的 profile：
+
+```text
+RoboTwin-System-10
+├── official_clean
+├── official_randomized
+├── internal_visual_hard
+├── internal_physics_hard
+└── internal_control_hard
+```
+
+- 前两档原样复现官方协议，用于对外可比。
+- 后三档是**本库提出的团队内部扩展**，不是 RoboTwin 官方现成档位，也不能作为官方 leaderboard 分数上报。
+
+#### `internal_visual_hard`：主要新增 YAML
+
+大部分可以复用官方字段，不必修改底层引擎。为隔离视觉因素，应关闭会改变任务几何的 `random_table_height`：
+
+```yaml
+domain_randomization:
+  random_background: true
+  cluttered_table: true
+  random_head_camera_dis: 0.03
+  random_table_height: 0
+  random_light: true
+  random_embodiment: false
+```
+
+若要加入更细的遮挡、相机内参、传感器噪声或 3DGS 特有退化，仍需扩展 renderer / sensor 配置。
+
+#### `internal_physics_hard`：需要扩展环境代码
+
+官方通用 YAML 没有完整物理随机化接口，需要在 task reset / asset load 阶段把自定义参数写入 SAPIEN actor、articulation 和 material，例如：
+
+```yaml
+physics_randomization:
+  object_mass_scale: [0.7, 1.3]
+  friction_scale: [0.6, 1.4]
+  joint_damping_scale: [0.8, 1.2]
+  restitution_range: [0.0, 0.1]
+  center_of_mass_offset_m: 0.01
+```
+
+参数必须按任务绑定：`open_microwave` 重点改铰链阻尼，`lift_pot` 改质量与质心，`stack_bowls_three` 改摩擦与接触参数，`shake_bottle` 改质量与惯量。不能对所有资产无差别乘同一个随机系数。
+
+#### `internal_control_hard`：需要扩展评测 wrapper
+
+场景与物理保持不变，在 policy–environment 接口注入时序扰动：
+
+```yaml
+control_stress:
+  observation_delay_steps: 2
+  action_delay_steps: 1
+  observation_drop_rate: 0.02
+  action_repeat: 2
+  proprio_camera_skew_steps: 1
+```
+
+RoboTwin 的 policy deployment 接口允许定制 `eval()`、`update_obs()`、`get_action()`，可在 wrapper 中实现延迟队列、丢帧和不同步，而不污染任务本身（[官方部署接口](https://robotwin-platform.github.io/doc/usage/deploy-your-policy.html)）。
+
+三个内部 hard 应首先采用**单因素实验**；只有最终系统压力测试才增加 `mixed-hard = visual + physics + control`。`mixed-hard` 可以检验综合鲁棒性，但不能用于退化归因。
 
 ### 3.3 `Embodied-Agent`：BEHAVIOR-Core-20 / Full-100
 
@@ -149,15 +220,15 @@ ManiSkill 的 Task Card 会明确机器人、随机化、成功/失败条件和�
 - 官方 success predicate
 - 不私自增加 domain randomization
 
-#### Stress
+#### Stress（内部扩展）
 
 用于内部发现退化：
 
-- `visual-hard`
-- `physics-hard`
-- `control-hard`
+- `internal_visual_hard`
+- `internal_physics_hard`
+- `internal_control_hard`
 
-Canonical 与 Stress 必须分开报告，不能把内部随机化后的结果当作官方 benchmark 分数。
+RoboTwin 的 Canonical 还应区分 `official_clean` 与 `official_randomized`。Canonical 与 Stress 必须分开报告，不能把内部随机化后的结果当作官方 benchmark 分数。
 
 ### 6.2 配对评测
 
@@ -258,7 +329,8 @@ Embodied-Core
 
 Embodied-Manipulation-Stress
   RoboTwin-System-10
-  clean / visual-hard / physics-hard / control-hard
+  official_clean / official_randomized
+  internal_visual_hard / internal_physics_hard / internal_control_hard
 
 Embodied-Agent
   BEHAVIOR-Core-20

@@ -22,6 +22,8 @@
 - **端侧(快小脑 · 高频 · 必须离线可用)**:专家技能库(带 L3 编排)+ 安全脊髓(CBF/shield,实时·断网可用)+ 程序性技能(固化,≈生物小脑)+ 蒸馏轻脑(断网兜底)。
 - **双记忆**:云端 episodic/semantic = 显式记忆("做什么");端侧固化技能 = 隐式/程序性记忆("怎么做")。
 - **接口是计划级、不是动作级**;**端侧专家有局部自主**(云 RTT 只能低频)。
+  - **具体形态(2026-08 由 [[Zhang et al. - Harness VLA Steering Frozen VLAs into Reliable Manipulation Primitives via Memory-Guided Agents|Harness VLA]] 实证)**:接口载荷是 **(目标, 终止判据) 二元组** —— planner 下发的不只是"做什么",还包括"**什么时候算做完**"(`prompt` + early-return predicate `τ`)。这比"结构化计划/子目标"具体一档。
+  - **为什么这招重要**:同一个冻结策略靠一个参数就能被**特化成多个局部专家**(抓取阶段 τ=lift-and-grasp,插入阶段 τ=contact-state),**零权重改动**。⚠️ 真机化时 τ 只能取本体可测量(见 [[Embodied failure detection]])。
 → 完整架构:[[Home robot architecture - a hierarchical embodied agent]]
 
 ## 3 · 怎么持续进化(学习平面:端云 co-evolution)

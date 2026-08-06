@@ -58,6 +58,9 @@ This map collects the vault's embodied-AI cluster: vision-language-action (VLA) 
 ### Sources — VLA quantization
 - [[Zheng et al. - DyQ-VLA Temporal-Dynamic-Aware Quantization for Embodied Vision-Language-Action Models|DyQ-VLA]] · [[Zhang et al. - QuantVLA Scale-Calibrated Post-Training Quantization for Vision-Language-Action Models|QuantVLA]] · [[Wang et al. - Omega-QVLA Robust Quantization for Vision-Language-Action Models via Composite Rotation and Per-step Scaling|Ω-QVLA]] · [[Lin et al. - DuQuant Distributing Outliers via Dual Transformation Makes Stronger Quantized LLMs|DuQuant]]
 
+### Sources — embodied harness / agentic scaffolding
+- [[Zhang et al. - Harness VLA Steering Frozen VLAs into Reliable Manipulation Primitives via Memory-Guided Agents|Harness VLA]] — **清华等,2026-07**;把**冻结 π0.5** 降级成一个 primitive(`vla_act`)+ 固定小解析原语库,由 agentic planner 用 JSON 编排;planner 下发 **(prompt, 终止判据 τ)**,失败则 **re-staging 重选交棒点**;双记忆(任务解法骨架 + 成功规则/失败模型)。**不动权重** LIBERO-Pro **+38.6pp**。本库 [[Harness design]] 概念的**首个学术量化证据** + [[Alex Zhang - The Mismanaged Geniuses Hypothesis|MGH]] 的具身验证。**⚠️ 全仿真、成功判据依赖仿真 oracle**(源笔记有"真机无法实现的技术点"专章)
+
 ### Sources — skill acquisition / training methodology
 - [[Heravi et al. - LEACL LLM-Enhanced Automatic Curriculum Learning for RL in Long-Horizon Manipulation|LEACL]] — LLM 生成**任务空间 + 难度排序**(而非 dense reward)喂给现成 ACL,长程操控**只用稀疏奖励**训练(UT Austin / Peter Stone, 2026)。技能工厂"新专家怎么训"的一环;**实测反证:拆解+稀疏奖励≈0%,段内还需课程**
 

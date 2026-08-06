@@ -737,3 +737,38 @@
 - **`90 System/log.md` 未改** —— append-only 历史,与此前 colon-title 链接修复时同一原则:历史条目保留当时的措辞
 - **保留一处术语指针**(经用户口味权衡后的折中):[[Robot data engine]] 定义处加行内小注"(权威但贵到调不起的那个判定;文献中多称 *oracle*)" —— 让读者能按论文里的说法反查,但正文不再依赖该词。若嫌多余可删
 - Lint 干净:0 broken-A / 0 broken-B / 1 orphan / 1 dup
+
+## [2026-08-06] ingest + deepen | Harness VLA(清华)+ 具身 harness 三处深化
+一次讨论(具身 Agent vs LLM Agent → harness → 失败检测 → τ 真机可行性)的四项收口,一并落盘。
+
+### ① Ingest: [[Zhang et al. - Harness VLA Steering Frozen VLAs into Reliable Manipulation Primitives via Memory-Guided Agents|Harness VLA]]
+- arXiv:2607.08448 v1(2026-07-09,cs.RO,CC BY 4.0);**清华** + Striding AI + Purdue + 中科院自动化所 + **无问芯穹** + 中关村学院 + 港科大;通讯 Chao Yu。raw = URL-only(**HTML 全文自读核实**)。⚠️ 用户最初称"清华提出的",我一度说无法核实作者单位,**后经全文确认属实**
+- **机制**:冻结 VLA(π0.5-SFT / RLDX-1 / LingBot-VLA 三 backend)降级为单个 primitive `vla_act`,与**固定小解析原语库**由 agentic planner 用 JSON 编排;planner 从不发力矩/关节目标/action chunk。**词表评测前固定,planner 不能发明新原语**
+- **三个值得记的机制**:① **接口载荷 = (prompt, 终止判据 τ)**,τ ∈ {lift-and-grasp / contact-state / **benchmark predicate** / chunk budget} —— 一个参数把通用专家特化成多个局部专家,零权重改动;② **两层判定**(执行中环境按 τ 判何时停手 ≠ 返回后 planner 判成没成;论文自划界"post-condition 不是 task success 的替代");③ **re-staging = 重选交棒点**(改 approach pose/viewpoint/staging = 在 `o₀` 上搜索,把机器人送进 VLA 能力域),**不是回退世界**
+- **双记忆**:TSM(程序性 trace = 任务级解法骨架,**空间参数是 reference-scene binding 须重新接地**)+ GM(success rules + failure models);**refine 而非累积**
+- **结果**:不微调 LIBERO-Pro **+38.6pp** / RoboCasa365 **+25.4pp** / RoboTwin C2R 58.4%,标准 LIBERO 不退化
+- **⚠️ 按用户要求设"真机部署时无法实现的技术点"专章**(6 条 + 替换方案):① benchmark completion predicate 作成功判据**且已进入决策回路**(GM 明写"check the benchmark success signal")② **τ 可直接取 benchmark predicate**(连终止条件都能挂仿真判据)③ 重试近乎免费(真机有时间/磨损/损坏成本)④ 回合自动复位(真机复位成本是与能力覆盖正交的第二维)⑤ 不可恢复失败只标注不处理 ⑥ 无噪声本体/深度观测。**公平之处**:空间真值上克制(不给物体坐标,强制 RGB-D 自定位)⇒ 问题不在感知作弊,**在"谁告诉你成功了"**
+- **对本库的意义**:**[[Harness design]] 概念的首个学术量化证据**(此前仅靠两篇 Anthropic 厂商博客);**[[Alex Zhang - The Mismanaged Geniuses Hypothesis|MGH]] 在具身侧的强验证**(完全冻结的 π0.5 +38.6pp ⇒ 能力本就在权重里,是脚手架浪费了它);化解"扩库 vs 冻结库"张力 ⇒ **扩库必须在有验证门的一侧,部署时只许学会用现有的**
+
+### ② [[Embodied failure detection]] 三处深化
+- **新增「谁来判、判什么:三层分工」** —— L1 本体谓词(wrapper 固定小谓词库,控制环频率)/ L2 学出的判别器(语义级,~10Hz)/ L3 planner(秒级)。**澄清常见误解:τ 不是动作模型的职责**,判定在包着 VLA 的 wrapper 代码里,故"VLA 没被训练做判别"不构成障碍
+- **τ 四形式的真机可行性表**:chunk budget ✅ / contact-state ✅(**真机上甚至更自然**,有 F/T 传感器)/ lift-and-grasp ✅ / **benchmark predicate ❌ 仿真专属**。⇒ 真机执行期判定可行且必须存在,但**只能基于本体可测量**
+- **由此推出机制⑤的结构性理由**(此前只给了功能性理由):真机 τ 只能"很笨"⇒ 判定压力上移 ⇒ planner 秒级接不住 ⇒ **中间频率鸿沟必须由端侧学出的判别器填**,它填的是[[Embodied Cerebellum Models|多速率栈]]的一个空档
+- **回答"规则会不会爆炸"**:不会——**任务无穷但物理事件类型有限**(八类);按"**固定谓词 × 任务参数**"组织即可(同 PDDL/LEACL/Harness VLA 的"小而固定的库"哲学)。分工:谓词实现=工程一次性、跨任务复用;谓词选择与参数=planner 调用时绑定。**爆炸只发生在按任务写规则时**。剩余真实成本=阈值标定(**按本体一次性,不随任务数增长**)
+- **新增「主动探测 active probing」** —— harness 特有、模型做不到的一招:**主动改变观测来消除歧义**(不确定抓住没有 → 轻轻抬 2cm 看物体跟不跟)。**与 LLM agent"跑一下测试"完全同构**;绕开阈值精度问题;天然受"失败可逆"约束(探测动作须廉价可逆)。⇒ 设计规则:**每个高风险 primitive 配一个廉价探测后缀**(目前无工作系统化做)
+- **前置条件改为中性表述**:Harness VLA 无显式前置守卫是**设计选择而非遗漏**(load-bearing 原则:planner 够强则该部件不承重);但保留其独立价值——**最便宜的事前拦截**,位于"什么都不做"与"世界模型验证(最贵)"之间,可挡掉一部分不可逆失败
+
+### ③ [[Future embodied Agent framework - integrated view]]:计划级接口的具体形态
+"接口是计划级"此前只是抽象说法 ⇒ 补入实证形态:**载荷 = (目标, 终止判据) 二元组**——planner 下发的不只是"做什么",还包括"**什么时候算做完**"。比"结构化计划/子目标"具体一档
+
+### ④ [[Cloud-edge co-evolving embodied agent - a continuous-evolution framework]]:能力画像的精确化
+从抽象说法收紧为:**能力画像的本质 = 这个技能的「能力域」边界在哪**(`p(success|o₀)` 中什么样的 `o₀` 能成);⇒ **大脑的工作 = 把系统送进能力域再交棒**;落地形态**不是数值向量**而是成功规则+失败模型+解法骨架(空间参数须标为参考场景绑定);**补一个此前遗漏的维度:失败后果是否可逆**(决定能否自主重试)
+
+- 接线:Embodied MOC 新增 "Sources — embodied harness / agentic scaffolding" 小节、index Raw+Sources。Lint 干净:**0 broken-A / 0 broken-B / 1 orphan / 1 dup**;131 notes, 17 assets
+## [2026-08-06] synthesis | 面向具身计算系统优化的仿真评测套件 v0.1
+- **触发**：Ethan 明确问题不是“如何评价仿真器”，而是团队优化具身 Agent、VLA 推理、渲染、物理和 3DGS 后，应该用哪些仿真任务判断端到端精度是否退化，以及 π0.5 与任务配置如何标准化
+- 新建 [[Embodied simulation benchmark suite for systems optimization]]：提出“**共同核心回归集 + 优化点专项集**”，而非所有优化共用一张总榜
+- 三套工作负载草案：`Embodied-Core` = LIBERO 四套件；`Embodied-Manipulation-Stress` = 内部提出的 RoboTwin-System-10 + clean/visual-hard/physics-hard/control-hard；`Embodied-Agent` = BEHAVIOR-Core-20 / Full-100；ManiSkill 作为物理组件探针
+- 冻结第一版 π0.5-LIBERO reference：官方 30k checkpoint、BF16、action horizon 10、flow steps 10、replan 5、224×224、两视角、50 rollouts/task、seed 7、四套件 timeout；外部事实均回读 OpenPI / RoboTwin / BEHAVIOR / ManiSkill 官方代码或文档
+- 关键方法：环境 seed 与 π0.5 flow noise seed 双冻结；reference/candidate 做逐 episode 配对；Canonical 与 Stress 分开；物理引擎同时用固定 action trace、scripted controller、π0.5 闭环三种方式归因
+- **状态**：v0.1 讨论稿。待冻结 RoboTwin-System-10、BEHAVIOR-Core-20、算力预算、各 benchmark 的 π0.5 checkpoint、非劣性阈值与 trace 格式

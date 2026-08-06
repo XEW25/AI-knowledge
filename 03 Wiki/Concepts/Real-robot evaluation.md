@@ -207,6 +207,7 @@ PhAIL（⚠️ 未核实）把 **time-to-success CDF** 当评测原语。关键�
 - [[Robot data engine]] — 评测作为金标准的一面（代理层级、调度目标）
 - [[Real-robot data collection - teleop vs UMI-class, and the model-in-the-loop quality problem]] — L0–L3 评估栈的出处
 - [[Real-robot eval bench - task suite design and setup checklist]] — 本页框架在具体机械臂平台上的落地清单（团队专属，有时效）
+- [[Embodied simulation benchmark suite for systems optimization]] — 面向 Agent、VLA 推理、渲染、物理与 3DGS 优化的仿真端到端精度回归套件
 - [[VLA quantization]] — 量化评测该测什么
 - [[Task Decomposition as OOD Mitigation]] — 组合泛化的真机侧反证
 - [[Home robot architecture - a hierarchical embodied agent]] — capability vs dependability

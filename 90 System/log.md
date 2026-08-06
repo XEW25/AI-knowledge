@@ -779,6 +779,22 @@
 - **旁证**:Sentinel 独立验证了本库此前推导的三层频率分工(便宜的管时间敏感、贵的管不时间敏感),且**失败检测这条线的真机成熟度高于 harness 编排那条线**(Sentinel 真机 95% vs Harness VLA 全仿真)
 - **FAIL-Detect 仍为摘要级**(2503.08558,未读全文,页内已标注)——值得单独 ingest
 - 接线:Embodied MOC 新增 "Sources — failure detection / runtime monitoring" 小节、index Raw+Sources。Lint 干净:0 broken;133 notes
+
+## [2026-08-06] ingest | FAIL-Detect(TRI):"检测失败但不需要失败数据",并回填两条限定
+- **触发**:Ethan 追问"FAIL-Detect 怎么把输入输出蒸馏成标量信号""CP 是什么意思"。此前该篇在库内仅**摘要级**,遂读全文 ingest([[Xu et al. - FAIL-Detect Uncertainty-Aware Runtime Failure Detection for Imitation Learning Policies]],arXiv:2503.08558 v3;raw = URL-only,HTML 全文自读)
+- **作者/机构核实**:Chen Xu 等,**Toyota Research Institute (TRI)** + Woven by Toyota —— 本库 dependability 表里已有的 "TRI LBM" 同源
+- **两阶段框架**:① 打分 `D_M(A_t, O_t; θ)→标量`,**输入 = 最近 `T_O=2` 步观测(机器人状态+视觉特征)+ 策略生成的未来动作**,**刻意不喂增长的历史轨迹**(防在历史上过拟合);② **conformal prediction 构造时变阈值**
+- **四类打分器(全部只用成功数据)**:(a) 学出的数据密度(logpO / **logpZO**)(b) 二阶分布(NatPN Dirichlet 先验、DER 多元证据回归 —— **分离 aleatoric/epistemic**)(c) 单类(CFM、RND)(d) post-hoc 不学习(**SPARC 动作平滑度**、PCA-kmeans、**STAC**)
+- **logpZO(本文最佳,机制值得记)**:logpO 直接算 `log p(O_t)` 需**沿 ODE 积分 `f_θ` 的散度**,高维难估;logpZO 改为用同一 CNF 跑**前向 ODE** 把 `O_t` 推到噪声空间得 `Z_{O_t}`,**分布内时近似标准高斯** ⇒ `p(Z)=C·exp(−0.5‖Z‖²)` ⇒ **分数本质 = ‖Z‖²**。**绕开散度积分**,实测 **0.04 s(Square)/0.033 s(Transport) 每步**
+- **CP 的具体用法(比标准 CP 进一步)**:**单侧 + 时变** band —— 单侧因只关心分数偏高;时变因各时刻正常水平不同,故从**成功 rollout 校准集**算每时刻 `μ_t` 与带宽 `h_t`(带宽取"**最大偏差**"分位数以覆盖整条轨迹)。**两种标定**:setting-dependent vs **ID-only**;仿真中 **ID-only 即可覆盖 ID+OOD 测试,实践上更可取(无需预采 OOD 数据)**。对比:**STAC 用单一常数阈值**,本文改进之一即以时变 band 取代之
+- **结果**:**learned > post-hoc** 且**更快**(准确与速度不取舍);**logpZO 最一致**(combined accuracy top-1 10/16;硬件小样本 8/12 top-1、11/12 top-3);STAC top-1 仅 3/16,PCA-kmeans 从未最佳,SPARC 最快但从未 top-1。定性:Square 上**分数陡增恰对应夹爪脱手瞬间**
+- **实验**:仿真 Robomimic(Square/Transport/Can/ToolHang,略去 Lift 因两策略均 100%),OOD 由 **t=50 模拟相机碰撞**;真机**双臂 Franka Panda** 的 FoldRedTowel / CleanUpSpill(OOD = 皱毛巾+蓝铲干扰、换绿毛巾;另有人为拉扯)。**两种 backbone:FM 与 DP**;rollout 仿真 2000 / 硬件仅 50
+- **⚠️ 回填限定一(推翻上一条 log 的判断)**:**STAC 未必能放端侧实时跑** —— FAIL-Detect 硬件实验**没跑 STAC**,原文 "*slow to run on hardware in real-time*",因其**每步需 256 条动作预测**(少采会损害统计性质)。Sentinel 自称"negligible cost"是**相对 VLM** 而言。⇒ 已在 [[Embodied failure detection]] 机制③加限定框:**"便宜"要分清相对谁**
+- **⚠️ 回填限定二**:**"策略自身信号 = 免费"要收紧** —— 真正好用的是 **learned** 信号(需离线训小流模型);**post-hoc 免费信号(采样方差/SPARC/PCA-kmeans)在两篇论文里都被系统性击败**。正确表述:**"离线训一次(只用成功数据)+ 在线推理便宜"** = [[Robot data engine]] 的**买断制**结构再次出现
+- **另补**:机制⑤门槛条additionally 注明 **ID-only 校准即可覆盖 OOD**(冷启动无需预采 OOD 数据);机制③的 FAIL-Detect 条目由"摘要级"升为全文核实并写入 logpZO 机制
+- **CP 的第三个落点确认**:本文 related work **自己就把 KnowNo 归为 CP 的另一应用**(为 LLM planner 的动作构造不确定性集合、有歧义时请求人工)⇒ 印证"KnowNo(语义层)/ STAC(动作一致性层)/ FAIL-Detect(执行监控层)是同一套机器施加在不同层次"
+- **两篇姊妹工作的互补性未被任何一方测过**(logpZO 强在 erratic/OOD、Sentinel 的 VLM 强在 task-progression)——已列为两篇源笔记的 open question
+- Lint 干净:0 broken-A / 0 broken-B / 1 orphan / 1 dup;135 notes
 ## [2026-08-06] synthesis | 面向具身计算系统优化的仿真评测套件 v0.1
 - **触发**：Ethan 明确问题不是“如何评价仿真器”，而是团队优化具身 Agent、VLA 推理、渲染、物理和 3DGS 后，应该用哪些仿真任务判断端到端精度是否退化，以及 π0.5 与任务配置如何标准化
 - 新建 [[Embodied simulation benchmark suite for systems optimization]]：提出“**共同核心回归集 + 优化点专项集**”，而非所有优化共用一张总榜

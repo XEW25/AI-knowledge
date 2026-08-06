@@ -61,13 +61,16 @@
 **3｜策略自身的信号（免费且被低估）.** 不动权重就能拿到，零标注、与策略同源、可端侧。两条已验证的做法：
 
 - **STAC（时序动作自一致性）** — [[Agia et al. - Sentinel Runtime Monitoring of Consistency and Progress for Generative Policies|Sentinel]] 的核心。生成式策略每 `k` 步重规划但预测 `h` 步（`k<h`）⇒ **t 与 t+k 两次预测在时间上重叠**；比较两个分布在重叠窗口上的**统计距离** `D(π̄_t, π̃_{t+k})`。原理：策略相当于内含一个世界模型，**分布内它会同意自己刚才的预测，OOD 时会自我矛盾**。检出 **99% 的 erratic 失败**，成本可忽略，**策略无关**。
-- **学出的密度/不确定性信号 + OOD 框架** — **FAIL-Detect**（2503.08558，*摘要级*）把策略输入输出**蒸馏成标量信号**（刻画 epistemic uncertainty），按**序贯 OOD 检测**处理；结论是 **learned 信号优于 post-hoc 信号**（其 flow-based 密度估计器最好）。
+- **学出的密度信号 + OOD 框架** — [[Xu et al. - FAIL-Detect Uncertainty-Aware Runtime Failure Detection for Imitation Learning Policies|FAIL-Detect]]（TRI）把**最近 2 步观测 + 生成的未来动作**蒸馏成标量，按**序贯 OOD 检测**处理。其最佳打分器 **logpZO**：用连续归一化流把观测**推进噪声空间**，分数 = **‖Z‖²**（分布内 → 落在标准高斯中心附近）；这样**绕开了直接算密度所需的高维散度积分**，开销仅 **~0.03–0.04 s/步**。
 
 > ⚠️ **两个必须记住的更正**（否则会走弯路）：
 > 1. **不是"看单时刻采样方差"**。朴素的 **Diffusion Output Variance**（对 B 条采样算方差）在 Sentinel 里是**被 STAC 击败的 baseline**，且原文指出它"does not quantify epistemic model uncertainty"。**关键在跨时刻的自一致性，不在单时刻的离散度。**
 > 2. **必须用分布距离，不能比均值**。生成式策略是多模态的（同任务多种合法解法）；消融显示**用非统计距离（如 min. distance）比 baseline 还差**，正因为它抹掉了多模态性。实现用 **MMD + RBF 核**。
 >
-> **代价**：STAC 依赖 chunk 重叠结构，对 horizon 敏感（k=2→TPR 61%，k=4→78%，**k=8/h=16→95%**）；单步策略或 `k=h` 不适用。
+> **代价与两条重要限定**：
+> - STAC 依赖 chunk 重叠结构，对 horizon 敏感（k=2→TPR 61%，k=4→78%，**k=8/h=16→95%**）；单步策略或 `k=h` 不适用。
+> - ⚠️ **STAC 未必能放端侧实时跑**。它每步要生成 **256 条动作预测**；[[Xu et al. - FAIL-Detect Uncertainty-Aware Runtime Failure Detection for Imitation Learning Policies|FAIL-Detect]] 的硬件实验**干脆没跑 STAC**——"*slow to run on hardware in real-time*"（少采几条可以，但会损害其统计性质）。Sentinel 自称"成本可忽略"是**相对 VLM** 而言。⇒ **"便宜"要分清是相对谁。**
+> - ⚠️ **"策略自身信号 = 免费"这个说法要收紧**。真正好用的是 **learned 信号**（要离线训一个小的流模型）；**post-hoc 的免费信号（采样方差 / SPARC 平滑度 / PCA-kmeans）在两篇论文里都被系统性击败**。正确表述是 **"离线训一次（只用成功数据）+ 在线推理很便宜"** —— 又一次落进 [[Robot data engine]] 的**买断制**结构。好消息：learned 方法**准确与速度不取舍**（FAIL-Detect 里检测时间也最快）。
 
 **3′｜⚠️ 机制③ 与机制⑥ 是一条流水线，不是两个并列项.** 正确结构是：
 
@@ -84,7 +87,7 @@ conformal prediction 校准
 
 **5｜学出来的判别器（替代仿真器成功判据的正解）.** 真机化必须补的一环，本库已有三个可参照形态：**VLM 成功判别器**（AutoEval 微调 PaliGemma，与人工 **Pearson 0.942**）、**二值奖励分类器**（HIL-SERL，遥操采正负样本）、**value function**（[[Physical Intelligence - pi0.6 a VLA That Learns From Experience|π*₀.6 Recap]] 打 advantage）。三者都是"**训一次判别器、之后 per-sample 只花推理**"的**买断制**（[[Robot data engine]] 的 C 类），这是工业上唯一跑得起的形态。
 
-> ⚠️ **"必须采失败样本"这个门槛被证伪了（2026-08 修正）**：**FAIL-Detect** 整篇就在论证 *"detect failures **without failure data**"*——只用成功数据训练；[[Agia et al. - Sentinel Runtime Monitoring of Consistency and Progress for Generative Policies|Sentinel]] 的 STAC 校准集同样**只需少量成功 rollout**。代价是问题被弱化为**"是否偏离训练分布"**（OOD ≠ 一定失败），但对**冷启动**极有价值：一条失败样本都没有时也能先跑起来。⇒ 上面三个"需正负样本"的形态是**更强但更贵**的一档，不是唯一入口。
+> ⚠️ **"必须采失败样本"这个门槛被证伪了（2026-08 修正）**：[[Xu et al. - FAIL-Detect Uncertainty-Aware Runtime Failure Detection for Imitation Learning Policies|FAIL-Detect]] 整篇就在论证 *"detect failures **without failure data**"*——只用成功数据训练（且 **ID-only 校准即可覆盖 OOD 测试**，冷启动无需预先采 OOD 数据）；[[Agia et al. - Sentinel Runtime Monitoring of Consistency and Progress for Generative Policies|Sentinel]] 的 STAC 校准集同样**只需少量成功 rollout**。代价是问题被弱化为**"是否偏离训练分布"**（OOD ≠ 一定失败），但对**冷启动**极有价值：一条失败样本都没有时也能先跑起来。⇒ 上面三个"需正负样本"的形态是**更强但更贵**的一档，不是唯一入口。
 
 **6｜不确定 → 求助.** **KnowNo**（conformal prediction，2307.01928）给出有统计保证的"我不确定"，触发人工介入。价值在于把"检测失败"**前移**为"失败前求助"；并直接接上 [[Robot data engine]] 的结论——**人类注意力才是稀缺资源，优化目标是每次求助的信息量，不是数据量**。
 

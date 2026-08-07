@@ -42,6 +42,7 @@ NVIDIA **不是单纯的 VLA 玩家，而是横跨多流派的全栈玩家**（�
 - **⚠️ 术语陷阱**：官方称 "open-source **agentic** orchestrator"——此处 agent 指**能被编码 agent 操作**（仓库带 `AGENTS.md`/`CLAUDE.md`/`.claude/agents/`，支持 prompt-driven 开发），**不是"编排具身 agent"**
 
 ### Isaac Lab-Arena：评测算力成为预算项的商业佐证
+→ **源笔记**：[[NVIDIA - Isaac Lab-Arena Scalable Robot Policy Evaluation in Simulation]]（**与 Lightwheel 共同开发**；**pre-alpha**）
 开源（商业许可）。解决"大规模策略评测搭建又繁又手工"。**乐高式模块化**：Objects / **Affordances**（`Openable`、`Pressable`，用于任务泛化）/ Scenes / Embodiments（GR1 人形、Franka）/ Tasks（封装目标与成功判据）→ **按需即时组装环境**；**GPU 并行，40× 于串行**（复杂任务 **0.76h vs 34.9h**）。扩展自 Isaac Lab，GEAR Lab 用它基准 GR00T N 系，**以 OSMO 为 CI/CD 部署环境**。
 
 > **意义**：本库 [[Robot data engine]] 断言"**评估算力第一次与训练算力并列成为预算项**"——**一个算力供应商专门为评测吞吐做开源产品、并以加速比为卖点**，是该判断最强的一类证据（不是论文说的，是卖算力的人用产品投票）。

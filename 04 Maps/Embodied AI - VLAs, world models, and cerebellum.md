@@ -59,6 +59,9 @@ This map collects the vault's embodied-AI cluster: vision-language-action (VLA) 
 ### Sources — VLA quantization
 - [[Zheng et al. - DyQ-VLA Temporal-Dynamic-Aware Quantization for Embodied Vision-Language-Action Models|DyQ-VLA]] · [[Zhang et al. - QuantVLA Scale-Calibrated Post-Training Quantization for Vision-Language-Action Models|QuantVLA]] · [[Wang et al. - Omega-QVLA Robust Quantization for Vision-Language-Action Models via Composite Rotation and Per-step Scaling|Ω-QVLA]] · [[Lin et al. - DuQuant Distributing Outliers via Dual Transformation Makes Stronger Quantized LLMs|DuQuant]]
 
+### Sources — evaluation infrastructure
+- [[NVIDIA - Isaac Lab-Arena Scalable Robot Policy Evaluation in Simulation|Isaac Lab-Arena]] — NVIDIA × **Lightwheel**,**pre-alpha 开源**;把"造 benchmark + 跑评测"本身做成框架:**Object/Scene/Embodiment/Task 乐高式即时编译** + **Affordance 系统**(`Openable`/`Pressable`)跨物体泛化;策略无关;GR00T N1.5 × 10 RoboCasa 任务 × 每任务 **4096 同构变体** × 8 卡 → **0.76h**(串行 34.9h)。生态:Lightwheel **250+ 任务**、LeRobot Env Hub、RoboTwin 2.0 扩展。**⚠️ 只解决"可比+快",未报 sim-to-real 相关性("可信"未碰);40× 是内部并行 vs 串行对照**
+
 ### Sources — failure detection / runtime monitoring
 - [[Xu et al. - FAIL-Detect Uncertainty-Aware Runtime Failure Detection for Imitation Learning Policies|FAIL-Detect]] — **TRI**;*"检测失败,但不需要失败数据"* —— 重构为**序贯 OOD 检测**,两阶段(标量打分 → **时变 CP band**);最佳打分器 **logpZO**:把观测经归一化流**推进噪声空间**,分数=**‖Z‖²**,绕开高维散度积分(~0.03–0.04 s/步)。**learned > post-hoc**(且更快);双臂 Franka 叠毛巾/擦洒漏真机验证。⚠️ 硬件上**没能实时跑 STAC**(每步 256 条采样)
 - [[Agia et al. - Sentinel Runtime Monitoring of Consistency and Progress for Generative Policies|Sentinel]] — Stanford 系;**失败分类学先于方法**:erratic(时间敏感但视觉细微)用 **STAC**(时序动作自一致性 + MMD,**策略无关、成本可忽略**,99% 检出)、task-progression(视觉明显但时间自洽)用**零样本 VLM**(抽帧视频+时限,每 episode 查 2 次)。并行 **>97%** 检出、**+18%** vs 单用;**真机 95%**。⚠️ 证伪"看采样方差"(是被击败的 baseline)、证伪"必须采失败样本"(校准只需成功 rollout)

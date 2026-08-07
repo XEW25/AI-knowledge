@@ -931,3 +931,17 @@
 - **产业结构判断(本轮最有价值)**:与 [[AgiBot 智元]] 的 AIMA "1+3+X" 形成对照 —— AgiBot 把 **"X = 具身智能体框架"明确列为栈里的生态位(要占位)**;NVIDIA **把 agent 拆进模型与开发基建、运行时框架留白(不占,卖底座)**。⇒ **"具身 Agent 框架"这一层目前没有平台方标准化**:学术侧各做各的,产业侧一个占位一个留白。**对本框架"接口契约共版本化"是现实提醒——该契约目前没有事实标准的制定者**
 - **一条被砍掉的候选**:曾想记"agent readiness 成为软件交付物"(仓库放 `AGENTS.md` 等),**证据只有一个仓库,太薄,暂不记**,待再见两三例
 - Lint 干净:0 broken;144 notes
+
+
+## [2026-08-06] ingest | Isaac Lab-Arena 源笔记(评测基础设施第一篇)
+- 应 Ethan 要求把上一条只在实体页提及的 Arena 收成独立源笔记。**这次没依赖摘要器**——curl 抓原文自读(19.5k 字符),因而补到摘要器没给的几处关键信息
+- **[[NVIDIA - Isaac Lab-Arena Scalable Robot Policy Evaluation in Simulation]]**(NVIDIA Technical Blog,**2026-01-05**,2026-02-03 更新补入性能;5 位作者;**与 Lightwheel 共同开发**;开源+商业许可;**pre-alpha**)
+- **摘要器漏掉而原文有的**:① **与 Lightwheel 共同开发**(physical AI 基础设施公司)② **pre-alpha**,原文自述 *"intentionally an early framework skeleton with **limited features**"* ③ 完整性能设置 ④ 生态细节 ⑤ 路线图
+- **核心机制**:**Object / Scene / Embodiment / Task 四类独立积木即时编译**成 Isaac Lab 环境(替代"整块写死的任务描述")+ **Affordance 系统**(`Openable`/`Pressable`)标准化交互**使一个任务跨物体复用**;`Task` 封装目标/成功判据/终止逻辑/事件/指标;换物体(microwave→power_drill)、换本体(GR1→Franka)、换场景(kitchen→packing_table)**均不需重建环境或管线**;**策略无关**
+- **性能(Lightwheel 实测)**:**GR00T N1.5 × 10 个 RoboCasa 任务 × 每任务 4096 同构环境变体 × 8×6000D GPU** → **并行 0.76h vs 串行 34.9h**
+  - ⚠️ **易被误引的点**:**"40×" 是 Arena 并行 vs Arena 串行的内部对照**,**不是**相对原 MuJoCo(RoboCasa) 实现;原文提到也与 MuJoCo 版比过但正文未给该数字
+- **生态**(比框架本身更值得注意):Lightwheel 用它开源 **250+ 任务**(Lightwheel-RoboCasa-Tasks / Lightwheel-LIBERO-Tasks)+ 工业基准 **RoboFinals**;接入 **HF LeRobot Environment Hub**(可后训练/评测 **GR00T N / π0 / SmolVLA**);**RoboTwin** 用它建 RoboTwin 2.0 扩展版与长程基准;GEAR Lab 基准 GR00T N 系;Seattle Robotics Lab 并入语言条件任务套件。与 Isaac Lab-Teleop / Isaac Lab-Mimic / GR00T N 后训练打通;部署可本地或 **OSMO** 做 CI/CD
+- **路线图与本库 L0–L3 评估栈独立吻合**:近期 = 自然语言指定物体摆放、**复合任务(串联原子技能)**、RL 任务设置、**异构并行评测**;更远 = **Omniverse NuRec 做 real-to-sim(= L2)** + **Cosmos 世界模型驱动的神经仿真(= L3)**
+- **四条 Why it matters**:① **"评估算力成为一等预算项"最强的一类证据**(卖算力的人用产品投票)② 路线图沿 L0–L3 往上走 ③ **Affordance × Object × Scene × Embodiment 的组合式任务生成 = "固定谓词 × 任务参数"设计原则的第三次独立出现**(前两次:LEACL 参数化 PDDL、Harness VLA 固定小原语库)④ **评测环境开始有"分发中心"**(LeRobot Env Hub 可注册可发现)—— 与刚记下的"**具身 Agent 框架层至今无人标准化**"形成对照:**评测这一层已经开始标准化了**
+- **⚠️ 最重要的限定**:**它只解决"可比 + 快",完全没碰"可信"** —— **全文未报任何 sim-to-real 相关性数字**(对照 SIMPLER 的 r=0.924 是这层的"质检证书")⇒ **是吞吐工具,不是保真度工具**;用它得出的排名能否代表真机仍需另行校准。这正好落在 [[Real-robot evaluation]] 的核心矛盾("仿真可比不可信 / 真机可信不可比")上,两页互为对位
+- 接线:[[NVIDIA]] 实体页 Arena 节加源笔记指针;Embodied MOC 新增 "Sources — evaluation infrastructure" 小节;index Sources。Lint 干净:0 broken;145 notes

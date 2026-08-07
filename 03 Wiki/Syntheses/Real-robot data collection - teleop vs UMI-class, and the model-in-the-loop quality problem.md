@@ -263,7 +263,16 @@ per-sample 模型判别唯一工业化处 = 部署经验数据（Recap value fun
 2. **缩小金标准**：冻结骨干+小头（[[NVIDIA - GR00T N1 An Open Foundation Model for Generalist Humanoid Robots|GR00T]] / [[Chen et al. - LaWAM Latent World Action Models for Efficient Dynamics-Aware Robot Policies|LaWAM]] / RL Tokens，vault 代码核实）→ 验证新数据只训小头；小模型代理+scaling 外推（Re-Mix 小参考模型；GO-1"可预测 scaling"暗示 scaling-law 数据决策——分析性推断）。
 3. **把验证折进训练（最深）**：Recap/π0.7 全量数据带质量标签一次训完，判别器 = 训练副产品——**独立验证循环被结构性消掉**；GO-1 latent action 让无标签数据可用 = 减少验证问题发生率。
 4. **仿真/评估侧吞吐**：GPU 万级并行仿真（Isaac Lab/MJX/Genesis）；Tesla 影子模式 = 车队"只评不动"零边际验证成本（业界广泛记载，本轮未回读一手）——具身车队可预期模板。
-5. **编排/调度层（唯一实例 + 空档）**：**NVIDIA OSMO**（已核实，开源）——云原生编排平台，YAML 定义多阶段 Physical-AI 工作流（合成数据生成/训练/RL/仿真），带**数据谱系追踪与版本化**、CI/CD 集成（每夜回归/模型验证），内部支撑 GR00T/Isaac Lab 日均数千 GPU 时——**"数据 CI/CD"的现实雏形**；但它是通用工作流编排，"为数据验证优化的调度"——消融树并发调度、warm-start 增量训练、训练态缓存、增量式数据估值——**仍是公开空白**。
+5. **编排/调度层（唯一实例 + 空档）**：**NVIDIA OSMO**（已核实，开源）——云原生编排平台，YAML 定义多阶段 Physical-AI 工作流（合成数据生成/训练/RL/仿真），带**数据谱系追踪与版本化**、CI/CD 集成（每夜回归/模型验证），内部支撑 GR00T/Isaac Lab 日均数千 GPU 时——**"数据 CI/CD"的现实雏形**；"为数据验证优化的调度"——消融树并发调度、warm-start 增量训练、训练态缓存、增量式数据估值——**仍是公开空白**。
+
+   > ⚠️ **2026-08 核实修正**：此前写作"但它是通用工作流编排"**不准确**。官方文档明确**对标并区别于 SLURM**，自称 **purpose-built for physical AI**（领域专用，非通用）；统一**训练集群 + 仿真环境 + 边缘硬件**于单一控制面，覆盖 数据生成 → RL → 训练 → 仿真验证 → **SIL/HIL 评估**，主接口是 **YAML**（"no Kubernetes expertise needed"），受众是**缺基础设施专长的人类开发者**。**空白的真正理由**因此要换：不是"它太通用"，而是**它把"验证"当作工作流里的一个普通阶段，未把验证吞吐当成一等优化目标**。
+   >
+   > **边界（官方原话）**：*"OSMO prepares trained policies, datasets, and artifacts, but **deployment into production systems is outside its scope**."* ⇒ **纯开发/训练期编排，不是运行时**，与具身 Agent 系统无直接关系；在本库框架里它只落在**演进通道的云侧**（云①持续学习 / 云③技能工厂 / **云④验证门**的执行底座），与运行时通道无关。
+   >
+   > ⚠️ **术语陷阱**：官方称其为 "open-source **agentic** orchestrator" —— 这里的 agent 指**能被编码 agent 操作**（仓库带 `AGENTS.md`/`CLAUDE.md`/`.claude/agents/`，支持 prompt-driven 开发），**不是"编排具身 agent"**。同词异指，勿归错层。
+
+6. **仿真评测层（2026-08 新增）**：**NVIDIA Isaac Lab-Arena**（开源，商业许可）——针对"大规模策略评测搭建又繁又手工"。**乐高式模块化**：Objects / **Affordances**（`Openable`、`Pressable`，用于任务泛化）/ Scenes / Embodiments（GR1 人形、Franka）/ Tasks（封装目标与成功判据），**按需即时组装成可运行环境**；**GPU 并行**，**40× 于串行**（复杂任务 **0.76h vs 34.9h**）。扩展自 Isaac Lab，GEAR Lab 用它给 GR00T N 系做基准，**以 OSMO 为云原生 CI/CD 部署环境**。
+   > **意义**：这是"**评估算力第一次与训练算力并列成为预算项**"（§5.1 判断）的**商业佐证**——一个算力供应商专门为**评测吞吐**做开源产品并以加速比为卖点。另注：其 **Affordance × 物体 × 场景 × 本体**的组合式任务生成，与 [[Task decomposition]] 里"**固定谓词 × 任务参数所以规则不爆炸**"的结论结构同构。
 - **研究机会（分析性，对 Ethan 定位）**：把"数据验证吞吐"当一等系统指标——增量数据估值（缓存梯度/训练态做 delta 估值而非重训）、消融树共享前缀调度、验证作业与生产训练错峰。LLM infra 有雏形；具身因视频 I/O+物理评测，问题结构是新的。
 
 ### 5.5 收口：三层 × 算力形态一览

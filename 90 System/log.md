@@ -917,3 +917,17 @@
 - 冻结 ESAS-RoboTwin 五轴结构：Canonical / Visual / Physics / Control / Compound；前三个压力轴优先做单因素实验，Compound 只用于最终综合压力。
 - 建立 Public Dev → Private Validation → Sealed Final Holdout 的数据隔离，以及聚合反馈、提交频率限制、实例轮换和版本哈希等防过拟合治理。
 - 最终验收采用相同隐藏 episodes 上的 reference–candidate 配对非劣性检验；先运行 100 episodes/task，对临界项顺序扩样至 300–500。
+
+
+## [2026-08-06] correct + deepen | NVIDIA 在具身 Agent 层的站位;OSMO 定性修正 + Isaac Lab-Arena 补入
+- **触发**:Ethan 问"NVIDIA 作为算力提供商,有没有对具身 Agent 做技术部署",继而追问 OSMO 细节并质疑"它是不是就是个训练+评测编排,和具身 Agent 没太大关系"。**质疑成立**
+- **一次自我纠错链(值得记的过程)**:搜索摘要称 OSMO 为 "open-source **agentic** orchestrator" → 我据此把它往 agent 层归 → Ethan 追问 → 读官方文档发现 **"agentic" 指"能被编码 agent 操作"**(仓库带 `AGENTS.md`/`CLAUDE.md`/`.claude/agents/`,支持 prompt-driven 开发),**不是"编排具身 agent"** → 我又过度解读成"为 coding agent 准备的" → Ethan 再质疑"人类开发员不亲和吗" → 读 README 确认**主受众明确是人类开发者**("no infrastructure expertise required"、YAML 而非 Python、对标 SLURM),agent 上下文文件只是**附加可及性**。**两轮过度解读均由用户质疑纠正**
+- **OSMO 的准确定性**:**面向 physical AI 的领域专用**工作流编排(官方明确对标并区别于 SLURM,**非通用**);统一训练集群+仿真+边缘硬件于单一控制面;覆盖 数据生成→RL→训练→仿真验证→**SIL/HIL 评估**;YAML 主接口 + CLI + VSCode/Jupyter/SSH。**边界(官方原话)**:"OSMO prepares trained policies, datasets, and artifacts, but **deployment into production systems is outside its scope**" ⇒ **纯开发/训练期,不是运行时,与具身 Agent 系统无直接关系**;在本框架里只落**演进通道云侧**(云①/云③/**云④验证门**的执行底座)
+- **⚠️ 修正两处既有表述**([[Robot data engine]] + [[Real-robot data collection - teleop vs UMI-class, and the model-in-the-loop quality problem|数据金字塔综述]]):原写"**但它是通用工作流编排**"**不准确**。**"为数据验证优化的调度仍是公开空白"这个结论不变,但理由要换** —— 不是"它太通用",而是**它把"验证"当作工作流里的一个普通阶段,未把验证吞吐当成一等优化目标**
+- **新增 [[Real-robot data collection - teleop vs UMI-class, and the model-in-the-loop quality problem|数据金字塔综述]] §5.4 第 6 条:仿真评测层 = NVIDIA Isaac Lab-Arena**(开源,商业许可):解决"大规模策略评测搭建又繁又手工";**乐高式模块化**(Objects / **Affordances** `Openable`/`Pressable` 用于任务泛化 / Scenes / Embodiments GR1·Franka / Tasks 封装目标与成功判据)**按需即时组装环境**;**GPU 并行 40× 于串行**(复杂任务 **0.76h vs 34.9h**);扩展自 Isaac Lab,GEAR Lab 用它基准 GR00T N 系,**以 OSMO 为 CI/CD 部署环境**
+  - **意义**:这是本库"**评估算力第一次与训练算力并列成为预算项**"判断的**商业佐证** —— **算力供应商专门为评测吞吐做开源产品、以加速比为卖点**(不是论文说的,是卖算力的人用产品投票)
+  - 另注:其 **Affordance × 物体 × 场景 × 本体**的组合式任务生成,与 [[Task decomposition]] 的"**固定谓词 × 任务参数所以规则不爆炸**"结构同构 —— 又一次独立收敛
+- **[[NVIDIA]] 实体页新增「在具身 Agent 层的站位」节**:核实结论 = **agent 能力分成两处、且都不是运行时** —— ① **吸收进模型**(GR00T System 2,N1.7 用自家 **Cosmos-Reason2-2B**,"Open Reasoning VLA" + enhanced task decomposition ⇒ **规划/推理做进权重,不外挂 harness**);② **落在开发基建**(OSMO 编排 + Arena 评测);③ **运行时 agent harness = 没有**
+- **产业结构判断(本轮最有价值)**:与 [[AgiBot 智元]] 的 AIMA "1+3+X" 形成对照 —— AgiBot 把 **"X = 具身智能体框架"明确列为栈里的生态位(要占位)**;NVIDIA **把 agent 拆进模型与开发基建、运行时框架留白(不占,卖底座)**。⇒ **"具身 Agent 框架"这一层目前没有平台方标准化**:学术侧各做各的,产业侧一个占位一个留白。**对本框架"接口契约共版本化"是现实提醒——该契约目前没有事实标准的制定者**
+- **一条被砍掉的候选**:曾想记"agent readiness 成为软件交付物"(仓库放 `AGENTS.md` 等),**证据只有一个仓库,太薄,暂不记**,待再见两三例
+- Lint 干净:0 broken;144 notes

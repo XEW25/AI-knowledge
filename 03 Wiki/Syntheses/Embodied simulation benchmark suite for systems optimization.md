@@ -2,7 +2,7 @@
 
 > **定位**：为具身 Agent 架构、VLA 推理加速、渲染引擎、物理引擎与 3DGS 等系统优化建立统一的**端到端精度回归工作负载**。本页讨论的不是“如何评价一个仿真器是否逼真”，而是：替换或优化某个系统组件后，如何判断具身任务精度有没有退化，并能进一步定位退化来源。
 >
-> 制定于 **2026-08-06**。当前为 **v0.3 讨论稿**，后续需要根据团队算力预算、实际引擎、本体和 Agent 接口冻结具体 manifest。
+> 制定于 **2026-08-06**。当前为 **v0.4 讨论稿**，后续需要根据团队算力预算、实际引擎、本体和 Agent 接口冻结具体 manifest。
 
 ## 1. 核心问题
 
@@ -117,7 +117,6 @@ ESAS-LIBERO
 ├── Covariate-Robustness
 ├── Grounding
 ├── Task-Generalization
-├── Control
 └── Compound
 ```
 
@@ -125,10 +124,9 @@ ESAS-LIBERO
 - `Covariate-Robustness`：主要复用 Plus 的 Camera、Robot、Layout、Light、Background、Noise。Level 1–3 或 reference 位于约 30%–80% 的实例用于精度回归；更困难实例进入压力集。
 - `Grounding`：结合 Plus Language 与 PRO Object/Semantic，检查指令—对象—动作绑定、干扰物和目标存在性。
 - `Task-Generalization`：主要复用 PRO Position/Task/Environment；中等难度项可守门，地板项只作能力压力和未来模型突破跟踪。
-- `Control`：由团队在 policy–environment 接口注入 latency、jitter、action hold、chunk/频率变化及视觉—本体感知不同步；Plus/PRO 没有系统覆盖这一轴。
-- `Compound`：只在最终验收中组合轻量条件变化，不用于首轮归因。
+- `Compound`：只在最终验收中组合轻量 Covariate、Grounding 与 Task-Generalization 变化，不用于首轮归因。
 
-ESAS-LIBERO 不必机械复制 ESAS-RoboTwin 的 Physics 轴：LIBERO 更适合视觉、语言、grounding 和任务泛化；复杂物理与接触仍由 ESAS-RoboTwin 和 ManiSkill 主承载。
+ESAS-LIBERO 不设置独立 Control 或 Physics 数据轴：推理时延、chunk scheduling 等由开发团队验证；评估团队负责冻结统一运行协议，确保所有提交使用相同 action horizon、实际执行步数和控制接口。复杂物理与接触仍由 ESAS-RoboTwin 和 ManiSkill 主承载。
 
 ### 3.2 RoboTwin 2.0：公开开发回归与 ESAS 私有验收
 
@@ -295,7 +293,7 @@ BEHAVIOR 2026 官方赛道使用 RGB + depth + proprioception，测试时禁止 
 
 | 优化方向 | 必跑 | 专项追加 | 主要精度观察量 |
 |---|---|---|---|
-| π0.5 量化 / 推理加速 | 原始 LIBERO 40 + RoboTwin 2.0 全 50 × clean/randomized | ESAS-LIBERO Canonical-Heldout/Control + ESAS-RoboTwin Canonical/Control | paired success delta、成败翻转、长程退化、轨迹漂移、timeout |
+| π0.5 量化 / 推理加速 | 原始 LIBERO 40 + RoboTwin 2.0 全 50 × clean/randomized | ESAS-LIBERO Canonical-Heldout + ESAS-RoboTwin Canonical/Control | paired success delta、成败翻转、长程退化、轨迹漂移、timeout |
 | Agent 架构 | LIBERO-10 + LIBERO-PRO | ESAS-LIBERO Grounding/Task-Generalization + BEHAVIOR-Core-20 / Full-100 | predicate progress、端到端成功、恢复次数、规划开销 |
 | 渲染引擎 | LIBERO-Plus + RoboTwin 2.0 全 50 × clean/randomized | ESAS-LIBERO Covariate + ESAS-RoboTwin Visual | 成功率、感知导致的动作分歧、视觉压力曲线 |
 | 3DGS | LIBERO-Plus + RoboTwin 2.0 全 50 × clean/randomized | ESAS-LIBERO Covariate 与 ESAS-RoboTwin Visual 中的固定场景 paired renderer | 任务精度 + 图像/特征差异；不能只报 PSNR |
@@ -345,7 +343,6 @@ ManiSkill 的 Task Card 会明确机器人、随机化、成功/失败条件和�
 - `ESAS-LIBERO/Covariate-Robustness`
 - `ESAS-LIBERO/Grounding`
 - `ESAS-LIBERO/Task-Generalization`
-- `ESAS-LIBERO/Control`
 - `ESAS-LIBERO/Compound`
 - `ESAS-RoboTwin/Visual`
 - `ESAS-RoboTwin/Physics`
@@ -372,7 +369,7 @@ Reference 与优化版本必须使用完全相同的：
 
 π0.5 的 flow-matching 推理从随机噪声开始，因此只固定环境 seed 不够。需要同时固定环境随机性与模型噪声，并做逐 episode 配对比较。
 
-ESAS 的核心判断不是 candidate 是否超过一个孤立的绝对成功率，而是：在同一隐藏 episode 上，candidate 相对于未优化 reference 是否发生超过允许范围的退化。Canonical、Visual、Physics、Control 分别使用各自相同的隐藏 manifest；渲染引擎替换还要区分“同一新场景下比较两个模型后端”和“同一状态经 reference/candidate renderer 输出”的两种配对实验。
+ESAS 的核心判断不是 candidate 是否超过一个孤立的绝对成功率，而是：在同一隐藏 episode 上，candidate 相对于未优化 reference 是否发生超过允许范围的退化。ESAS-LIBERO 的 Canonical-Heldout、Covariate、Grounding、Task-Generalization，以及 ESAS-RoboTwin 的 Canonical、Visual、Physics、Control，分别使用各自相同的隐藏 manifest；渲染引擎替换还要区分“同一新场景下比较两个模型后端”和“同一状态经 reference/candidate renderer 输出”的两种配对实验。
 
 ### 6.3 结果聚合
 
@@ -390,40 +387,106 @@ ESAS 的核心判断不是 candidate 是否超过一个孤立的绝对成功率�
 - 成功 rollout 上的轨迹长度、jerk 或动作抖动
 - 碰撞、保护触发、异常退出和 simulator error
 
-最终守门采用**配对非劣性检验**：全量 Macro、各 profile / 任务族和关键任务分别设界限，并报告置信区间。示例起点可以是 Canonical Macro 不低于 reference `-1pp`、Visual/Physics/Control 不低于 `-2pp`、任务族不低于 `-5pp`，但这些数字必须根据 reference π0.5 的重复运行方差与业务风险校准，不能直接作为冻结标准。全 50 任务平均值不能掩盖少数任务的严重退化；同时也不宜对所有单任务设置不现实的 `-1pp` 门槛。
+最终守门采用**配对非劣性检验**：全量 Macro、各 profile / 任务族和关键任务分别设界限，并报告置信区间。示例起点可以是 Canonical Macro 不低于 reference `-1pp`、各压力 profile 不低于 `-2pp`、任务族不低于 `-5pp`，但这些数字必须根据 reference π0.5 的重复运行方差与业务风险校准，不能直接作为冻结标准。全量平均值不能掩盖少数任务的严重退化；同时也不宜对所有单任务设置不现实的 `-1pp` 门槛。
 
 连续诊断指标与成功率的关系沿用 [[Real-robot evaluation]]：连续量主要用于筛选和归因，不能自动替代任务验收。
 
-## 7. π0.5-LIBERO reference 配置
+## 7. π0.5-LIBERO 标准 baseline 与运行协议
 
-以下来自当前 OpenPI 官方代码和评测脚本，应作为第一版冻结基线：
+评估团队不另设 Control 扰动集，而是冻结一套所有提交都必须遵守的运行协议。配置分为三类：**模型固有配置、闭环执行配置、评测采样配置**。除非某字段正是被评估的优化变量，否则 reference 与 candidate 不得改变。
 
-| 配置项 | Reference |
+### 7.1 模型与 checkpoint 标准
+
+| 配置项 | ESAS-LIBERO v1 Reference |
 |---|---|
+| model | π0.5 flow-matching head |
 | checkpoint | `gs://openpi-assets/checkpoints/pi05_libero` |
-| checkpoint 阶段 | 30k finetuned |
-| 计算精度 | BF16 |
+| checkpoint 阶段 | 30k finetuned；记录 checkpoint hash |
+| reference 计算精度 | BF16 |
 | VLM | PaliGemma `gemma_2b` |
 | action expert | `gemma_300m` |
-| flow-matching steps | 10 |
-| action horizon | 10 |
-| replan interval | 执行 5 步后重新推理 |
-| 图像输入 | 224 × 224 |
-| 相机 | agent view + wrist view |
+| `pi05` | `True` |
 | `discrete_state_input` | `False` |
-| norm stats | 随官方 checkpoint / config 固定 |
-| benchmark seed | 7 |
-| 初始稳定等待 | 10 simulator steps |
-| 正式 rollout | 50 / task |
-| max steps | Spatial 220 / Object 280 / Goal 300 / LIBERO-10 520 |
+| max token length | 200（π0.5 默认） |
+| flow-matching integration steps | **10** |
+| predicted action horizon | **10 actions** |
+| internal action dimension | 32；LIBERO 有效输出取前 7 维 |
+| action representation | LIBERO 原生 7D delta action；`extra_delta_transform=False` |
+| normalization | 使用 checkpoint 自带 norm stats；不得重新计算或替换 |
+
+这里的 flow-matching steps 常被口头称为“降噪/降采样步数”，标准 reference 固定为 **10**。`action_horizon=10` 表示模型每次预测 10 个 actions，不等于环境会把 10 个全部执行。
+
+### 7.2 观测与闭环执行标准
+
+| 配置项 | ESAS-LIBERO v1 Reference |
+|---|---|
+| simulator render resolution | 256 × 256 |
+| 模型图像输入 | resize-with-pad 到 224 × 224，uint8 |
+| 图像方向 | agent/wrist 图像均旋转 180°，与训练预处理一致 |
+| 有效相机 | `agentview_image` + `robot0_eye_in_hand_image` |
+| 第三相机槽位 | right-wrist 使用零图并 mask，不得替换成其他视角 |
+| proprioception | EEF position + quaternion→axis-angle + gripper qpos，共 8 维后按模型规则 padding |
+| instruction | 原任务 `task.language` 原文；Canonical 不做改写 |
+| 每次模型预测 | 10 actions |
+| 每次实际执行 | **前 5 actions** |
+| replanning | 执行 5 步后丢弃剩余 5 步，重新观测并推理 |
+| action smoothing / ensemble | 关闭 |
+| action repeat / hold | 1 simulator step / action |
+| policy–environment 交互 | 同步；拿到新 chunk 后才继续执行 |
+
+因此标准闭环是：
+
+```text
+observe → predict 10 actions → execute actions[0:5]
+        → discard actions[5:10] → observe again
+```
+
+所有团队必须报告 `predicted_action_horizon` 与 `executed_actions_per_chunk`，不能只写一个含糊的 “chunk size”。对 LIBERO v1 标准分数，二者固定为 **10/5**。
+
+### 7.3 评测采样标准
+
+| 配置项 | Public LIBERO | ESAS-LIBERO |
+|---|---:|---:|
+| environment seed | 官方复现固定 7 | 由隐藏 episode manifest 指定 |
+| policy noise seed | 固定并记录 | 按 episode/inference index 确定性派生 |
+| 初始稳定等待 | 10 simulator steps | 10 simulator steps |
+| episodes / task | 官方复现 50 | 先 100，临界项扩到 300–500 |
+| max action steps | Spatial 220 / Object 280 / Goal 300 / LIBERO-10 520 | 与来源任务 suite 相同 |
+| success | 官方 environment `done` / success predicate | 保持同一 predicate |
+| 异常处理 | 异常 episode 记录并按预定义规则计入，不得静默重跑 | 同左，并单独报告 simulator error |
+
+OpenPI 官方 runner 只显式固定 NumPy/环境 seed；ESAS 的成对比较还应控制 flow 初始噪声。若当前后端不能从接口注入每次推理的 noise tensor，至少必须固定 policy server RNG，并记录 server restart 与 seed；不能让 reference 和 candidate 使用不可追踪的独立随机流。
 
 代码依据：
 
-- `pi05_libero` 使用 `Pi0Config(pi05=True, action_horizon=10, discrete_state_input=False)`，训练 30k steps（[OpenPI config](https://github.com/Physical-Intelligence/openpi/blob/main/src/openpi/training/config.py)）。
-- π0.5 默认 BF16，PaliGemma `gemma_2b` + `gemma_300m` action expert；`sample_actions` 默认 10 个 flow steps（[模型配置](https://github.com/Physical-Intelligence/openpi/blob/main/src/openpi/models/pi0_config.py)、[模型实现](https://github.com/Physical-Intelligence/openpi/blob/main/src/openpi/models/pi0.py)）。
-- 官方 LIBERO runner 使用 224 输入、`replan_steps=5`、每任务 50 次、seed 7，并按 suite 设置不同 timeout（[评测脚本](https://github.com/Physical-Intelligence/openpi/blob/main/examples/libero/main.py)）。
+- `pi05_libero` 当前使用 `Pi0Config(pi05=True, action_horizon=10, discrete_state_input=False)`、`extra_delta_transform=False`，训练 30k steps（[OpenPI config](https://github.com/Physical-Intelligence/openpi/blob/main/src/openpi/training/config.py)）。
+- π0.5 默认 BF16、PaliGemma `gemma_2b` + `gemma_300m` action expert，`sample_actions` 默认 10 个 flow integration steps（[模型配置](https://github.com/Physical-Intelligence/openpi/blob/main/src/openpi/models/pi0_config.py)、[模型实现](https://github.com/Physical-Intelligence/openpi/blob/main/src/openpi/models/pi0.py)）。
+- 当前官方 runner 使用 `replan_steps=5`、224 输入、seed 7、初始等待 10 步、每任务 50 次，并按 suite 固定 max steps；每次只把预测 chunk 的前 5 步送入环境（[评测脚本](https://github.com/Physical-Intelligence/openpi/blob/main/examples/libero/main.py)）。
+- LIBERO policy adapter 输入 agent+wrist 两路图像，将不存在的 right-wrist 置零并 mask，输出只取 action 的前 7 维（[policy adapter](https://github.com/Physical-Intelligence/openpi/blob/main/src/openpi/policies/libero_policy.py)）。
 
-### 两个 reference，而不是一个
+### 7.4 允许改变什么
+
+标准验收采用“**单一声明变量**”原则：
+
+- 量化、算子、编译器、框架迁移：保持 flow steps=10、horizon=10、execute=5，只改变声明的计算实现或数值精度。
+- flow-step reduction：允许 candidate 使用少于 10 步，但必须与 10-step BF16 reference 配对，并把步数写入结果名称，例如 `INT8-flow6-h10-e5`。
+- action-horizon 或 chunk-execution 优化：不进入标准 LIBERO 精度榜；作为独立 scheduling 实验报告，因为它改变了闭环控制协议。
+- 渲染或输入降质：模型与闭环参数保持 10/10/5，只改变声明的 renderer、分辨率、压缩或传感器变量。
+
+每个结果必须附带配置指纹：
+
+```text
+model/checkpoint hash
+openpi commit + LIBERO commit
+backend/framework + dtype/quantization
+flow_steps / predicted_horizon / executed_actions
+image preprocessing + cameras
+norm_stats hash
+episode manifest hash + environment/policy seeds
+simulator/dependency versions
+```
+
+### 7.5 两个 reference，而不是一个
 
 系统优化最好保留两个参照：
 
@@ -473,7 +536,7 @@ RoboTwin Public Dev
 ESAS (Embodied System Acceptance Suite)
   ESAS-LIBERO
     Canonical-Heldout / Covariate-Robustness / Grounding
-    Task-Generalization / Control / Compound
+    Task-Generalization / Compound
     Private Validation / Sealed Final Holdout
   ESAS-RoboTwin
     Canonical / Visual / Physics / Control / Compound

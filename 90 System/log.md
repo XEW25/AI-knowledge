@@ -953,3 +953,11 @@
 - 明确 LIBERO-PRO 主要测试 Object/Position/Semantic/Task/Environment 下的 grounding、任务泛化与反记忆；记录作者 π0.5 结果中的 Task/困难 Position 地板效应，不能用于小幅精度回退守门。
 - 新增 ESAS-LIBERO：Canonical-Heldout / Covariate-Robustness / Grounding / Task-Generalization / Control / Compound；复用 Plus/PRO 设计但隐藏具体 seed、资产、指令、位置和任务组合。
 - 配置标准改为 Public Canonical、Private Canonical-Heldout、Stress 三类；复杂物理仍由 ESAS-RoboTwin 与 ManiSkill 主承载。
+
+
+## [2026-08-10] synthesis | 冻结 π0.5-LIBERO baseline 运行协议
+- 更新 [[Embodied simulation benchmark suite for systems optimization]] 至 v0.4；撤销 v0.3 中的 `ESAS-LIBERO/Control` 数据轴。推理时延与 scheduling 由开发团队自行验证，评估团队只冻结统一闭环协议。
+- 基于当前 OpenPI 官方配置冻结 LIBERO v1 reference：π0.5 30k checkpoint、BF16、flow integration steps=10、predicted horizon=10、每次执行前 5 actions 后重新观测。
+- 补齐图像与状态协议：256 render、旋转 180°、resize-with-pad 到 224、agent+wrist 两路相机、right-wrist 零图并 mask、8D proprioception、LIBERO 原生 7D delta action、checkpoint norm stats。
+- 补齐评测协议：官方复现 seed=7 / 50 episodes；ESAS 使用隐藏 manifest，先 100 episodes，临界项扩到 300–500；成对比较还需固定或可追踪 policy flow noise。
+- 采用单一声明变量原则：量化/算子保持 10/10/5；flow-step reduction 可改变第一项并显式命名；horizon/execute 变化作为独立 scheduling 实验，不进入标准 LIBERO 精度榜。

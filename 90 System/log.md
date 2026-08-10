@@ -977,3 +977,9 @@
 - 修正采样口径：LIBERO-Plus 全量是 10,030 个已展开 fixed perturbed instances，各运行一次；不能给每个实例机械套用 50 episodes。论文从 14,000 候选过滤为 10,030 个 test-only 实例。
 - 明确 LIBERO-PRO 每个 task/profile 运行 50 episodes，并沿用 220/280/300/520 max steps；但官方没有完整披露 π0.5 flow steps、action horizon、chunk execution、policy noise 与初始等待，团队复现统一按 Policy Contract 补齐。
 - 将第 7.3 节改成 Public LIBERO / LIBERO-PRO / LIBERO-Plus / ESAS-LIBERO 四列 benchmark-specific 协议，分别冻结 workload unit、规模、随机性、重复次数、instruction、success predicate 与异常处理。
+
+## [2026-08-10] synthesis | 明确 ESAS-LIBERO Canonical-Heldout 边界
+
+- 在 [[Embodied simulation benchmark suite for systems optimization]] 中补充 Canonical-Heldout 字段表：task/BDDL、instruction、success predicate、simulator/config 保持不变；initial states 使用评估团队隐藏的新同分布样本；environment seed 与 policy noise 隐藏并冻结。
+- 明确 `initial_state_id`、`environment_seed`、`policy_noise_seed` 的层次区别，并要求它们与 manifest hash 一起记录、在 reference/candidate 间逐 episode 配对。
+- 约束 Canonical-Heldout 不混入视觉、语言、任务或物理 hardening；这些变化只能进入 Covariate、Grounding、Task-Generalization、Compound 等 Stress profile。

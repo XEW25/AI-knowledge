@@ -124,7 +124,7 @@ ESAS-LIBERO
 └── Compound
 ```
 
-- `Canonical-Heldout`：保持原始任务和正常分布，隐藏初始状态、环境/模型 seed、指令模板和合法对象位置；承担纯计算路径的主要非劣性验收。
+- `Canonical-Heldout`：保持原始任务和正常分布，只替换评估团队持有的隐藏初始状态，并冻结环境与 policy noise；具体字段见第 6.1 节表格，承担纯计算路径的主要非劣性验收。
 - `Covariate-Robustness`：主要复用 Plus 的 Camera、Robot、Layout、Light、Background、Noise。Level 1–3 或 reference 位于约 30%–80% 的实例用于精度回归；更困难实例进入压力集。
 - `Grounding`：结合 Plus Language 与 PRO Object/Semantic，检查指令—对象—动作绑定、干扰物和目标存在性。
 - `Task-Generalization`：主要复用 PRO Position/Task/Environment；中等难度项可守门，地板项只作能力压力和未来模型突破跟踪。
@@ -374,7 +374,21 @@ ManiSkill 的 Task Card 会明确机器人、随机化、成功/失败条件和�
 
 #### Private Canonical-Heldout
 
-保持任务语义、成功判定和正常难度分布，但由评估团队隐藏并冻结初始状态、合法对象位置、指令模板、资产实例与随机种子。它用于防止开发团队针对公开实例调参，并承担纯量化、算子替换和后端迁移的主要精度非劣性验收；它不是官方 benchmark 分数。
+保持任务语义、成功判定和正常难度分布，但由评估团队隐藏并冻结初始状态、合法对象位置、资产实例与随机种子。它用于防止开发团队针对公开实例调参，并承担纯量化、算子替换和后端迁移的主要精度非劣性验收；它不是官方 benchmark 分数。
+
+`Canonical-Heldout` 的边界必须明确为“同一任务分布下更换隐藏实例”，不能在该 profile 中混入视觉、语言、任务或物理 hardening：
+
+| 字段 | Canonical-Heldout 标准 | 评测团队的控制要求 |
+|---|---|---|
+| `task / BDDL` | **不变** | 使用与 Public Canonical 相同的 task id、BDDL、任务对象关系和目标逻辑 |
+| `instruction` | **不变** | 使用原始任务 instruction；不得改写、同义替换或注入额外提示 |
+| `success predicate` | **不变** | 使用来源 benchmark 的原始成功判定；candidate 不得特判 |
+| `simulator / config` | **不变** | 仿真器、控制器、相机接口、渲染分辨率、时间步、timeout、资产与依赖版本均冻结 |
+| `initial states` | **隐藏的新样本** | 评估团队生成并持有同分布的新初始状态、物体合法位置和关节状态；开发团队只看到 profile 级结果 |
+| `environment seed` | **隐藏并冻结** | 每个 episode 在 manifest 中固定；reference 与 candidate 必须使用相同 seed，不得运行时重新抽样 |
+| `policy noise` | **隐藏并冻结** | 每个 inference/chunk 的 flow 初始噪声或等价 RNG 状态固定并配对；不得让两版本各自自由采样 |
+
+这里的 `initial states` 与 `environment seed` 是两个不同层次：前者是 manifest 中被评测的具体初始状态，后者是生成环境与随机过程的可复现控制量；二者都必须写入隐藏 manifest 的 hash，而不是向开发团队公开具体值。`policy noise` 则属于模型推理随机性，必须和环境随机性分开记录。
 
 #### Stress（内部扩展）
 

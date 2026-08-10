@@ -2,7 +2,7 @@
 
 > **定位**：为具身 Agent 架构、VLA 推理加速、渲染引擎、物理引擎与 3DGS 等系统优化建立统一的**端到端精度回归工作负载**。本页讨论的不是“如何评价一个仿真器是否逼真”，而是：替换或优化某个系统组件后，如何判断具身任务精度有没有退化，并能进一步定位退化来源。
 >
-> 制定于 **2026-08-06**。当前为 **v0.4 讨论稿**，后续需要根据团队算力预算、实际引擎、本体和 Agent 接口冻结具体 manifest。
+> 制定于 **2026-08-06**。当前为 **v0.5 讨论稿**，后续需要根据团队算力预算、实际引擎、本体和 Agent 接口冻结具体 manifest。
 
 ## 1. 核心问题
 
@@ -271,7 +271,43 @@ Sealed Final Holdout
 - 定期轮换 Private Validation 的一部分实例；Final Holdout 保持密封。
 - 冻结并哈希 suite、代码、任务、资产、配置、容器、仿真器和成功判定版本。
 
-### 3.3 `Embodied-Agent`：BEHAVIOR-Core-20 / Full-100
+### 3.3 RoboCasa365：MuJoCo 统一物理栈与精度回归候选
+
+RoboCasa365 适合作为本体系中的 **MuJoCo 主任务集**。它基于 RoboCasa / robosuite / MuJoCo，覆盖 365 个厨房任务与 2,500 个厨房场景；当前公开 leaderboard 使用其中 50 个目标任务，分成 **Atomic-Seen 18、Composite-Seen 16、Composite-Unseen 16**。模型使用 Human300 的 300 个预训练任务训练，并在 `pretrain` 场景/对象 split 上评测这 50 个目标任务（[官方 leaderboard](https://robocasa.ai/leaderboard.html)、[benchmarking 文档](https://robocasa.ai/docs/build/html/benchmarking/benchmarking_overview.html)）。
+
+当前公开 π0.5 结果为：
+
+| 分组 | 任务数 | π0.5 success rate | 在本体系中的用途 |
+|---|---:|---:|---|
+| Atomic-Seen | 18 | 39.6% | 精度回归候选池；有足够成败翻转空间 |
+| Composite-Seen | 16 | 7.1% | 能力压力与长程诊断；存在明显地板效应 |
+| Composite-Unseen | 16 | 1.2% | 零样本组合泛化压力；不作为小幅精度退化门槛 |
+| Overall | 50 | 16.9% | 公开兼容性总览；不能掩盖三组难度差异 |
+
+这组 π0.5 成绩由 **RoboCasa 团队复现**，不是 Physical Intelligence 发布的 RoboCasa 官方 checkpoint。提交使用 RoboCasa 1.0.0、Human300、多任务训练 75,000 steps、batch size 64，以及 OpenPI fork commit `ca4c6d710db75e276bc7c866a57bd7e4aee5b6e8`（[提交记录](https://github.com/robocasa-benchmark/leaderboard/blob/main/submissions_md/pi05_2026-04-02.md)）。RoboCasa 1.0.1 已把全部任务 horizon 统一增加到原来的 1.5 倍，而 leaderboard 只明确说明 GR00T N1.5 已按新 horizon 重跑。因此 **39.6/7.1/1.2 只能作为候选难度证据，不能直接作为 ESAS-RoboCasa v1 验收基线**；冻结门槛前必须在统一的 RoboCasa 1.0.1 协议下重跑 π0.5 reference。
+
+#### RoboCasa 的三层使用方式
+
+```text
+RoboCasa365 Public-50
+  Atomic-Seen 18 / Composite-Seen 16 / Composite-Unseen 16
+
+ESAS-RoboCasa
+  Precision-Core        # 从 Atomic-Seen 18 中校准后选择；当前任务名单待定
+  Physics-Core          # 固定 trace / oracle / π0.5 三种执行方式
+  Scene-Object-Heldout  # target split；场景与对象均和 pretrain split 不重叠
+  Capability-Stress     # Composite-Seen / Composite-Unseen
+```
+
+- **Public-50**：开发团队按公开协议运行全 50 任务，复现公开兼容性结果。
+- **Precision-Core**：评估团队先在全部 18 个 Atomic-Seen 任务上跑 reference 校准，再按逐任务成功率、方差、接触类型和失败模式选择。优先保留成功率约 **20%–80%**、重复运行稳定、对目标优化敏感且任务族不重复的任务；具体名单待本轮实测后补充。
+- **Physics-Core**：优先从 fixture 交互、抓取放置、开合、接触与滑移相关 atomic 任务中产生，但不能只依赖闭环 π0.5；同一任务同时运行固定 action trace、scripted/oracle controller 与 π0.5 闭环。
+- **Scene-Object-Heldout**：官方 `target` split 使用 10 个不相交厨房和不相交对象，适合检查场景/对象 OOD；如果 reference 出现地板效应，则仅作为鲁棒性压力层。
+- **Capability-Stress**：Composite-Seen / Unseen 单独报告，不与 Precision-Core 合成一个验收总分。
+
+RoboCasa 让物理评测统一到 MuJoCo 家族，但“同一引擎名”不等于“同一物理栈”。必须同时冻结 RoboCasa、robosuite、MuJoCo、机器人与资产版本，以及 integrator、timestep/substeps、solver、contact、friction、controller 和 action conversion。RoboTwin 仍保留为 SAPIEN、双臂和跨引擎外部验证，避免只对 MuJoCo 生态过拟合。
+
+### 3.4 `Embodied-Agent`：BEHAVIOR-Core-20 / Full-100
 
 用于 Agent 系统设计、长程任务、导航、记忆、任务分解和失败恢复：
 
@@ -293,15 +329,15 @@ BEHAVIOR 2026 官方赛道使用 RGB + depth + proprioception，测试时禁止 
 
 | 优化方向 | 必跑 | 专项追加 | 主要精度观察量 |
 |---|---|---|---|
-| π0.5 量化 / 推理加速 | 原始 LIBERO 40 + RoboTwin 2.0 全 50 × clean/randomized | ESAS-LIBERO Canonical-Heldout + ESAS-RoboTwin Canonical/Control | paired success delta、成败翻转、长程退化、轨迹漂移、timeout |
+| π0.5 量化 / 推理加速 | 原始 LIBERO 40 + RoboTwin 2.0 全 50 × clean/randomized + RoboCasa365 Public-50 | ESAS-LIBERO Canonical-Heldout + ESAS-RoboTwin Canonical/Control + ESAS-RoboCasa Precision-Core | paired success delta、成败翻转、长程退化、轨迹漂移、timeout |
 | Agent 架构 | LIBERO-10 + LIBERO-PRO | ESAS-LIBERO Grounding/Task-Generalization + BEHAVIOR-Core-20 / Full-100 | predicate progress、端到端成功、恢复次数、规划开销 |
 | 渲染引擎 | LIBERO-Plus + RoboTwin 2.0 全 50 × clean/randomized | ESAS-LIBERO Covariate + ESAS-RoboTwin Visual | 成功率、感知导致的动作分歧、视觉压力曲线 |
 | 3DGS | LIBERO-Plus + RoboTwin 2.0 全 50 × clean/randomized | ESAS-LIBERO Covariate 与 ESAS-RoboTwin Visual 中的固定场景 paired renderer | 任务精度 + 图像/特征差异；不能只报 PSNR |
-| 物理引擎 | RoboTwin 2.0 全量 sanity / regression | ESAS-RoboTwin Physics + ManiSkill 物理探针 | 接触事件、状态轨迹误差、任务成功、数值稳定性 |
+| 物理引擎 | RoboCasa365 Atomic-Seen + RoboTwin 2.0 全量 sanity / regression | ESAS-RoboCasa Physics-Core + ManiSkill 物理探针；ESAS-RoboTwin Physics 作跨引擎验证 | 接触事件、状态轨迹误差、任务成功、数值稳定性 |
 
 ## 5. 物理引擎专项不能只用闭环 π0.5
 
-物理引擎优化至少需要三种执行方式：
+物理引擎优化至少需要三种执行方式，优先在 RoboCasa 的同一批 Atomic 任务上形成一一对应的结果：
 
 1. **固定 action trace 重放**：隔离物理引擎变化，比较状态轨迹、接触、穿透和约束误差。
 2. **scripted / oracle controller**：测试任务是否仍可稳定完成，排除视觉和 VLA 推理干扰。
@@ -348,6 +384,9 @@ ManiSkill 的 Task Card 会明确机器人、随机化、成功/失败条件和�
 - `ESAS-RoboTwin/Physics`
 - `ESAS-RoboTwin/Control`
 - `ESAS-RoboTwin/Compound`
+- `ESAS-RoboCasa/Scene-Object-Heldout`
+- `ESAS-RoboCasa/Physics-Core`
+- `ESAS-RoboCasa/Capability-Stress`
 
 公开开发回归的 RoboTwin Canonical 应区分 `official_clean` 与 `official_randomized`；ESAS 的 Canonical 则使用保持正常任务分布的隐藏实例。原始 LIBERO、LIBERO-Plus zero-shot、LIBERO-Plus finetuned、LIBERO-PRO 与 ESAS-LIBERO 也必须分开报告。公开结果与 ESAS、Canonical 与 Stress 不得混成一个不透明总分。
 
@@ -369,7 +408,7 @@ Reference 与优化版本必须使用完全相同的：
 
 π0.5 的 flow-matching 推理从随机噪声开始，因此只固定环境 seed 不够。需要同时固定环境随机性与模型噪声，并做逐 episode 配对比较。
 
-ESAS 的核心判断不是 candidate 是否超过一个孤立的绝对成功率，而是：在同一隐藏 episode 上，candidate 相对于未优化 reference 是否发生超过允许范围的退化。ESAS-LIBERO 的 Canonical-Heldout、Covariate、Grounding、Task-Generalization，以及 ESAS-RoboTwin 的 Canonical、Visual、Physics、Control，分别使用各自相同的隐藏 manifest；渲染引擎替换还要区分“同一新场景下比较两个模型后端”和“同一状态经 reference/candidate renderer 输出”的两种配对实验。
+ESAS 的核心判断不是 candidate 是否超过一个孤立的绝对成功率，而是：在同一隐藏 episode 上，candidate 相对于未优化 reference 是否发生超过允许范围的退化。ESAS-LIBERO 的 Canonical-Heldout、Covariate、Grounding、Task-Generalization，ESAS-RoboTwin 的 Canonical、Visual、Physics、Control，以及 ESAS-RoboCasa 的 Precision/Physics，分别使用各自相同的隐藏 manifest；渲染引擎替换还要区分“同一新场景下比较两个模型后端”和“同一状态经 reference/candidate renderer 输出”的两种配对实验。
 
 ### 6.3 结果聚合
 
@@ -495,20 +534,106 @@ simulator/dependency versions
 
 若直接拿官方 JAX 与本地 PyTorch + 自定义 kernel 比，差异会同时包含框架、预处理、checkpoint 转换和系统优化，难以归因。
 
-## 8. 不同频率的运行规模
+## 8. π0.5-RoboCasa 标准 baseline 与运行协议
+
+RoboCasa 与 LIBERO 虽然都通过 OpenPI 部署 π0.5，但模型 horizon、有效 action 维度、相机和 proprioception 均不同，不能复用 LIBERO 的 10/5 配置。ESAS-RoboCasa v1 应先以公开 checkpoint 和其提交 commit 为复现起点，再统一迁移到 RoboCasa 1.0.1 重建 reference。
+
+### 8.1 模型与 checkpoint 标准
+
+| 配置项 | ESAS-RoboCasa v1 Reference |
+|---|---|
+| model | π0.5 flow-matching head |
+| checkpoint | [RoboCasa π0.5 Human300 @ 75k](https://huggingface.co/robocasa/robocasa365_checkpoints/tree/main/pi05_pretrain_human300/multitask_learning/75000) |
+| checkpoint 来源 | RoboCasa 团队复现；Human300，多任务训练 75k steps，batch size 64 |
+| OpenPI | RoboCasa fork commit `ca4c6d710db75e276bc7c866a57bd7e4aee5b6e8` |
+| reference 计算精度 | BF16 |
+| VLM / action expert | PaliGemma `gemma_2b` / `gemma_300m` |
+| `pi05` / discrete state | `True` / `True` |
+| max token length | 200 |
+| flow-matching integration steps | **10** |
+| predicted action horizon | **50 actions** |
+| executed actions per chunk | **5 actions** |
+| internal / effective action dimension | 32 / RoboCasa 输出前 12 维 |
+| normalization | checkpoint 自带 norm stats；记录并校验 hash |
+
+`pi05_pretrain_human300` 没有覆写 `action_horizon`，因此继承 `Pi0Config` 的默认值 **50**；`sample_actions` 默认执行 **10** 个 flow integration steps。官方 RoboCasa runner 的 `replan_steps=5`，所以标准闭环是：
+
+```text
+observe → predict 50 actions → execute actions[0:5]
+        → discard actions[5:50] → observe again
+```
+
+所有结果都必须分别记录 `flow_steps / predicted_action_horizon / executed_actions_per_chunk`，RoboCasa v1 reference 固定为 **10/50/5**。量化、算子替换、编译器和后端迁移不得顺手改变后两项；flow-step reduction 作为被测变量时，仍与 10-step BF16 reference 配对。
+
+### 8.2 观测、action 与闭环标准
+
+| 配置项 | ESAS-RoboCasa v1 Reference |
+|---|---|
+| 模型图像输入 | 三路图像均 resize-with-pad 到 224 × 224，转 `uint8` |
+| 左外部相机 | `video.robot0_agentview_left` → `observation/image` |
+| 腕部相机 | `video.robot0_eye_in_hand` → `observation/wrist_image` |
+| 右外部相机 | `video.robot0_agentview_right` → `observation/right_image`；π0.5 下不可省略 |
+| proprioception | EEF relative position + relative rotation + base position + base rotation + gripper qpos，共 16 维，再 pad 到 32 |
+| instruction | `annotation.human.task_description` 原文 |
+| action | 模型输出前 12 维，随后使用官方 `convert_action()` 再送入环境 |
+| action smoothing / ensemble | 关闭 |
+| policy–environment 交互 | 同步；拿到新 chunk 后执行 5 步再请求下一次推理 |
+| success | `info["success"]` |
+
+相机顺序、图像方向、resize/padding、状态拼接次序、action 维度与 `convert_action()` 都属于 checkpoint 接口的一部分。渲染降质实验只能改变声明的 renderer/传感器变量，不能同时静默改变这些适配逻辑。
+
+### 8.3 评测采样与版本标准
+
+| 配置项 | Public RoboCasa365-50 | ESAS-RoboCasa |
+|---|---:|---:|
+| RoboCasa | 先复现提交的 1.0.0；正式 reference 统一冻结到 1.0.1 | 与正式 reference 完全相同 |
+| evaluation split | `pretrain` | Precision/Physics 使用隐藏的同分布 manifest；OOD 单独使用 `target` |
+| environment seed | 官方 runner 默认 7 | 由隐藏 episode manifest 指定 |
+| policy noise | 固定并记录 policy server RNG | 按 episode/inference index 确定性派生 |
+| episodes / task | 官方协议 50 | 先 100；临界任务顺序扩到 300，再到 500 |
+| max action steps | `get_task_horizon(task)`；1.0.1 使用统一增加 1.5× 后的任务 horizon | 与 reference 版本逐任务一致 |
+| task success | binary `info["success"]` | 同一 success predicate；另报连续诊断量 |
+| 异常处理 | 记录并按预定义规则计入，不得静默重跑 | 同左，另报 simulator error |
+
+迁移到 RoboCasa 1.0.1 时，必须先完整重跑 reference 并重新校准各任务成功率与方差，不能把 1.0.0 的公开分数当成验收常数。公开 `pretrain` 和 OOD `target` split 必须分开报告：后者同时更换厨房与对象，测的是场景/对象泛化，不是纯物理精度。
+
+代码依据：
+
+- π0.5 提交给出 checkpoint、训练步数、batch size、RoboCasa 版本和 OpenPI commit（[submission](https://github.com/robocasa-benchmark/leaderboard/blob/main/submissions_md/pi05_2026-04-02.md)）。
+- `pi05_pretrain_human300` 使用 `Pi0Config(pi05=True, max_token_len=200)`；`Pi0Config` 默认 BF16、32D action、50-step horizon、`gemma_2b` + `gemma_300m`（[训练配置](https://github.com/robocasa-benchmark/openpi/blob/ca4c6d710db75e276bc7c866a57bd7e4aee5b6e8/src/openpi/training/config.py)、[模型配置](https://github.com/robocasa-benchmark/openpi/blob/ca4c6d710db75e276bc7c866a57bd7e4aee5b6e8/src/openpi/models/pi0_config.py)）。
+- runner 固定 224 输入、`replan_steps=5`、`split=pretrain`、50 trials、seed 7，并使用三路相机、16D state、任务原始指令、`convert_action()` 与 `info["success"]`（[评测脚本](https://github.com/robocasa-benchmark/openpi/blob/ca4c6d710db75e276bc7c866a57bd7e4aee5b6e8/examples/robocasa/main.py)）。
+- policy adapter 在 π0.5 下要求三路相机，将 state/action pad 到 32，输出截取前 12 维（[policy adapter](https://github.com/robocasa-benchmark/openpi/blob/ca4c6d710db75e276bc7c866a57bd7e4aee5b6e8/src/openpi/policies/robocasa_policy.py)）。
+
+### 8.4 结果配置指纹
+
+每个 RoboCasa 结果至少附带：
+
+```text
+checkpoint hash + norm_stats hash
+openpi / RoboCasa / robosuite / MuJoCo commits or versions
+robot / assets / controller / action-conversion version
+integrator / timestep / substeps / solver / contact / friction
+dtype / quantization / backend / flow_steps
+predicted_horizon / executed_actions_per_chunk
+cameras / preprocessing / observation-state schema
+task set / split / episode-manifest hash / environment and policy seeds
+task-horizon table hash / success-predicate version
+```
+
+## 9. 不同频率的运行规模
 
 | 级别 | 建议规模 | 目的 |
 |---|---|---|
 | PR smoke | LIBERO 每套件 2 个任务 × 10 rollouts | 排除崩溃与严重精度问题 |
-| 开发日常回归 | 原始 LIBERO 40 + RoboTwin 全 50 × clean/randomized × 10–100 | 开发团队发现明显退化与任务级问题 |
+| 开发日常回归 | 原始 LIBERO 40 + RoboTwin 全 50 × clean/randomized × 10–100；RoboCasa365 Public-50 × 50 | 开发团队发现明显退化与任务级问题 |
 | 开发专项回归 | LIBERO-Plus / PRO 对应公开维度 | 公开鲁棒性、grounding 与泛化诊断 |
-| 评估预检 | ESAS-LIBERO / ESAS-RoboTwin 各 profile × 100 个配对 episodes / task | 评估团队筛出明确通过、失败与临界项 |
+| 评估预检 | ESAS-LIBERO / ESAS-RoboTwin 各 profile + ESAS-RoboCasa Precision/Physics × 100 个配对 episodes / task | 评估团队筛出明确通过、失败与临界项 |
 | 临界项扩样 | 可疑 task/profile 扩展到 300，再到 500 | 降低波动干扰，支持小差异判断 |
 | 正式发布 | 公开全量回归 + ESAS Private Validation + Sealed Final Holdout；必要时 BEHAVIOR Full-100 | 最终非劣性验收与跨层验证 |
 
 若 50 个任务、4 个主要 profile、每任务固定 500 次，则单模型需要 100,000 episodes；reference 与 candidate 成对运行约 200,000 次。因此优先采用顺序扩样：先跑 100，明确通过或失败即停止，只把临界项扩到 300–500。具体数字仍应根据算力预算、最小关注退化幅度和成败翻转率做功效分析。仿真 rollout 便宜不等于可以忽略统计设计。
 
-## 9. 尚未冻结的关键问题
+## 10. 尚未冻结的关键问题
 
 1. 团队实际使用哪些仿真器和引擎：MuJoCo / SAPIEN / Isaac / OmniGibson / 自研？
 2. π0.5 在 RoboTwin 与 BEHAVIOR 上使用官方、社区还是团队自训 checkpoint？训练 recipe 如何固定？
@@ -519,8 +644,9 @@ simulator/dependency versions
 7. 相对 reference 的非劣性界限如何按 Macro、profile、任务族和关键任务分层校准？
 8. 渲染与物理优化的固定 trace 数据格式、状态对齐方式与容差如何定义？
 9. 是否需要将吞吐、实时因子、显存、能耗与精度做成统一 Pareto 报告？
+10. RoboCasa 18 个 Atomic-Seen 任务在 1.0.1 + π0.5 reference 下的逐任务成功率、重复方差和失败模式是什么？据此哪些任务进入 Precision-Core / Physics-Core？
 
-## 10. 当前建议摘要
+## 11. 当前建议摘要
 
 ```text
 Embodied-Core
@@ -533,6 +659,9 @@ LIBERO Public Robustness / Generalization
 RoboTwin Public Dev
   50 tasks × official_clean / official_randomized
 
+RoboCasa365 Public-50
+  Atomic-Seen 18 / Composite-Seen 16 / Composite-Unseen 16
+
 ESAS (Embodied System Acceptance Suite)
   ESAS-LIBERO
     Canonical-Heldout / Covariate-Robustness / Grounding
@@ -541,6 +670,9 @@ ESAS (Embodied System Acceptance Suite)
   ESAS-RoboTwin
     Canonical / Visual / Physics / Control / Compound
     Private Validation / Sealed Final Holdout
+  ESAS-RoboCasa
+    Precision-Core (task list TBD after calibration) / Physics-Core
+    Scene-Object-Heldout / Capability-Stress
 
 Embodied-Agent
   BEHAVIOR-Core-20
@@ -553,6 +685,8 @@ Embodied-Agent
 - ESAS-LIBERO：复用 Plus/PRO 设计但隐藏具体实例，承担 LIBERO 体系的最终私有验收。
 - RoboTwin 官方全量：由开发团队承担公开、可复现的日常回归与任务级定位。
 - ESAS-RoboTwin：由评估团队维护隐藏、配对、分轴、版本冻结的最终系统验收集；原 System-10 只保留为能力压力或快速诊断候选。
+- RoboCasa365 Public-50：统一到 MuJoCo 任务栈的公开兼容性回归；π0.5 的 Atomic-Seen 具备精度候选价值，Composite 两组当前主要作为能力压力。
+- ESAS-RoboCasa：承担 MuJoCo 物理优化的 Precision/Physics 验收；具体 Atomic-Seen 任务待 1.0.1 reference 实测后冻结，当前不预选名单。
 - BEHAVIOR：承担 Agent、长程、导航、记忆与部分完成评估。
 - ManiSkill：作为物理引擎的组件级任务探针，不强求全部由 π0.5 驱动。
 - 不同 benchmark 必须使用各自适配或微调的 π0.5 checkpoint；不能用 `pi05_libero` 零样本运行其他本体后，把低分归因于系统优化。

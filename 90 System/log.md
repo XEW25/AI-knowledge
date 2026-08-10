@@ -961,3 +961,11 @@
 - 补齐图像与状态协议：256 render、旋转 180°、resize-with-pad 到 224、agent+wrist 两路相机、right-wrist 零图并 mask、8D proprioception、LIBERO 原生 7D delta action、checkpoint norm stats。
 - 补齐评测协议：官方复现 seed=7 / 50 episodes；ESAS 使用隐藏 manifest，先 100 episodes，临界项扩到 300–500；成对比较还需固定或可追踪 policy flow noise。
 - 采用单一声明变量原则：量化/算子保持 10/10/5；flow-step reduction 可改变第一项并显式命名；horizon/execute 变化作为独立 scheduling 实验，不进入标准 LIBERO 精度榜。
+
+## [2026-08-10] synthesis | 纳入 RoboCasa365 与 π0.5-RoboCasa 运行协议
+
+- 更新 [[Embodied simulation benchmark suite for systems optimization]] 至 v0.5，将 RoboCasa365 定位为 MuJoCo 主任务集：Public-50 用于公开兼容性回归，ESAS-RoboCasa 承担 Precision-Core、Physics-Core、Scene-Object-Heldout 与 Capability-Stress。
+- 记录当前 50-task leaderboard 的 Atomic-Seen 18 / Composite-Seen 16 / Composite-Unseen 16，以及 RoboCasa 团队复现 π0.5 的 39.6% / 7.1% / 1.2%；明确该提交基于 RoboCasa 1.0.0，正式门槛必须在 1.0.1 的 1.5× horizon 协议下重建 reference。
+- 冻结 π0.5-RoboCasa 候选 baseline：RoboCasa OpenPI fork commit `ca4c6d710db75e276bc7c866a57bd7e4aee5b6e8`、Human300 75k checkpoint、BF16、flow steps 10、predicted horizon 50、每 chunk 执行 5 actions、三路 224 图像、16D state、12D 有效 action 与官方 `convert_action()`。
+- 冻结公开采样起点：`pretrain` split、seed 7、每任务 50 episodes、逐任务 `get_task_horizon()` 和 `info["success"]`；ESAS 先跑 100 个配对 episodes，临界任务扩到 300–500，并固定环境与 policy flow noise。
+- Atomic-Seen 具体任务名单暂不预选；待用户完成 RoboCasa 1.0.1 reference 实测后，按逐任务成功率、重复方差、接触覆盖与失败模式冻结 Precision-Core / Physics-Core。

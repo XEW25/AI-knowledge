@@ -2,7 +2,7 @@
 
 > **定位**：为具身 Agent 架构、VLA 推理加速、渲染引擎、物理引擎与 3DGS 等系统优化建立统一的**端到端精度回归工作负载**。本页讨论的不是“如何评价一个仿真器是否逼真”，而是：替换或优化某个系统组件后，如何判断具身任务精度有没有退化，并能进一步定位退化来源。
 >
-> 制定于 **2026-08-06**。当前为 **v0.5 讨论稿**，后续需要根据团队算力预算、实际引擎、本体和 Agent 接口冻结具体 manifest。
+> 制定于 **2026-08-06**。当前为 **v0.6 讨论稿**，后续需要根据团队算力预算、实际引擎、本体和 Agent 接口冻结具体 manifest。
 
 ## 1. 核心问题
 
@@ -82,12 +82,14 @@ LIBERO-Plus 在原任务结构基本不变的前提下，构造 **10,030** 个�
 | Background | 场景和表面纹理 | 外观 shortcut |
 | Sensor Noise | 模糊、抖动、光度退化 | 视觉编码器、压缩和传感器链路 |
 
-它最适合渲染/3DGS、图像压缩、视觉编码器量化、相机变化和观测质量测试。官方协议把大量扰动实例本身作为样本，代码库建议每实例运行一次，而不是对每个实例重复 50 次。正式比较仍应让 reference 与 candidate 运行完全相同的实例。
+它最适合渲染/3DGS、图像压缩、视觉编码器量化、相机变化和观测质量测试。论文先从 40 个原始任务、四个 suite 和七个维度生成 14,000 个候选实例，再过滤为 10,030 个 test-only 实例；这些实例已经把具体扰动展开成独立任务。因此全量 published protocol 的工作负载单位是 **一个固定 perturbed instance**，不是“一个原始 task 再抽 50 个 episodes”（[论文 Appendix C](https://arxiv.org/html/2510.13626)）。正式比较应让 reference 与 candidate 各运行同一批 10,030 个实例一次；需要扩样时应增加独立扰动实例，而不是把同一实例机械重复 50 次。
 
 当前官方公开榜包含 π0、π0-Fast、OpenVLA 系列等结果，但不能把其他论文经额外 SFT 得到的 π0.5 数字称作 Physical Intelligence 官方 π0.5-LIBERO-Plus 基线。必须区分：
 
 - **Zero-shot robustness**：只用原始 LIBERO 训练，直接在 Plus 上测试。
 - **Plus-finetuned robustness**：训练中已见 Plus 数据；它回答的是增强训练后的性能，不再是对原始模型的 OOD 验收。
+
+LIBERO-Plus 论文没有报告 π0.5，也没有替 π0.5 冻结 flow steps、action horizon 或每 chunk 执行步数。团队运行 π0.5-Plus 时，必须把本页第 7.1–7.2 节作为内部统一 Policy Contract；这是一项 **ESAS 规定**，不能反称为 Plus 官方模型配置。
 
 #### LIBERO-PRO：grounding、任务泛化与反记忆
 
@@ -108,6 +110,8 @@ LIBERO-PRO 作者当前报告 π0.5 总体约 **0.53**；Object 与 Semantic 多
 - Object、Semantic 和经过校准的 Environment/Position 可用于 regression 或 grounding 验收。
 - 接近地板的 Task 与困难 Position 只能作为 `Capability-Stress`，不适合判断 1–3pp 的量化或算子回退。
 - 对 Agent、重规划、失败恢复和 memory/harness 系统，PRO 比单纯视觉扰动更有价值。
+
+LIBERO-PRO 明确规定每个 task 运行 **50 episodes**，并沿用 Spatial 220 / Object 280 / Goal 300 / LIBERO-10 520 的 horizon；但论文和仓库没有完整披露其 π0.5 的 flow steps、predicted horizon、executed actions、policy noise seed 与初始等待。因此其公开 π0.5 分数不能直接宣称与本页第 7.2 节的 10/10/5 协议完全同构。团队复现时仍统一采用第 7.1–7.2 节，并把差异写入结果元数据（[论文 §5.1](https://arxiv.org/html/2510.03827)、[官方配置与代码](https://github.com/Zxy-MLlab/LIBERO-PRO)）。
 
 #### `ESAS-LIBERO` 建议结构
 
@@ -430,9 +434,9 @@ ESAS 的核心判断不是 candidate 是否超过一个孤立的绝对成功率�
 
 连续诊断指标与成功率的关系沿用 [[Real-robot evaluation]]：连续量主要用于筛选和归因，不能自动替代任务验收。
 
-## 7. π0.5-LIBERO 标准 baseline 与运行协议
+## 7. π0.5-LIBERO Policy Contract 与 benchmark-specific 运行协议
 
-评估团队不另设 Control 扰动集，而是冻结一套所有提交都必须遵守的运行协议。配置分为三类：**模型固有配置、闭环执行配置、评测采样配置**。除非某字段正是被评估的优化变量，否则 reference 与 candidate 不得改变。
+评估团队不另设 Control 扰动集，而是冻结一套所有提交都必须遵守的运行协议。配置分为三类：**模型固有配置、闭环执行配置、benchmark-specific 评测采样配置**。第 7.1–7.2 节是团队运行 π0.5 在原始 LIBERO、LIBERO-Plus、LIBERO-PRO 与 ESAS-LIBERO 上共同遵守的 **Policy Contract**；它不表示 Plus/PRO 论文已经披露或采用了全部这些参数。除非某字段正是被评估的优化变量或 benchmark 定义的扰动变量，否则 reference 与 candidate 不得改变。
 
 ### 7.1 模型与 checkpoint 标准
 
@@ -465,7 +469,7 @@ ESAS 的核心判断不是 candidate 是否超过一个孤立的绝对成功率�
 | 有效相机 | `agentview_image` + `robot0_eye_in_hand_image` |
 | 第三相机槽位 | right-wrist 使用零图并 mask，不得替换成其他视角 |
 | proprioception | EEF position + quaternion→axis-angle + gripper qpos，共 8 维后按模型规则 padding |
-| instruction | 原任务 `task.language` 原文；Canonical 不做改写 |
+| instruction | 使用 episode manifest 提供的原文；Canonical 为原任务 `task.language`，Plus Language / PRO Semantic/Task 使用其官方改写，不得额外二次改写 |
 | 每次模型预测 | 10 actions |
 | 每次实际执行 | **前 5 actions** |
 | replanning | 执行 5 步后丢弃剩余 5 步，重新观测并推理 |
@@ -480,21 +484,28 @@ observe → predict 10 actions → execute actions[0:5]
         → discard actions[5:10] → observe again
 ```
 
-所有团队必须报告 `predicted_action_horizon` 与 `executed_actions_per_chunk`，不能只写一个含糊的 “chunk size”。对 LIBERO v1 标准分数，二者固定为 **10/5**。
+所有团队必须报告 `predicted_action_horizon` 与 `executed_actions_per_chunk`，不能只写一个含糊的 “chunk size”。对团队的 π0.5-LIBERO Policy Contract，二者固定为 **10/5**。
 
-### 7.3 评测采样标准
+Plus/PRO 的扰动可以改变观测内容，却不改变模型接口：Plus Camera 改变相机位姿/FOV但保留相机槽位，Robot Initial State 改变初始机器人状态但保留 8D schema，Light/Background/Noise 改变像素内容但保留图像预处理；PRO 的 Object/Position/Environment 改变环境内容，Semantic/Task 改变 manifest instruction，Task 还可能改变 success predicate。除此之外，图像尺寸与方向、state/action schema、normalization、flow steps 和 10/5 闭环均保持不变。
 
-| 配置项 | Public LIBERO | ESAS-LIBERO |
-|---|---:|---:|
-| environment seed | 官方复现固定 7 | 由隐藏 episode manifest 指定 |
-| policy noise seed | 固定并记录 | 按 episode/inference index 确定性派生 |
-| 初始稳定等待 | 10 simulator steps | 10 simulator steps |
-| episodes / task | 官方复现 50 | 先 100，临界项扩到 300–500 |
-| max action steps | Spatial 220 / Object 280 / Goal 300 / LIBERO-10 520 | 与来源任务 suite 相同 |
-| success | 官方 environment `done` / success predicate | 保持同一 predicate |
-| 异常处理 | 异常 episode 记录并按预定义规则计入，不得静默重跑 | 同左，并单独报告 simulator error |
+### 7.3 Benchmark-specific 评测采样标准
 
-OpenPI 官方 runner 只显式固定 NumPy/环境 seed；ESAS 的成对比较还应控制 flow 初始噪声。若当前后端不能从接口注入每次推理的 noise tensor，至少必须固定 policy server RNG，并记录 server restart 与 seed；不能让 reference 和 candidate 使用不可追踪的独立随机流。
+| 配置项 | Public LIBERO | LIBERO-PRO | LIBERO-Plus | ESAS-LIBERO |
+|---|---|---|---|---|
+| workload unit | 原始 task 的一个 rollout | 原始 task × PRO profile 的一个 rollout | 已展开的一个 fixed perturbed instance | 隐藏 manifest 中的一个 paired episode |
+| 标准规模 | 40 tasks | 40 base tasks；每个启用 profile 分开报告 | 全量 10,030 test-only instances | 按 ESAS profile 与冻结任务集 |
+| environment seed | OpenPI 复现固定 7 | 官方未完整冻结；团队复现写入 manifest | 每个固定实例自带配置；额外随机量写入 manifest | 由隐藏 episode manifest 指定 |
+| policy noise seed | 固定并记录 | 团队统一确定性派生 | 团队统一确定性派生 | 按 episode/inference index 确定性派生 |
+| 初始稳定等待 | 10 simulator steps | 官方未完整披露；团队统一固定 10 | 团队统一固定 10，除非实例定义另有要求 | 10 simulator steps |
+| rollouts / workload unit | 50 / task | **50 / task / profile** | **1 / fixed perturbed instance** | 先 100 / task/profile，临界项扩到 300–500 |
+| max action steps | Spatial 220 / Object 280 / Goal 300 / LIBERO-10 520 | 同左 | 按来源 suite：220 / 280 / 300 / 520 | 与来源 suite 相同 |
+| instruction | 原始 `task.language` | Semantic/Task 使用 PRO manifest，其余保持来源任务语义 | Language 实例使用 Plus instruction，其余按实例 manifest | 使用隐藏 manifest |
+| success | 原始 environment `done` / predicate | 保持 PRO 对应 predicate；Task profile 允许官方定义的目标变化 | 使用该 fixed instance 的 predicate | 与来源 profile 相同，不得 candidate 特判 |
+| 异常处理 | 记录并按预定义规则计入，不得静默重跑 | 同左 | 同左；不得以“实例生成失败”为由事后筛除 | 同左，并单独报告 simulator error |
+
+因此不能把“50 episodes/task”作为所有 LIBERO 派生 benchmark 的共同规则。PRO 的50次用于对每个 task/profile 的随机初态分布估计成功率；Plus 的10,030个条目本身已经是经过生成、筛选和难度分层的不同实例，全量一次运行即产生10,030个二元结果。若在 Plus 上额外重复，同一实例的重复结果必须单列为 `repeatability`，不能伪装成新的测试实例或与 published full-set score 混合。
+
+OpenPI 官方 runner 只显式固定 NumPy/环境 seed；ESAS、PRO 和 Plus 的 reference–candidate 成对比较还应控制 flow 初始噪声。若当前后端不能从接口注入每次推理的 noise tensor，至少必须固定 policy server RNG，并记录 server restart 与 seed；不能让 reference 和 candidate 使用不可追踪的独立随机流。
 
 代码依据：
 
@@ -626,7 +637,7 @@ task-horizon table hash / success-predicate version
 |---|---|---|
 | PR smoke | LIBERO 每套件 2 个任务 × 10 rollouts | 排除崩溃与严重精度问题 |
 | 开发日常回归 | 原始 LIBERO 40 + RoboTwin 全 50 × clean/randomized × 10–100；RoboCasa365 Public-50 × 50 | 开发团队发现明显退化与任务级问题 |
-| 开发专项回归 | LIBERO-Plus / PRO 对应公开维度 | 公开鲁棒性、grounding 与泛化诊断 |
+| 开发专项回归 | LIBERO-Plus 全量 10,030 fixed instances × 1；LIBERO-PRO 各启用 profile × 40 tasks × 50 episodes | 公开鲁棒性、grounding 与泛化诊断；两者不得套用同一重复次数 |
 | 评估预检 | ESAS-LIBERO / ESAS-RoboTwin 各 profile + ESAS-RoboCasa Precision/Physics × 100 个配对 episodes / task | 评估团队筛出明确通过、失败与临界项 |
 | 临界项扩样 | 可疑 task/profile 扩展到 300，再到 500 | 降低波动干扰，支持小差异判断 |
 | 正式发布 | 公开全量回归 + ESAS Private Validation + Sealed Final Holdout；必要时 BEHAVIOR Full-100 | 最终非劣性验收与跨层验证 |

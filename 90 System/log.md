@@ -969,3 +969,11 @@
 - 冻结 π0.5-RoboCasa 候选 baseline：RoboCasa OpenPI fork commit `ca4c6d710db75e276bc7c866a57bd7e4aee5b6e8`、Human300 75k checkpoint、BF16、flow steps 10、predicted horizon 50、每 chunk 执行 5 actions、三路 224 图像、16D state、12D 有效 action 与官方 `convert_action()`。
 - 冻结公开采样起点：`pretrain` split、seed 7、每任务 50 episodes、逐任务 `get_task_horizon()` 和 `info["success"]`；ESAS 先跑 100 个配对 episodes，临界任务扩到 300–500，并固定环境与 policy flow noise。
 - Atomic-Seen 具体任务名单暂不预选；待用户完成 RoboCasa 1.0.1 reference 实测后，按逐任务成功率、重复方差、接触覆盖与失败模式冻结 Precision-Core / Physics-Core。
+
+## [2026-08-10] synthesis | 区分 LIBERO、LIBERO-PRO 与 LIBERO-Plus 运行协议
+
+- 更新 [[Embodied simulation benchmark suite for systems optimization]] 至 v0.6，将第 7.1–7.2 节明确定位为团队统一的 π0.5 Policy Contract，而不是 Plus/PRO 论文已披露的官方模型配置。
+- 明确 LIBERO-Plus 论文没有报告 π0.5；团队运行时自行冻结 BF16、flow/horizon/execute=10/10/5，并仅允许 benchmark manifest 指定的 Camera、Robot、Language、Light、Background、Noise、Layout 变量变化。
+- 修正采样口径：LIBERO-Plus 全量是 10,030 个已展开 fixed perturbed instances，各运行一次；不能给每个实例机械套用 50 episodes。论文从 14,000 候选过滤为 10,030 个 test-only 实例。
+- 明确 LIBERO-PRO 每个 task/profile 运行 50 episodes，并沿用 220/280/300/520 max steps；但官方没有完整披露 π0.5 flow steps、action horizon、chunk execution、policy noise 与初始等待，团队复现统一按 Policy Contract 补齐。
+- 将第 7.3 节改成 Public LIBERO / LIBERO-PRO / LIBERO-Plus / ESAS-LIBERO 四列 benchmark-specific 协议，分别冻结 workload unit、规模、随机性、重复次数、instruction、success predicate 与异常处理。

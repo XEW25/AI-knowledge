@@ -2,7 +2,7 @@
 
 > **定位**：为具身 Agent 架构、VLA 推理加速、渲染引擎、物理引擎与 3DGS 等系统优化建立统一的**端到端精度回归工作负载**。本页讨论的不是“如何评价一个仿真器是否逼真”，而是：替换或优化某个系统组件后，如何判断具身任务精度有没有退化，并能进一步定位退化来源。
 >
-> 制定于 **2026-08-06**。当前为 **v0.2 讨论稿**，后续需要根据团队算力预算、实际引擎、本体和 Agent 接口冻结具体 manifest。
+> 制定于 **2026-08-06**。当前为 **v0.3 讨论稿**，后续需要根据团队算力预算、实际引擎、本体和 Agent 接口冻结具体 manifest。
 
 ## 1. 核心问题
 
@@ -37,7 +37,7 @@
 
 而不是给所有系统优化只配一张总榜。
 
-## 3. 建议的三套固定工作负载
+## 3. 建议的分层固定工作负载
 
 ### 3.1 `Embodied-Core`：LIBERO 四套件
 
@@ -57,6 +57,78 @@
 - 优点：公开、可运行、π0.5 原生支持，适合持续回归和对外可比。
 - 缺点：整体接近饱和；接触、复杂动力学、双臂和真正 Agent 级长程能力不足。
 - 结论：可以证明“优化没有破坏 π0.5-LIBERO 能力”，不能单独证明物理引擎、双臂或 Agent 系统没有退化。
+
+#### LIBERO 的三层使用方式
+
+原始 LIBERO 同样不应独自承担开发回归、鲁棒性诊断与最终质量验收。建议拆成：
+
+1. **Public Compatibility**：原始 LIBERO 40，复现官方 π0.5 配置和公开结果。
+2. **Public Robustness / Generalization**：开发团队运行公开的 LIBERO-Plus 与 LIBERO-PRO，发现视觉、条件和任务泛化问题。
+3. **Private Acceptance**：评估团队维护 `ESAS-LIBERO`，复用 Plus/PRO 的扰动设计，但使用隐藏的 seed、资产、指令、位置、任务组合与 Final Holdout。
+
+公开 Plus/PRO 不能替代私有验收：只要实例、组合和反馈长期暴露，开发团队仍可能直接训练或反复调参。另一方面，单纯隐藏原始 LIBERO seed 也不能解决 π0.5 接近 97% 的天花板效应；ESAS-LIBERO 还需把 reference 成功率校准到有区分度的区间。
+
+#### LIBERO-Plus：条件鲁棒性与 covariate shift
+
+LIBERO-Plus 在原任务结构基本不变的前提下，构造 **10,030** 个评测实例，覆盖 7 个扰动维度、21 个子维度，并按经验难度分成 Level 1–5（[论文](https://openaccess.thecvf.com/content/CVPR2026/papers/Fei_LIBERO-Plus_A_Progressive_Robustness_Benchmark_for_Visual-Language-Action_Models_CVPR_2026_paper.pdf)、[官方代码库](https://github.com/sylvestf/LIBERO-plus)）：
+
+| 维度 | 变化 | 对系统优化的价值 |
+|---|---|---|
+| Object Layout | 干扰物、目标物位移 | 空间与目标定位、视觉 shortcut |
+| Camera | 位姿、朝向、FOV | 渲染、3DGS、视角鲁棒性 |
+| Robot Initial State | 机械臂初始姿态 | 固定动作模板依赖、控制闭环 |
+| Language | 指令改写 | 语言表述鲁棒性 |
+| Light | 强度、方向、颜色、阴影 | 光照与 renderer 鲁棒性 |
+| Background | 场景和表面纹理 | 外观 shortcut |
+| Sensor Noise | 模糊、抖动、光度退化 | 视觉编码器、压缩和传感器链路 |
+
+它最适合渲染/3DGS、图像压缩、视觉编码器量化、相机变化和观测质量测试。官方协议把大量扰动实例本身作为样本，代码库建议每实例运行一次，而不是对每个实例重复 50 次。正式比较仍应让 reference 与 candidate 运行完全相同的实例。
+
+当前官方公开榜包含 π0、π0-Fast、OpenVLA 系列等结果，但不能把其他论文经额外 SFT 得到的 π0.5 数字称作 Physical Intelligence 官方 π0.5-LIBERO-Plus 基线。必须区分：
+
+- **Zero-shot robustness**：只用原始 LIBERO 训练，直接在 Plus 上测试。
+- **Plus-finetuned robustness**：训练中已见 Plus 数据；它回答的是增强训练后的性能，不再是对原始模型的 OOD 验收。
+
+#### LIBERO-PRO：grounding、任务泛化与反记忆
+
+LIBERO-PRO 针对原始 LIBERO 训练任务与评测任务过度相似的问题，检查模型是否根据当前观测和指令在线决策，而不是重放记住的场景—轨迹映射（[论文](https://arxiv.org/abs/2510.03827)、[官方代码库](https://github.com/Zxy-MLlab/LIBERO-PRO)）。论文把它概括为四类高层变化；当前代码库实际提供五个配置轴：
+
+| 维度 | 变化 | 主要判断 |
+|---|---|---|
+| Object | 外观、颜色、尺度或对象变化 | 是否正确绑定视觉对象 |
+| Position | 对象移动到新的可行位置 | 是否依赖固定抓取点和轨迹 |
+| Semantic | 等价指令改写 | 是否理解语言而非记模板 |
+| Task | 改变目标对象、目标状态或任务逻辑 | 是否能组合和执行新任务 |
+| Environment | 替换工作环境 | 是否能跨场景迁移 |
+
+Plus 与 PRO 有对象、位置、语言和环境上的重叠，但问题不同：**Plus 主要问同一个任务在输入条件变化后是否稳健；PRO 进一步问对象、位置、目标或任务逻辑变化后，模型是否真正理解当前任务。** `Task` 因而不是普通视觉 hard，而是 task/goal shift。
+
+LIBERO-PRO 作者当前报告 π0.5 总体约 **0.53**；Object 与 Semantic 多在 0.92–0.98，Position 为 0.08–0.38，Task 几乎为 0–0.01，Environment 为 0.46–0.73（四个原始 suite 分别报告）。这不是 Physical Intelligence 官方成绩，但足以说明使用边界：
+
+- Object、Semantic 和经过校准的 Environment/Position 可用于 regression 或 grounding 验收。
+- 接近地板的 Task 与困难 Position 只能作为 `Capability-Stress`，不适合判断 1–3pp 的量化或算子回退。
+- 对 Agent、重规划、失败恢复和 memory/harness 系统，PRO 比单纯视觉扰动更有价值。
+
+#### `ESAS-LIBERO` 建议结构
+
+```text
+ESAS-LIBERO
+├── Canonical-Heldout
+├── Covariate-Robustness
+├── Grounding
+├── Task-Generalization
+├── Control
+└── Compound
+```
+
+- `Canonical-Heldout`：保持原始任务和正常分布，隐藏初始状态、环境/模型 seed、指令模板和合法对象位置；承担纯计算路径的主要非劣性验收。
+- `Covariate-Robustness`：主要复用 Plus 的 Camera、Robot、Layout、Light、Background、Noise。Level 1–3 或 reference 位于约 30%–80% 的实例用于精度回归；更困难实例进入压力集。
+- `Grounding`：结合 Plus Language 与 PRO Object/Semantic，检查指令—对象—动作绑定、干扰物和目标存在性。
+- `Task-Generalization`：主要复用 PRO Position/Task/Environment；中等难度项可守门，地板项只作能力压力和未来模型突破跟踪。
+- `Control`：由团队在 policy–environment 接口注入 latency、jitter、action hold、chunk/频率变化及视觉—本体感知不同步；Plus/PRO 没有系统覆盖这一轴。
+- `Compound`：只在最终验收中组合轻量条件变化，不用于首轮归因。
+
+ESAS-LIBERO 不必机械复制 ESAS-RoboTwin 的 Physics 轴：LIBERO 更适合视觉、语言、grounding 和任务泛化；复杂物理与接触仍由 ESAS-RoboTwin 和 ManiSkill 主承载。
 
 ### 3.2 RoboTwin 2.0：公开开发回归与 ESAS 私有验收
 
@@ -223,10 +295,10 @@ BEHAVIOR 2026 官方赛道使用 RGB + depth + proprioception，测试时禁止 
 
 | 优化方向 | 必跑 | 专项追加 | 主要精度观察量 |
 |---|---|---|---|
-| π0.5 量化 / 推理加速 | RoboTwin 2.0 全 50 × clean/randomized | ESAS-RoboTwin Canonical / Control | paired success delta、成败翻转、长程退化、轨迹漂移、timeout |
-| Agent 架构 | LIBERO-10 | BEHAVIOR-Core-20 / Full-100 | predicate progress、端到端成功、恢复次数、规划开销 |
-| 渲染引擎 | RoboTwin 2.0 全 50 × clean/randomized | ESAS-RoboTwin Visual、BEHAVIOR 视觉搜索任务 | 成功率、感知导致的动作分歧、视觉压力曲线 |
-| 3DGS | RoboTwin 2.0 全 50 × clean/randomized | ESAS-RoboTwin Visual 中的固定场景 paired renderer | 任务精度 + 图像/特征差异；不能只报 PSNR |
+| π0.5 量化 / 推理加速 | 原始 LIBERO 40 + RoboTwin 2.0 全 50 × clean/randomized | ESAS-LIBERO Canonical-Heldout/Control + ESAS-RoboTwin Canonical/Control | paired success delta、成败翻转、长程退化、轨迹漂移、timeout |
+| Agent 架构 | LIBERO-10 + LIBERO-PRO | ESAS-LIBERO Grounding/Task-Generalization + BEHAVIOR-Core-20 / Full-100 | predicate progress、端到端成功、恢复次数、规划开销 |
+| 渲染引擎 | LIBERO-Plus + RoboTwin 2.0 全 50 × clean/randomized | ESAS-LIBERO Covariate + ESAS-RoboTwin Visual | 成功率、感知导致的动作分歧、视觉压力曲线 |
+| 3DGS | LIBERO-Plus + RoboTwin 2.0 全 50 × clean/randomized | ESAS-LIBERO Covariate 与 ESAS-RoboTwin Visual 中的固定场景 paired renderer | 任务精度 + 图像/特征差异；不能只报 PSNR |
 | 物理引擎 | RoboTwin 2.0 全量 sanity / regression | ESAS-RoboTwin Physics + ManiSkill 物理探针 | 接触事件、状态轨迹误差、任务成功、数值稳定性 |
 
 ## 5. 物理引擎专项不能只用闭环 π0.5
@@ -250,9 +322,9 @@ ManiSkill 的 Task Card 会明确机器人、随机化、成功/失败条件和�
 
 ## 6. 任务配置标准
 
-### 6.1 两类配置
+### 6.1 三类配置
 
-#### Canonical
+#### Public Canonical
 
 严格复现官方协议，用于对外可比：
 
@@ -262,16 +334,25 @@ ManiSkill 的 Task Card 会明确机器人、随机化、成功/失败条件和�
 - 官方 success predicate
 - 不私自增加 domain randomization
 
+#### Private Canonical-Heldout
+
+保持任务语义、成功判定和正常难度分布，但由评估团队隐藏并冻结初始状态、合法对象位置、指令模板、资产实例与随机种子。它用于防止开发团队针对公开实例调参，并承担纯量化、算子替换和后端迁移的主要精度非劣性验收；它不是官方 benchmark 分数。
+
 #### Stress（内部扩展）
 
 用于内部发现退化：
 
+- `ESAS-LIBERO/Covariate-Robustness`
+- `ESAS-LIBERO/Grounding`
+- `ESAS-LIBERO/Task-Generalization`
+- `ESAS-LIBERO/Control`
+- `ESAS-LIBERO/Compound`
 - `ESAS-RoboTwin/Visual`
 - `ESAS-RoboTwin/Physics`
 - `ESAS-RoboTwin/Control`
 - `ESAS-RoboTwin/Compound`
 
-公开开发回归的 Canonical 应区分 `official_clean` 与 `official_randomized`；ESAS 的 Canonical 则使用保持正常任务分布的隐藏实例。公开结果与 ESAS、Canonical 与 Stress 必须分开报告，不能把内部随机化后的结果当作官方 benchmark 分数。
+公开开发回归的 RoboTwin Canonical 应区分 `official_clean` 与 `official_randomized`；ESAS 的 Canonical 则使用保持正常任务分布的隐藏实例。原始 LIBERO、LIBERO-Plus zero-shot、LIBERO-Plus finetuned、LIBERO-PRO 与 ESAS-LIBERO 也必须分开报告。公开结果与 ESAS、Canonical 与 Stress 不得混成一个不透明总分。
 
 ### 6.2 配对评测
 
@@ -356,8 +437,9 @@ ESAS 的核心判断不是 candidate 是否超过一个孤立的绝对成功率�
 | 级别 | 建议规模 | 目的 |
 |---|---|---|
 | PR smoke | LIBERO 每套件 2 个任务 × 10 rollouts | 排除崩溃与严重精度问题 |
-| 开发日常回归 | RoboTwin 全 50 × clean/randomized × 10–100 | 开发团队发现明显退化与任务级问题 |
-| 评估预检 | ESAS-RoboTwin 各 profile × 100 个配对 episodes / task | 评估团队筛出明确通过、失败与临界项 |
+| 开发日常回归 | 原始 LIBERO 40 + RoboTwin 全 50 × clean/randomized × 10–100 | 开发团队发现明显退化与任务级问题 |
+| 开发专项回归 | LIBERO-Plus / PRO 对应公开维度 | 公开鲁棒性、grounding 与泛化诊断 |
+| 评估预检 | ESAS-LIBERO / ESAS-RoboTwin 各 profile × 100 个配对 episodes / task | 评估团队筛出明确通过、失败与临界项 |
 | 临界项扩样 | 可疑 task/profile 扩展到 300，再到 500 | 降低波动干扰，支持小差异判断 |
 | 正式发布 | 公开全量回归 + ESAS Private Validation + Sealed Final Holdout；必要时 BEHAVIOR Full-100 | 最终非劣性验收与跨层验证 |
 
@@ -369,10 +451,11 @@ ESAS 的核心判断不是 candidate 是否超过一个孤立的绝对成功率�
 2. π0.5 在 RoboTwin 与 BEHAVIOR 上使用官方、社区还是团队自训 checkpoint？训练 recipe 如何固定？
 3. 每日、周度、发布评测的 GPU-hour 预算分别是多少？
 4. ESAS-RoboTwin 各 profile 的任务纳入规则、扰动范围和基线可解性门槛如何冻结？
-5. `BEHAVIOR-Core-20` 的分层抽样规则和最终任务清单是什么？
-6. 相对 reference 的非劣性界限如何按 Macro、profile、任务族和关键任务分层校准？
-7. 渲染与物理优化的固定 trace 数据格式、状态对齐方式与容差如何定义？
-8. 是否需要将吞吐、实时因子、显存、能耗与精度做成统一 Pareto 报告？
+5. ESAS-LIBERO 从 Plus/PRO 采用哪些生成器、难度层和资产，如何建立不泄漏的私有实例池？
+6. `BEHAVIOR-Core-20` 的分层抽样规则和最终任务清单是什么？
+7. 相对 reference 的非劣性界限如何按 Macro、profile、任务族和关键任务分层校准？
+8. 渲染与物理优化的固定 trace 数据格式、状态对齐方式与容差如何定义？
+9. 是否需要将吞吐、实时因子、显存、能耗与精度做成统一 Pareto 报告？
 
 ## 10. 当前建议摘要
 
@@ -380,10 +463,18 @@ ESAS 的核心判断不是 candidate 是否超过一个孤立的绝对成功率�
 Embodied-Core
   LIBERO-Spatial / Object / Goal / 10
 
+LIBERO Public Robustness / Generalization
+  LIBERO-Plus
+  LIBERO-PRO
+
 RoboTwin Public Dev
   50 tasks × official_clean / official_randomized
 
 ESAS (Embodied System Acceptance Suite)
+  ESAS-LIBERO
+    Canonical-Heldout / Covariate-Robustness / Grounding
+    Task-Generalization / Control / Compound
+    Private Validation / Sealed Final Holdout
   ESAS-RoboTwin
     Canonical / Visual / Physics / Control / Compound
     Private Validation / Sealed Final Holdout
@@ -393,7 +484,10 @@ Embodied-Agent
   BEHAVIOR-Full-100
 ```
 
-- LIBERO：所有优化共同必跑，承担 π0.5 可复现基础回归。
+- 原始 LIBERO：所有 π0.5 优化共同必跑，承担可复现基础回归，但不独自承担最终验收。
+- LIBERO-Plus：公开的条件鲁棒性和视觉/传感器压力层，尤其适合渲染、3DGS、视觉编码和相机链路。
+- LIBERO-PRO：公开的 grounding、任务泛化和反记忆层；地板任务作为能力压力，不作为小精度回退门槛。
+- ESAS-LIBERO：复用 Plus/PRO 设计但隐藏具体实例，承担 LIBERO 体系的最终私有验收。
 - RoboTwin 官方全量：由开发团队承担公开、可复现的日常回归与任务级定位。
 - ESAS-RoboTwin：由评估团队维护隐藏、配对、分轴、版本冻结的最终系统验收集；原 System-10 只保留为能力压力或快速诊断候选。
 - BEHAVIOR：承担 Agent、长程、导航、记忆与部分完成评估。

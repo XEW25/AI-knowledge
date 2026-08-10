@@ -945,3 +945,11 @@
 - **四条 Why it matters**:① **"评估算力成为一等预算项"最强的一类证据**(卖算力的人用产品投票)② 路线图沿 L0–L3 往上走 ③ **Affordance × Object × Scene × Embodiment 的组合式任务生成 = "固定谓词 × 任务参数"设计原则的第三次独立出现**(前两次:LEACL 参数化 PDDL、Harness VLA 固定小原语库)④ **评测环境开始有"分发中心"**(LeRobot Env Hub 可注册可发现)—— 与刚记下的"**具身 Agent 框架层至今无人标准化**"形成对照:**评测这一层已经开始标准化了**
 - **⚠️ 最重要的限定**:**它只解决"可比 + 快",完全没碰"可信"** —— **全文未报任何 sim-to-real 相关性数字**(对照 SIMPLER 的 r=0.924 是这层的"质检证书")⇒ **是吞吐工具,不是保真度工具**;用它得出的排名能否代表真机仍需另行校准。这正好落在 [[Real-robot evaluation]] 的核心矛盾("仿真可比不可信 / 真机可信不可比")上,两页互为对位
 - 接线:[[NVIDIA]] 实体页 Arena 节加源笔记指针;Embodied MOC 新增 "Sources — evaluation infrastructure" 小节;index Sources。Lint 干净:0 broken;145 notes
+
+
+## [2026-08-10] synthesis | ESAS-LIBERO：纳入 LIBERO-Plus 与 LIBERO-PRO
+- 更新 [[Embodied simulation benchmark suite for systems optimization]] 至 v0.3，将 LIBERO 拆成 Public Compatibility（原始 40 任务）、Public Robustness/Generalization（Plus/PRO）和 Private Acceptance（ESAS-LIBERO）三层。
+- 明确 LIBERO-Plus 主要测试任务语义不变时的七轴条件鲁棒性与 covariate shift，适合渲染、3DGS、视觉编码、相机和传感器链路；区分 zero-shot 与 Plus-finetuned 协议。
+- 明确 LIBERO-PRO 主要测试 Object/Position/Semantic/Task/Environment 下的 grounding、任务泛化与反记忆；记录作者 π0.5 结果中的 Task/困难 Position 地板效应，不能用于小幅精度回退守门。
+- 新增 ESAS-LIBERO：Canonical-Heldout / Covariate-Robustness / Grounding / Task-Generalization / Control / Compound；复用 Plus/PRO 设计但隐藏具体 seed、资产、指令、位置和任务组合。
+- 配置标准改为 Public Canonical、Private Canonical-Heldout、Stress 三类；复杂物理仍由 ESAS-RoboTwin 与 ManiSkill 主承载。

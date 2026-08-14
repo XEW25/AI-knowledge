@@ -983,3 +983,15 @@
 - 在 [[Embodied simulation benchmark suite for systems optimization]] 中补充 Canonical-Heldout 字段表：task/BDDL、instruction、success predicate、simulator/config 保持不变；initial states 使用评估团队隐藏的新同分布样本；environment seed 与 policy noise 隐藏并冻结。
 - 明确 `initial_state_id`、`environment_seed`、`policy_noise_seed` 的层次区别，并要求它们与 manifest hash 一起记录、在 reference/candidate 间逐 episode 配对。
 - 约束 Canonical-Heldout 不混入视觉、语言、任务或物理 hardening；这些变化只能进入 Covariate、Grounding、Task-Generalization、Compound 等 Stress profile。
+
+## [2026-08-14] source | 深度核实 Recap（π*0.6）方法机制
+
+- 自读 arXiv 2511.14759 HTML 全文 + 附录 A-C，大幅扩写 [[Physical Intelligence - pi0.6 a VLA That Learns From Experience]] 的 Method 节。
+- **厘清 Recap 训的不是 π0.6**：π0.6 是基座（训练另见模型卡，不在本文），π*0.6 = π0.6 + 二值优势指示位 I_t 的条件通路；Phase 1 的数据是 D_demo（演示 + 网络图文），**不含自主经验**。
+- 补 §IV-A：分布值函数为原文用语（B=201 个 value bin，交叉熵训练，Monte Carlo 估计），目标为"到成功还差多少步"，归一化到 (−1,0)；作者自认 on-policy 估计次优但可靠。
+- 补 §IV-B 完整推导链：贝叶斯改写 → Eq.2 CFG 形式 → β=1 特例（改进策略 = 以"好"为条件的参考策略）→ Eq.3 双项目标。明确 −α·log π(a|I,o,ℓ) 的作用是**分开好/坏两支**，坏数据用于提供对比而非模仿目标（对照 AWR 的过滤式做法）。
+- 补 ε_ℓ 取 30% 分位数，以及不调 β 的第二条理由：**CFG 权重管不到模型的自回归部分**。
+- 补附录 A-C：Eq.3 中连续部分是 **ELBO 代理**（加权 L2，噪声权重 w(η)=e^{−η/2}），非真似然——这是绕开 policy gradient 的关键。
+- 新增"两个防退化机制"表：**KI 防遗忘（继承自 π0.5）** 与 **每轮退回预训练 checkpoint 防迭代漂移**是两回事 ⇒ 持续学习第三层挂着两个代价。
+- 修正两处过度外推：**"车队级"是本库外推**（迭代实验用单一静态双臂平台）；"慢"不在轮数（常一轮即可）而在**单轮粒度**（laundry 消融每轮 600 条轨迹）。
+- 在 [[FAR - Failure-Aware Retry for Test-Time Recovery and Continual Policy Improvement]] 补时间尺度差异的**机械根源**：MC 回报需集终止 vs 集内时序价值差，非工程选择。

@@ -995,3 +995,20 @@
 - 新增"两个防退化机制"表：**KI 防遗忘（继承自 π0.5）** 与 **每轮退回预训练 checkpoint 防迭代漂移**是两回事 ⇒ 持续学习第三层挂着两个代价。
 - 修正两处过度外推：**"车队级"是本库外推**（迭代实验用单一静态双臂平台）；"慢"不在轮数（常一轮即可）而在**单轮粒度**（laundry 消融每轮 600 条轨迹）。
 - 在 [[FAR - Failure-Aware Retry for Test-Time Recovery and Continual Policy Improvement]] 补时间尺度差异的**机械根源**：MC 回报需集终止 vs 集内时序价值差，非工程选择。
+
+## [2026-08-15] source | Ingest 三篇运行时失败检测/自适应重规划工作（VLA-FAIL、FIPER、DVAC）
+
+- 三篇均**自读 arXiv HTML 全文核实**（未走摘要器），各建 `01 Raw` URL-only note + `02 Sources` 源笔记：
+  - [[Seligmann et al. - VLA-FAIL Efficient Task Failure Detection for Finetuned Vision-Language-Action Models]]（FZI + KIT，arXiv:2606.21386）
+  - [[Romer et al. - FIPER Failure Prediction at Runtime for Generative Robot Policies]]（TUM，NeurIPS 2025，arXiv:2510.09459）
+  - [[Feng et al. - DVAC Denoising-Variance Adaptive Chunking for Flow-Based Robot Policies]]（深圳河套 + 港中深，arXiv:2606.03847）
+- **归类判断：DVAC 不是失败检测工作**（全文 `failure detection` / `conformal` 均 0 命中，作者自陈是 empirical proxy 而非校准过的不确定性）。故它**不挂在 [[Embodied failure detection]] 的机制表下**，而是作为"同族信号的第二种用法"单列，主链接落到 [[Embodied Cerebellum Models]] 的 chunk 消费层。
+- [[Embodied failure detection]] 大幅扩写，五处结构性更新：
+  1. **机制③拆成三个取信号的位置**（观测侧 / **表征侧** / 动作侧）。表征侧（VLA-FAIL 的 LLMD）是本库此前缺的一格，且它擅长抓**最易漏的"进展停滞"类**（死循环重试、默认动作）—— 该类此前只有停滞超时（很粗）与 VLM（很贵）两档。
+  2. **成本前沿下移，修正本页旧结论**：此前记"STAC 未必能端侧实时跑"（每步 256 采样，FAIL-Detect 硬件实验没跑它）；**ACC 是 STAC 的单样本速度归一化估计，真机上几乎全面胜过它** ⇒ "策略自身信号=免费"在用对估计量的前提下**重新成立**。新增按额外算力排的成本前沿表。买断制结构未消失，只是移到了 LLMD 的数据预处理 / RND-OE 的离线训练上。
+  3. **新增组合逻辑一节（AND vs OR）**：FIPER 用 AND（附 Proposition 1：两分数不独立时合取仍守同一误报上界），VLA-FAIL 用 OR。**代价被 FIPER 自家主表量化**——DT 0.18/0.25（单用）→ 0.30（AND），准确率顺序相反。⇒ 本页原则②第一次有了两个可比落点。
+  4. **阈值类型之争被化解**：FIPER 附录 D 自陈时变阈值的失效条件（完成方式时序多变、rollout 长度不一）**恰好就是 VLA-FAIL 拒绝时变的理由** ⇒ 两边同意底层判据，只是任务集把它们推到两端。提炼成部署规则记入。
+  5. **benign OOD**：本页原先把"只用成功数据"的代价记为"OOD ≠ 一定失败"；FIPER 的四象限（Success OOD vs Fail ID）正面攻击了这道缝，可从"限制"改写为"已被专门攻击的子问题"，但**远未解决**（准确率 0.78，作者自陈对装配线不够）。
+- **两处独立收敛值得记**：(a) **VLA-FAIL 与 FIPER 各自独立诊断出 STAC 在"策略选择行为模态"时误报** —— 把本页旧教训"必须用分布距离"推进一层：**用了分布距离仍不够，距离在模态切换处本身就大**；(b) **AUCPDT 与 TWA 是两个组独立提出的同一类指标修正**（把检测时间折进主指标，堵住"等到最后再预测"与"第一步全报警"两种套利）。
+- [[Embodied Cerebellum Models]]：chunk 消费层补上"**块该多长**"这一半（此前只有 RTC 管"块与块怎么接"）。
+- 同步 [[04 Maps/Embodied AI - VLAs, world models, and cerebellum|Embodied MOC]] 的 failure detection 小节（+3 条）与 `index.md`（Raw ×3、Sources ×3）。

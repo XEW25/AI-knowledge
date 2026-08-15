@@ -44,7 +44,7 @@
 |---|---|---|---|---|
 | 1 | Primitive 前/后置条件契约 | 执行失败 | 零学习 | 端 |
 | 2 | 停滞 / no-progress 超时 | 进展停滞 | 极低 | 端 |
-| 3 | 策略自身的分歧信号 | 执行+语义（弱） | 零额外模型 | 端 |
+| 3 | 策略自身的信号（观测 / 表征 / 动作 **三个位置**） | 执行 + 停滞（表征侧）+ 语义（弱） | **近零～买断制** | 端 |
 | 4 | 预期-实测核对（assertion） | 语义失败 | VLM 推理 | 端/云 |
 | 5 | 学出来的成功/失败判别器 | 语义+执行 | **需采失败样本** | 端推理/云训练 |
 | 6 | 不确定 → 求助 | 全类（前移） | 需校准 | 端触发/人 |
@@ -58,19 +58,58 @@
 
 **2｜停滞检测.** 动作在发、状态不变 = 卡住。**性价比最高的一个**：几乎不要钱，却吃掉长程任务里最大的静默失败源。建议**每个 primitive 都带 no-progress 超时**。
 
-**3｜策略自身的信号（免费且被低估）.** 不动权重就能拿到，零标注、与策略同源、可端侧。两条已验证的做法：
+**3｜策略自身的信号（免费且被低估）.** 不动权重就能拿到，零标注、与策略同源、可端侧。
 
-- **STAC（时序动作自一致性）** — [[Agia et al. - Sentinel Runtime Monitoring of Consistency and Progress for Generative Policies|Sentinel]] 的核心。生成式策略每 `k` 步重规划但预测 `h` 步（`k<h`）⇒ **t 与 t+k 两次预测在时间上重叠**；比较两个分布在重叠窗口上的**统计距离** `D(π̄_t, π̃_{t+k})`。原理：策略相当于内含一个世界模型，**分布内它会同意自己刚才的预测，OOD 时会自我矛盾**。检出 **99% 的 erratic 失败**，成本可忽略，**策略无关**。
-- **学出的密度信号 + OOD 框架** — [[Xu et al. - FAIL-Detect Uncertainty-Aware Runtime Failure Detection for Imitation Learning Policies|FAIL-Detect]]（TRI）把**最近 2 步观测 + 生成的未来动作**蒸馏成标量，按**序贯 OOD 检测**处理。其最佳打分器 **logpZO**：用连续归一化流把观测**推进噪声空间**，分数 = **‖Z‖²**（分布内 → 落在标准高斯中心附近）；这样**绕开了直接算密度所需的高维散度积分**，开销仅 **~0.03–0.04 s/步**。
+### 三个取信号的位置（2026-08 补全）
+信号可以从策略的三个不同位置取，**它们不是同一件事的变体，各自擅长的失败类别不同**：
+
+| 位置 | 读什么 | 代表方法 | 擅长抓 |
+|---|---|---|---|
+| **① 观测侧** | 进来的东西训练时见过吗 | **logpZO**（FAIL-Detect）、**RND-OE**（FIPER）、PCA-kmeans | 环境变了 |
+| **② 表征侧** | 策略即将据以行动的那层特征正常吗 | **LLMD**（VLA-FAIL） | **空转**：死循环重试、与环境无关的"默认动作" |
+| **③ 动作侧** | 策略对自己要做的事有把握吗 | **STAC**（Sentinel）、**ACC**（VLA-FAIL）、**ACE**（FIPER） | **行为紊乱**：抖动、自相矛盾 |
+
+**观测侧**：[[Xu et al. - FAIL-Detect Uncertainty-Aware Runtime Failure Detection for Imitation Learning Policies|FAIL-Detect]]（TRI）把**最近 2 步观测 + 生成的未来动作**蒸馏成标量，按**序贯 OOD 检测**处理。最佳打分器 **logpZO**：用连续归一化流把观测**推进噪声空间**，分数 = **‖Z‖²**；**绕开了直接算密度所需的高维散度积分**，开销仅 **~0.03–0.04 s/步**。
+[[Romer et al. - FIPER Failure Prediction at Runtime for Generative Robot Policies|FIPER]] 的 **RND-OE** 是同一位置的另一种做法：随机网络蒸馏的残差当新颖度，**关键设计是两个网络都复用并冻结策略自己的观测编码器** ⇒ 异常检测发生在**策略的嵌入空间**里，且**小数据也能训**（真机只用 10 条成功 rollout，且**不需要策略的训练数据**）。
+
+**表征侧（本库此前缺的一格）**：[[Seligmann et al. - VLA-FAIL Efficient Task Failure Detection for Finetuned Vision-Language-Action Models|VLA-FAIL]] 的 **LLMD** 在**最后一层特征**上算逐 token 马氏距离。难点是 flow matching 的该层特征同时依赖噪声动作 `a_t`；解法是**固定先验噪声**——`t=0` 处 `p₀(a|o)=N(0,I)` **与 `o` 无关**，故可采单个固定 `a₀*`（`t>0` 固定会引入人为协变量偏移）。**一次前向即可，且可与动作采样并行；若不需多模态，开销为零。**
+> **它的价值在于抓到了动作侧看不见的东西**：LLMD 擅长**策略反复重试成死循环**或**退化为默认动作**——正是本页维度一里**最容易漏的"进展停滞"类**。此前该类只有停滞超时（机制②，很粗）和 VLM（机制④，很贵）两档，**现在有了近零成本的中间档**。
+
+**动作侧**：**STAC（时序动作自一致性）** — [[Agia et al. - Sentinel Runtime Monitoring of Consistency and Progress for Generative Policies|Sentinel]] 的核心。生成式策略每 `k` 步重规划但预测 `h` 步（`k<h`）⇒ **t 与 t+k 两次预测在时间上重叠**；比较两个分布在重叠窗口上的**统计距离**。原理：策略相当于内含一个世界模型，**分布内它会同意自己刚才的预测，OOD 时会自我矛盾**。检出 **99% 的 erratic 失败**、**策略无关**。
+后续两个改进都在动作侧，且**都指出了 STAC 的同一个毛病**（见下）。
 
 > ⚠️ **两个必须记住的更正**（否则会走弯路）：
 > 1. **不是"看单时刻采样方差"**。朴素的 **Diffusion Output Variance**（对 B 条采样算方差）在 Sentinel 里是**被 STAC 击败的 baseline**，且原文指出它"does not quantify epistemic model uncertainty"。**关键在跨时刻的自一致性，不在单时刻的离散度。**
 > 2. **必须用分布距离，不能比均值**。生成式策略是多模态的（同任务多种合法解法）；消融显示**用非统计距离（如 min. distance）比 baseline 还差**，正因为它抹掉了多模态性。实现用 **MMD + RBF 核**。
 >
-> **代价与两条重要限定**：
-> - STAC 依赖 chunk 重叠结构，对 horizon 敏感（k=2→TPR 61%，k=4→78%，**k=8/h=16→95%**）；单步策略或 `k=h` 不适用。
-> - ⚠️ **STAC 未必能放端侧实时跑**。它每步要生成 **256 条动作预测**；[[Xu et al. - FAIL-Detect Uncertainty-Aware Runtime Failure Detection for Imitation Learning Policies|FAIL-Detect]] 的硬件实验**干脆没跑 STAC**——"*slow to run on hardware in real-time*"（少采几条可以，但会损害其统计性质）。Sentinel 自称"成本可忽略"是**相对 VLM** 而言。⇒ **"便宜"要分清是相对谁。**
-> - ⚠️ **"策略自身信号 = 免费"这个说法要收紧**。真正好用的是 **learned 信号**（要离线训一个小的流模型）；**post-hoc 的免费信号（采样方差 / SPARC 平滑度 / PCA-kmeans）在两篇论文里都被系统性击败**。正确表述是 **"离线训一次（只用成功数据）+ 在线推理很便宜"** —— 又一次落进 [[Robot data engine]] 的**买断制**结构。好消息：learned 方法**准确与速度不取舍**（FAIL-Detect 里检测时间也最快）。
+> **结构性约束（仍然成立）**：STAC/ACC 一族**依赖 chunk 重叠**，对 horizon 敏感（k=2→TPR 61%，k=4→78%，**k=8/h=16→95%**）；**单步策略、`k=h`、或完全开环整块执行时全部不适用**。
+
+### ⚠️ 成本前沿已经下移（2026-08 重要修正）
+本页此前记的是"**STAC 未必能放端侧实时跑**"——它每步要生成 **256 条动作预测**，[[Xu et al. - FAIL-Detect Uncertainty-Aware Runtime Failure Detection for Imitation Learning Policies|FAIL-Detect]] 的硬件实验**干脆没跑它**（"*slow to run on hardware in real-time*"）。**这个限制被解决了，而且是被一个更简单的东西解决的。**
+
+[[Seligmann et al. - VLA-FAIL Efficient Task Failure Detection for Finetuned Vision-Language-Action Models|VLA-FAIL]] 的 **ACC 本质上是 STAC 的速度归一化单样本估计**，却**在几乎所有真机任务上胜过 STAC**。三处简化：**每步只采 1 个动作样本**（vs 256）、**只用 D=3 的末端位置**、**速度归一化 + 强指数平滑 α=0.9**（成功执行中本来也会重规划，**只有持续不一致才是失败信号**）。
+
+**按额外算力排的当前成本前沿：**
+
+| 档 | 方法 | 额外成本 |
+|---|---|---|
+| **≈0** | **ACC**、**LLMD**（可与采样并行；不要多模态时为零）、**DVAC 的去噪方差** | 复用已算出的东西 |
+| 低 | **RND-OE**（一次小 MLP 前向） | 需离线训一个小模型 |
+| 中 | **logpZO**（CNF，~0.03–0.04 s/步）、**ACE**（采 B 个动作块） | 买断制 |
+| 高 | **STAC**（256 次采样） | 真机实时下曾跑不动 |
+| 很高 | **VLM 语义监控** | 只能低频 |
+
+⇒ **"策略自身信号 = 免费"这句话，在用对估计量的前提下重新成立了。** 此前的收紧（"必须 learned 才好用，post-hoc 都被击败"）是对 2025 年那批 post-hoc 信号（采样方差 / SPARC / PCA-kmeans）成立的；**ACC 与 LLMD 是新一代的近零成本信号，且不是靠更聪明的后处理，而是靠选对了读信号的位置和归一化方式。**
+
+> ⚠️ 但**买断制结构没有消失**，只是位置变了：LLMD 需要**对微调数据做一次无梯度预处理**，RND-OE 需要**离线训一个小网络**。仍是 [[Robot data engine]] 的**买断制**（训一次，之后每次只花推理）。
+
+### ⚠️ STAC 的一个毛病被两个组独立诊断出来
+[[Seligmann et al. - VLA-FAIL Efficient Task Failure Detection for Finetuned Vision-Language-Action Models|VLA-FAIL]] 与 [[Romer et al. - FIPER Failure Prediction at Runtime for Generative Robot Policies|FIPER]] 各自独立指出：**STAC 会把"策略正在决定采用哪个行为模态"的时刻误判为高不确定性**（先拿 A 还是 B、从侧面还是上方抓、从左还是右绕障）。
+
+- **VLA-FAIL 的解释**：ACC **只与已执行的动作块比较，不与反事实轨迹比较** ⇒ 模态选择时更少误报
+- **FIPER 的解释**：多模态下**该测分布的锐度（熵）而非离散度（方差/距离）**——因为 IL 的多模态**通常是离散的**，每个采样都应清晰落在某一模态里
+
+> **这条与本页原有的更正②不冲突，而是把它推进了一层**：原来的教训是"**必须用分布距离，不能比均值**"（否则抹掉多模态性）；新的教训是"**用了分布距离仍然不够——分布距离在模态切换处本身就会大**"。⇒ **多模态是这条线上反复出现的头号麻烦，且每一代方法都在它上面栽一次。**
 
 **3′｜⚠️ 机制③ 与机制⑥ 是一条流水线，不是两个并列项.** 正确结构是：
 
@@ -82,6 +121,61 @@ conformal prediction 校准
 有保证的决策（报警 → 重试；或 → 求助人类）
 ```
 **CP 是把原始分数变成"有统计保证的决策"的连接组织**，KnowNo（语义/规划层）、FAIL-Detect（执行监控层）、STAC（动作一致性层）用的是**同一套机器、施加在不同层次**。⇒ **CP 的 α 就是本页"漏报/误报权衡"那个原则的可调旋钮**：你选定容许误报率，它给统计保证。（如何按"漏报传播代价 vs 误报物理代价"来定 α，是开放问题。）
+
+**3″｜双检测器 + CP 已经是这条线的事实标准配方（2026-08）.**
+四篇独立工作收敛到了同一个骨架：**一路读"环境陌生吗"，一路读"策略犹豫吗"，只用成功数据，用 conformal prediction 定阈值。**
+
+| 工作 | 环境侧 | 策略侧 | 组合 | 阈值 |
+|---|---|---|---|---|
+| Sentinel | —（改用 VLM 管语义进展） | STAC | 并行 | 常数 |
+| FAIL-Detect | logpZO | — | 单路 | **时变** |
+| **FIPER** | **RND-OE** | **ACE** | **AND** | **时变** |
+| **VLA-FAIL** | **LLMD**（表征侧） | **ACC** | **OR** | **常数** |
+
+### ⚠️ 组合逻辑：AND 与 OR 是可测量的取舍，不是风格
+- **FIPER 用 AND**——理由是"**并非所有 OOD 都导致失败**，且成功 rollout 里也会有暂时的高 aleatoric 不确定性"。它还证明了 **Proposition 1**：两路各按 `δ` 校准后，即使两个分数**不独立**，合取预测器**仍满足同一个误报上界**（合取只会更保守，界自动保持）。
+- **VLA-FAIL 用 OR**——评测时对两个分数各做秩变换后**取最小值**。
+
+**代价被 FIPER 自己的主表量化了**：
+
+> 检测时间 DT：**RND-OE 单用 0.18 < ACE 单用 0.25 < FIPER(AND) 0.30**，而 TWA/准确率的顺序正好反过来（0.59 / 0.63 / **0.65**）。
+
+⇒ **合取更准但更慢，析取更早但更吵。** 按本页原则②（误报与漏报的代价不对称**且方向会翻转**），这条原则第一次有了两个可比的落点：**高风险/不可逆动作该用 OR 抢时间，常规动作该用 AND 抑噪**。**动态切换组合逻辑目前没有工作做过。**
+
+### ⚠️ 阈值类型之争：其实两边同意，只是被任务集推到了两端
+表面冲突：FAIL-Detect 与 FIPER 用**时变**阈值，VLA-FAIL 明确拒绝时变、用**常数**。但 FIPER 附录 D 自陈了时变阈值的两个失效条件，**恰好就是 VLA-FAIL 的理由**：
+
+> "if the training data contains **multiple temporally distinct ways of completing the task**, **a constant threshold may be more suitable**"
+> 时变阈值只能在校准集里出现足够多次的时刻上计算 ⇒ **rollout 长度不一时会出问题**
+
+VLA-FAIL 拒绝时变的原话则是：*"not applicable to episodes that vary significantly in length, such as in our real-world Drawer task"*。
+
+⇒ **可提炼成一条部署规则**：**回合时序稳定（同一任务总是差不多的节奏）→ 时变阈值更紧；回合长度或完成路径多变（长程、多阶段、允许重试）→ 常数阈值更稳。** 长程家务任务显然属后者。
+
+### ⚠️ "benign OOD" 是这条线真正的难点所在
+本页原先把"只用成功数据"的代价记为**问题被弱化成"是否偏离训练分布"（OOD ≠ 一定失败）**。FIPER 正面攻击了这道缝：把 rollout 分成 **Success ID / Success OOD / Fail ID / Fail OOD** 四象限，**关键指标是 Success OOD 与 Fail ID 之间的间隔**——即"看着陌生但策略能扛" vs "看着正常但已经在失败"。
+
+实测教训两条：
+- **纯 OOD 检测器确实掉在这条缝里**：PCA-kmeans 的 **TNR 仅 0.24**
+- ⚠️ **"成功/失败平均分数差大" ≠ "预测性能好"**（作者据 PCA-kmeans 的反例明确指出）—— 挑检测器时别只看分数分离图
+
+⇒ 该段的"代价"可以从**限制**改写为**已被专门攻击的子问题**，但**远未解决**：FIPER 的总体准确率**只有 0.78**，作者自陈对"必须早、必须准、误报很贵"的场景（如装配线）仍不够。**本库谈"失败检测让长程 `p^N` 不崩"时应带上这个量级——当前技术水平是"有用的粗筛"，不是"可信的守门员"。**
+
+### 指标：检测时间终于进了指标本身
+VLA-FAIL 的 **AUCPDT** 与 FIPER 的 **TWA** 是两个组**独立提出**的同一类修正：此前普遍报准确率 + 单独一个检测时间，**而单看任一个都可被套利**——一直等到回合结束再"预测"能拿高准确率，第一步全报警能拿完美延迟。两者都把"早"折进主指标（TWA 给真阳性记 `1−DT`；AUCPDT 取 precision–PDT 的 Pareto 前沿面积）。⇒ **同一个评测缺陷被同时发现两次，说明这是该子领域当前的真实痛点**（对位 [[Real-robot evaluation]] 的指标设计讨论）。
+
+**3‴｜同一族信号的第二种用法：不报警，调粒度（本页此前漏掉的一整列）.**
+以上全部是"**测出不确定 → 停下 / 求助 / 重试**"。[[Feng et al. - DVAC Denoising-Variance Adaptive Chunking for Flow-Based Robot Policies|DVAC]] 展示了另一种消费方式："**测出不确定 → 把执行粒度调细，多想几次**"。
+
+它读的是 flow matching **整条去噪轨迹上干净动作估计的尾部方差**（这个量本来就算出来了，此前所有部署都只取最后一步、把轨迹丢掉）。观察是：**方差在自由移动阶段低，在接触密集/精度敏感阶段陡升**（40 个 LIBERO 任务上逐步标注 MOVING/OPERATING，得到稳定负相关 `r < −0.27, p < 0.05`）。做法是**把低方差前缀执行掉，在高方差动作被提交之前重规划**。π₀.₅ 上 LIBERO **0.948 → 0.980，同时重规划次数 −43%**。
+
+> **同一个信号，一个当刹车，一个当变速箱。**
+>
+> 关键差别：**变速箱这一档没有误报代价**——把执行粒度调细，最坏只是多花几次推理；不像误报会触发不必要的物理重试。按本页原则②（误报的物理代价），**这是一条严格更安全的不确定性消费方式，应当优先于报警型机制被采用。**
+
+⚠️ **但它不是检测器**，作者自陈：*"uses denoising variance as an **empirical proxy** for action stability rather than a **calibrated uncertainty or safety estimate**"*（三篇检测工作都有 CP 层，它没有）。作者自己指的 future work 正是**把去噪方差与视觉反馈、接触线索、任务进展指标结合起来构建更可靠的失败检测器**。
+
+⚠️ **一个具体且尚无人处理的兼容性问题**：ACC/STAC 都依赖**固定的 chunk 重叠结构**，而 DVAC 让 `N_exec` 逐步变化 ⇒ **重叠长度随之变化，检测器的统计前提被动摇**。想同时用这两样东西的话，这是必须先解决的。
 
 **4｜预期-实测核对.** planner 调用前**显式声明预期后置状态**，调用后用 VLM 核对——本质是给具身动作加 **assertion**，把隐式判断变成可检查断言。
 
@@ -189,6 +283,12 @@ Harness VLA 列的 τ 四种形式，逐个看真机可行性：
 - **语义失败**（抓错物体/假成功）目前只能靠 VLM 核对，可靠性未知——这是四类里最欠缺的一格。
 - 失败样本的采集：判别器需要负样本，但**部署中主动制造失败**与安全相冲突。
 - 检测知识能否**跨机器人共享**（Harness VLA 的 Global Memory 形态 → 车队共智）？
+- **AND 与 OR 缺一次同任务集的直接对比** —— FIPER 与 VLA-FAIL 的任务集零重叠，现有比较全是间接的。
+- **能否按动作风险动态切换组合逻辑**（不可逆动作 OR、常规动作 AND）？无人做过。
+- **三个动作侧信号（ACC / ACE / DVAC 去噪方差）冗余度多高？** 都在读"策略对动作的把握"。若高度冗余，按 [[Harness design]] 的 load-bearing 原则应只留最便宜的那个。
+- **自适应执行时域与依赖 chunk 重叠的检测器不兼容** —— DVAC 让重叠长度逐步变化，ACC/STAC 需重新校准。
+- **LLMD 的训练数据依赖能否去掉**？（用少量成功 rollout 估 `μ_s`、`Σ_s` 而非全量微调数据）—— 这决定它能否用在别人发布的 checkpoint 上，而那是 VLA 时代最常见的用法。
+- **LLMD 抓"死循环重试"与机制②的停滞超时覆盖重叠多少**？若重叠很大，该退役哪一个？
 
 ## Related
 - [[Harness design]] — load-bearing 原则的来源；本页是它在具身侧的展开
@@ -199,6 +299,13 @@ Harness VLA 列的 τ 四种形式，逐个看真机可行性：
 - [[Real-robot evaluation]] — 成功判据与测量可信度
 - [[Physical Intelligence - pi0.6 a VLA That Learns From Experience]] — value function 作为质量信号
 - [[Future embodied Agent framework - integrated view]] — 整合入口
+
+**本页机制③的四个主要源笔记（按信号位置）**
+- [[Agia et al. - Sentinel Runtime Monitoring of Consistency and Progress for Generative Policies]] — 动作侧 STAC + VLM 语义；两类失败的模态互补论证出处
+- [[Xu et al. - FAIL-Detect Uncertainty-Aware Runtime Failure Detection for Imitation Learning Policies]] — 观测侧 logpZO；"无需失败数据"的正式出处
+- [[Romer et al. - FIPER Failure Prediction at Runtime for Generative Robot Policies]] — RND-OE + ACE，**AND 组合**、benign-OOD 四象限、TWA
+- [[Seligmann et al. - VLA-FAIL Efficient Task Failure Detection for Finetuned Vision-Language-Action Models]] — LLMD（**表征侧**）+ ACC，**OR 组合**、成本前沿、AUCPDT、**首次在大 VLA 上验证**
+- [[Feng et al. - DVAC Denoising-Variance Adaptive Chunking for Flow-Based Robot Policies]] — **同族信号的非报警用法**（调执行粒度）
 
 ## tags
 #concept #embodied-ai #failure-detection #dependability #harness #runtime-monitoring #safety #agentic

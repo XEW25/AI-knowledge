@@ -71,6 +71,8 @@
 - **混合线性注意力**：O(n²)→O(n)（[[ACE Robotics - Kairos 3.0 a Real-Time Generative Video World Model\|Kairos]] 用 GatedDeltaNet 1-in-4 混合）压单步算力。
 - **图编译 / AOT**：端侧偏 AOT（TensorRT engine / 昇腾 .om）——把编译成本挪到构建期，端上只剩"加载+触发"；配 CUDA Graph / 整图下沉把每次推理的几百次 kernel 发射压成一次。静态形状的 FM 路线天然图编译友好；AR 路线（解码长度变化）是反例。
 - **action chunking + 实时拼接**：一次推理出一段动作块、缓冲队列逐步出队，掩盖推理延迟；块边界的不连续由 PI 的 **Real-Time Chunking（RTC）** 等处理。
+  - ⚠️ **这里其实是两个独立问题，RTC 只解了一半**：**"块与块之间怎么接"**（RTC）vs **"块该多长"**。后者长期被当成一个固定超参。[[Feng et al. - DVAC Denoising-Variance Adaptive Chunking for Flow-Based Robot Policies|DVAC]] 指出 **flow matching 的去噪轨迹里本来就藏着答案**：干净动作估计的尾部方差**在自由移动阶段低、在接触密集/精度敏感阶段陡升**（LIBERO 上 40 任务逐步标注，`r < −0.27, p < 0.05`）⇒ **执行低方差前缀、在高方差动作被提交前重规划**。π₀.₅ 上 LIBERO **0.948 → 0.980 且重规划次数 −43%**——**准确率与推理成本同时改善，且不训练不改权重**。
+  - **对本页的含义**：执行时域**本就不该是常数**，它应随任务阶段变化——这与本页的多速率结构自洽。真机对照也很直接：固定 15 步 vs 固定 40 步，后者省推理但成功率从 0.80 掉到 0.53 ⇒ **很多部署可能正把这个旋钮拧错**。仅适用于流/扩散式动作头（需访问中间去噪轨迹），自回归 VLA 不适用。
 - **神经形态 / SNN 计算**（与以上正交的新路线）：事件驱动脉冲神经网络跑在神经形态芯片上，脉冲稀疏 → 量级更低的功耗/延迟。[[Guo et al. - NeuroVLA Brain-inspired Neuromorphic Cortex-Cerebellum-Spinal VLA|NeuroVLA]] 的脊髓 SNN 在 FPGA 上 **0.4W / 2.19ms / <20ms 反射**。区别于量化（[[VLA quantization]]，常规加速器低比特）——这是把 VLA 塞进端侧的**另一条轴**。
 
 ## 与大脑的接口（从小脑侧看）

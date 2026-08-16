@@ -1012,3 +1012,12 @@
 - **两处独立收敛值得记**：(a) **VLA-FAIL 与 FIPER 各自独立诊断出 STAC 在"策略选择行为模态"时误报** —— 把本页旧教训"必须用分布距离"推进一层：**用了分布距离仍不够，距离在模态切换处本身就大**；(b) **AUCPDT 与 TWA 是两个组独立提出的同一类指标修正**（把检测时间折进主指标，堵住"等到最后再预测"与"第一步全报警"两种套利）。
 - [[Embodied Cerebellum Models]]：chunk 消费层补上"**块该多长**"这一半（此前只有 RTC 管"块与块怎么接"）。
 - 同步 [[04 Maps/Embodied AI - VLAs, world models, and cerebellum|Embodied MOC]] 的 failure detection 小节（+3 条）与 `index.md`（Raw ×3、Sources ×3）。
+
+## [2026-08-14] source | 二次核实 FAR 的 critic 训练数据与复位口径
+
+- 自读 arXiv 2607.01111 §3 Setting / §4.1 / §4.2，补进 [[FAR - Failure-Aware Retry for Test-Time Recovery and Continual Policy Improvement]]。
+- **修正"无需环境复位"的表述**：原文实为 *preserve the scene state, return the robot to a predefined start pose* ⇒ **只复位机器人本体，保留世界状态**。这是"真机重试只能复位本体、不能复位世界"的第四次独立出现（Harness VLA re-staging / ENPIRE 复位到最难段起点 / B2FF 换目标 / FAR 送回起始位姿），已标记为可升格的设计规律。
+- **补起步条件**：critic 必须先用离线专家演示训好，且 *"Reward signals are used for critic training"*；测试时才降级为只需成/败的 outcome feedback。⇒ "在线、单机、当场改"的定位要打折扣，它有离线前置阶段。原文未说明 critic 训练用稠密还是稀疏奖励，已标注为未定。
+- **补此前完全漏记的 actor/critic 数据不对称**：三个 buffer（D_exp / D_succ / D_fail），**critic 三个全用（含失败），actor 只用 D_exp ∪ D_succ**（原文理由 "To avoid learning poor behaviors"）；策略更新是 **AWR**（A=Q−V，w=exp(A/η)，优势加权去噪目标）。
+- 补 IQL 期望分位损失式子，以及 chunk-conditioned critic 的实现细节（Q 给动作块打分，TD 目标用时序聚合后实际执行的单步动作 ã=g(a)）。
+- 新增 Why-it-matters 第 6 条：与 **LWD**（arXiv:2605.00416，待 ingest）的对照——LWD 批评的 *"use only part of the available experience"* 正命中 FAR 的 actor 更新；并指出 AWR-vs-QAM 的分水岭是模型尺度，与 Recap / RL Tokens 同属"规模决定手法"规律。

@@ -1021,3 +1021,13 @@
 - **补此前完全漏记的 actor/critic 数据不对称**：三个 buffer（D_exp / D_succ / D_fail），**critic 三个全用（含失败），actor 只用 D_exp ∪ D_succ**（原文理由 "To avoid learning poor behaviors"）；策略更新是 **AWR**（A=Q−V，w=exp(A/η)，优势加权去噪目标）。
 - 补 IQL 期望分位损失式子，以及 chunk-conditioned critic 的实现细节（Q 给动作块打分，TD 目标用时序聚合后实际执行的单步动作 ã=g(a)）。
 - 新增 Why-it-matters 第 6 条：与 **LWD**（arXiv:2605.00416，待 ingest）的对照——LWD 批评的 *"use only part of the available experience"* 正命中 FAR 的 actor 更新；并指出 AWR-vs-QAM 的分水岭是模型尺度，与 Recap / RL Tokens 同属"规模决定手法"规律。
+
+## 2026-08-17 — 具身 harness 开发基座选型 + VLA harness 设计（多轮讨论收口）
+
+- **两个代码仓 clone 逐文件审计**（非 WebFetch 摘要）：[[openJiuwen - JiuwenSymbiosis Physical AI Assistant Framework]]（华为，Apache-2.0，24.8k+19.2k 测试）与 [[RLinf - RPent Recursive Physical Agent Framework]]（**核实为 Harness VLA 的代码仓真身**——README 明认；无 LICENSE、无测试、仅 LIBERO）。各配 01 Raw capture。
+- **选型决策记录**：[[Harness development base - JiuwenSymbiosis selection and build plan]]。根本原因 = 机制 vs 嘱咐（RPent 的 harness 在 markdown：Python 中 staging/postcondition/verif 命中 0）+ 部署终局 + rails-off 即基线。推进 8 步，评测环境与成功信号先于四特性。
+- **新概念页**：[[Harness granularity]] —— harness 挂载粒度必须等于执行器决策粒度；"事中"监控住进复合算子内部（伺服环先例 → `vla_until` 设计）；策略侧信号可中止无权定罪 / 世界侧证据正式裁决。
+- **[[Embodied failure detection]] 增补**：检测管线四段分工（拦截/裁决/善后/转述）——工业实现的"裁决"段是空的（DiagnosisRail `_is_failed` 三通道全自报、零判断）；DetectionRail（裁判）vs DiagnosisRail（解说员）之辨；叠加图回传 planner 的廉价 L2 机制。
+- **[[Cloud-edge co-evolving embodied agent - a continuous-evolution framework]] 增补**："演进通道能否去人：检测信号质量是闸门"（ENPIRE 全自动 / 华为人审 / RLinf 人审三点外证）+ "coding agent 属于演进通道，进运行时环就出不了仿真"。
+- **[[Zhang et al. - Harness VLA Steering Frozen VLAs into Reliable Manipulation Primitives via Memory-Guided Agents]] 补代码发布信息**（RPent + 实现暴露的三件事）。
+- 顺带修正本 session 早前一个错误结论："NVIDIA 在具身 Agent 层没做过具体工作"为假——**ENPIRE（arXiv:2606.19980）是演进通道 harness**（自称 "a harness framework for coding agents"，8 台真机双臂 YAM，99% pass@8）；NVIDIA 的准确站位 = 造 agent harness 但只围开发/研究循环，不围机器人任务。**ENPIRE 待 ingest**；[[NVIDIA]] 实体页"运行时 harness｜没有"一行仍为真、无需改，但可补演进通道条目（待办）。

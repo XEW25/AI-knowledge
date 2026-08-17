@@ -220,6 +220,25 @@ Harness VLA 列的 τ 四种形式，逐个看真机可行性：
 
 剩下的真实成本是**阈值标定**（"力矩超过多少算接触"）——但它**按本体一次性标定，不随任务数增长**（同 [[Real-robot evaluation]] 里"阈值来自本体规格书，不来自评测设计"）。
 
+## 检测管线的四段分工与挂载粒度（2026-08，来自工业代码核实）
+
+审计 [[openJiuwen - JiuwenSymbiosis Physical AI Assistant Framework|JiuwenSymbiosis]]（华为，rails 架构）后，本页的机制在一条真实管线上落位，并暴露出两条此前没写的结构：
+
+**① 失败管线是四段，各司一职、不可互相顶替：**
+
+| 段 | 职责 | 工业对应 | 现状 |
+|---|---|---|---|
+| **拦截** | 事前否决非法指令（运动学层） | SafetyRail（Z/XY/关节限位，抛异常让 LLM 自纠） | ✅ 已有 |
+| **裁决** | 事后判定真实结果（"发了、执行了，**但成了吗**"） | **DetectionRail——待建**；现只有夹爪闭合处一个硬编码后置条件（`is_grasp_confirmed`，fail-closed） | ❌ 最大的洞 |
+| **善后** | 对失败做物理恢复 | RecoveryRail（持物三态、回 home） | ✅ 已有（仅四格第一格） |
+| **转述** | 把失败讲给 LLM 重规划 | DiagnosisRail（因果链+"别用原参数重试"注入下一轮） | ✅ 已有 |
+
+**关键发现：现有工业管线的"裁决"段是空的**——DiagnosisRail 的 `_is_failed` 三条通道（exception > `success=False` > entry.error）**全是自报信号，自己零判断**。⇒ 工具说成功但世界没到位的失败（semantic），整条管线是瞎的，防线只剩 VLM prompt。**Diagnosis（写病历）≠ Detection（做检查）**——先有报告员、没有检查科，是收口本页机制①⑤时最该防的实现走样。补 DetectionRail 时的接线技巧：裁决后直接翻 `success=False`，下游善后与转述一行不改（它们本来就监听这两条通道）。⚠️ 已知接缝：RecoveryRail 只挂 `on_tool_exception`，听不到 after_tool_call 里的翻案。
+
+**② 挂载粒度决定 during 那一列住哪**：rail 站在工具边界上，对执行单元**内部的循环**（伺服环、VLA chunk 循环）整段失明 ⇒ **本页三个时机里的"事中"必须住进复合算子内部**（伺服看门狗 / chunk 级监控器），且内外证据基础不同——**算子内消费策略侧信号（可中止、无权定罪），边界 rail 消费世界侧证据（正式裁决）**。展开见 [[Harness granularity]]。
+
+另一条廉价 L2 机制（来自 [[RLinf - RPent Recursive Physical Agent Framework|RPent]]）：**把分割叠加图（而非原始帧）回传给 VLM planner**——"检测器高置信度锁错物体"在坐标数字里不可见，看一眼 mask 压在哪就能发现；成本只是一次已有 VLM 的 look，机制上只需改视觉反馈的注入内容。
+
 ## 检测之后：恢复的四格设计空间
 
 本页主体讲**检测**；检测到之后**怎么恢复**是另一个设计空间。同一个目标（把策略拉回它的能力域），已有四种改法——**改的东西不同，代价与风险差别很大**：

@@ -17,7 +17,8 @@ This map collects the vault's embodied-AI cluster: vision-language-action (VLA) 
 - [[Visual token budget - pruning vs compression]] — 视觉 token 预算轴：剪枝（EVS）vs 压缩（π0.7 MEM）；为何视频理解侧与具身侧在同一根成本轴上收敛到相反解法。[[VLA quantization]] 的姊妹效率页
 - [[Memory in Embodied AI]] — implicit (procedural) vs explicit (episodic) memory across the two layers
 
-- [[Embodied failure detection]] — **具身环境不报错 ⇒ harness 要自己造 exception**：四类失败 × 三个时机 × 七种机制（成本排序）+ 检测器也会过期（load-bearing）+ 漏报/误报代价不对称（仿真里不存在的 trade-off）
+- [[Embodied failure detection]] — **具身环境不报错 ⇒ harness 要自己造 exception**：四类失败 × 三个时机 × 七种机制（成本排序）+ 检测器也会过期（load-bearing）+ 漏报/误报代价不对称（仿真里不存在的 trade-off）+ **检测管线四段分工**（拦截/裁决/善后/转述——工业实现的"裁决"段是空的）
+- [[Harness granularity]] — **harness 挂载粒度必须等于执行器决策粒度**：rail 对执行单元内部循环（伺服环/VLA chunk 环）整段失明 ⇒ "事中"监控住进复合算子内部；内外两层证据基础不同（策略侧可中止无权定罪 / 世界侧正式裁决）；两条纪律（算子只检测不恢复；决策者重量匹配层频率）
 - [[Robot data engine]] — 数据引擎:数据集 vs 引擎、"昂贵金标准的多级代理层级"(调度目标 = 最小化顶层金标准调用)、生产型 vs 自演进型、成本从人力→算力
 - [[Real-robot evaluation]] — **真机评测作为测量学**([[Robot data engine]] 的姊妹页:金标准视角 vs 测量仪器视角):可比 vs 可信矛盾、三条判据(任务 vs 条件 / 复位成本第二维 / 难度校准 40–70%)、8 条运动能力轴、统计功效现实、指标四层分层
 
@@ -35,6 +36,7 @@ This map collects the vault's embodied-AI cluster: vision-language-action (VLA) 
 - [[Future embodied Agent framework - integrated view]] — **整合入口**:why(泛化墙)/ what(分层架构)/ how(端云 co-evolution)/ 地基 四切面缝成单页 + 分层架构图 + "云↔端两条通道"
 - [[Real-robot eval bench - task suite design and setup checklist]] — **⚠️ 团队专属、有时效**：[[Real-robot evaluation]] 在具体机械臂平台（单臂+双臂 / π0 微调）上的落地清单——8 轴覆盖诊断、Tier 0/1 任务集、抽屉任务专章（自复位 ⇒ 高精度回归探针）、按 roadmap 挂载、立即可做五件事
 - [[Real-robot data collection - teleop vs UMI-class, and the model-in-the-loop quality problem]] — **具身数据三层金字塔全景**(2026-07,多轮追问后按三层框架重组):顶层真机遥操/中层仿真合成/底层人类行为数据的**特征对比→例子→趋势→评估体系→计算系统挑战**五段式;UMI=桥(判据=动作空间)、第四类=部署经验、阶段×数据矩阵;质量评估三代谱系+两级体系+A/B/C/D 机制辨析;**昂贵金标准代理层级**(L0–L3 评估栈)+供给侧五层优化(调度层空档=研究机会)+三层×算力形态收口表;含"星海图无 UMI 硬件产品"核实。云③技能工厂的数据上游
+- [[Harness development base - JiuwenSymbiosis selection and build plan]] — **⚠️ 团队专属选型决策记录**(2026-08-17):四特性(失败检测/重试/记忆/持续学习)开发基座选 **JiuwenSymbiosis 而非 RPent**;根本原因 = **机制 vs 嘱咐**(行为放代码可测可消融 vs 放 prompt 不可观测)+ 部署终局(真机/本地模型/断网可活)+ **rails-off 即基线**;推进次序 8 步(评测环境与成功信号先于一切特性);四特性→rails 落点表(DetectionRail 裁判 vs DiagnosisRail 解说);**π0.5 纯 VLA 路线的 `vla_until` 设计 + 2×2 paired 实验**(harness 价值是否依赖执行器范式——无已发表工作能答)
 
 ### Sources — VLA models
 - π series (范式 A source): [[Physical Intelligence - pi0 a Vision-Language-Action Flow Model for General Robot Control|π₀]] · [[Physical Intelligence - pi0.5 a VLA with Open-World Generalization|π₀.5]] · [[Physical Intelligence - pi0.6 a VLA That Learns From Experience|π*₀.6]] · [[Physical Intelligence - pi0.7 a Steerable Generalist Robotic Foundation Model|π₀.7]] · [[Physical Intelligence - RL Tokens Precise Manipulation with Efficient Online RL|RL Tokens]]
@@ -75,6 +77,9 @@ This map collects the vault's embodied-AI cluster: vision-language-action (VLA) 
 - [[Being-0 - a Humanoid Robotic Agent with VLMs and Modular Skills|Being-0]] — **分层具身 agent 框架**(框架改编自 LLM-agent 的 **Cradle**):GPT-4o(云) + **自训 Connector**(VideoLLaMA2 微调,板载 ~1s) + 遥操/模仿获得的技能库;全尺寸人形长程 **84.4%**。分类学落在"**harness + 训练的粘合层**"(纯 harness 与模型方案之间);**pose adjustment 与 Harness VLA 的 re-staging 独立收敛**;**只有 FM 在云**的极简边界。**⚠️ 团队后续已转向端到端基座模型,该框架未见延续**
 - [[Zeng et al. - HELM Harness-Enhanced Long-horizon Memory for VLA Manipulation|HELM]] — 清华+阿里;**harness 直接套在 VLA 上**(VLA 仍是主执行者,对照 Harness VLA 把 VLA 降级成 primitive)。诊断三缺口 **memory / verification / recovery**,各配一个学出的组件:EMM(CLIP 索引关键帧)、**SV**(记忆条件化的**执行前**失败预测,12ms/步)、HC(**用历史关键帧当视觉目标让 VLA 把世界开回去**的回滚 + HELM-Fwd 前向变体)。**LIBERO-LONG 58.4→81.5%(+23.1pp),而 4× 长上下文只买到 +5.4pp** ⇒ **记忆 ≠ 更长上下文**
 - [[Zhang et al. - Harness VLA Steering Frozen VLAs into Reliable Manipulation Primitives via Memory-Guided Agents|Harness VLA]] — **清华等,2026-07**;把**冻结 π0.5** 降级成一个 primitive(`vla_act`)+ 固定小解析原语库,由 agentic planner 用 JSON 编排;planner 下发 **(prompt, 终止判据 τ)**,失败则 **re-staging 重选交棒点**;双记忆(任务解法骨架 + 成功规则/失败模型)。**不动权重** LIBERO-Pro **+38.6pp**。本库 [[Harness design]] 概念的**首个学术量化证据** + [[Alex Zhang - The Mismanaged Geniuses Hypothesis|MGH]] 的具身验证。**⚠️ 全仿真、成功判据依赖仿真 oracle**(源笔记有"真机无法实现的技术点"专章)
+
+- [[openJiuwen - JiuwenSymbiosis Physical AI Assistant Framework]] — **华为 openJiuwen 生态的具身 Agent 框架，代码仓审计**（Apache-2.0，24.8k 源码 + 19.2k 测试，Piper/SO-101 真机适配器）。七层 Agent→Rails→Tools→API→Env→Hardware；六个 Rail（Safety/Recovery/VisualFeedback/SkillUse/Trace/Diagnosis）；`exec_mode` agent/fast 把大脑/小脑写成开关（fast = 一次规划 + 伺服闭环无 LLM）；能力档案**实例级收窄**；Trace Feedback Loop 人审门禁（设计而非未完成）。**四特性核实：检测◐（仅自报通道）/ 重试✅（仅恢复四格第一格）/ 记忆❌（生态 `agent-memory` 未接）/ 持续学习❌**。⚠️ **全仓无任何 benchmark 数字**；上游 openjiuwen 490k 行规模已量质量未验
+- [[RLinf - RPent Recursive Physical Agent Framework]] — **Harness VLA 的代码仓真身**（README 明认；279 stars，Pre-Alpha）。**实现暴露论文没说的三件事**：harness 策略在 markdown+prompt 不在代码（Python 中 staging/postcondition/verif 命中 0）、记忆写入 maintainer 人审无自助上传、**仅 LIBERO 零真机**（编码 agent 在运行时环 ⇒ 出不了仿真的结构原因）。值得搬的三样：**记忆两层 + "存过程不存坐标"铁律**（HF 数据集托管）、VLA HTTP 服务边界、**分割叠加图回传 planner**（廉价 L2 语义核对）。⚠️ 无 LICENSE 文件、无测试
 
 ### Sources — skill acquisition / training methodology
 - [[Heravi et al. - LEACL LLM-Enhanced Automatic Curriculum Learning for RL in Long-Horizon Manipulation|LEACL]] — LLM 生成**任务空间 + 难度排序**(而非 dense reward)喂给现成 ACL,长程操控**只用稀疏奖励**训练(UT Austin / Peter Stone, 2026)。技能工厂"新专家怎么训"的一环;**实测反证:拆解+稀疏奖励≈0%,段内还需课程**

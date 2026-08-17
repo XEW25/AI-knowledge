@@ -8,6 +8,7 @@
 - **Authors**: Yixian Zhang\*, Huanming Zhang\*, Feng Gao, Xiao Li, Zhihao Liu, Chunyang Zhu, Jiaxing Qiu, Yuchen Yan, Jiyuan Liu, Wenhao Tang, Zhengru Fang, Yi Nie, Changxu Wei, Yu Wang, Wenbo Ding, **Chao Yu**†(通讯) — \*equal
 - **Organization**: **清华大学** + Striding AI + Purdue + 中科院自动化所 + **无问芯穹** + 中关村学院 + 港科大
 - **arXiv**: [2607.08448](https://arxiv.org/abs/2607.08448)
+- **Code**（2026-08-17 核实）: **已开源，但不叫 HarnessVLA——是 [RLinf/RPent](https://github.com/RLinf/RPent)**（README 明写 *"Our first RPent publication, Harness VLA…"*；项目页 Code 按钮仍标 coming soon，唯一 GitHub 链接指向它）。**实现暴露了论文没说的三件事**：harness 策略在 markdown guides + prompt 里而非代码（Python 中 staging/postcondition/verif 命中 0）、记忆写入需 maintainer 人审且无自助上传、仅 LIBERO 零真机。⚠️ 仓库无 LICENSE 文件、无测试、Pre-Alpha。→ 审计详见 [[RLinf - RPent Recursive Physical Agent Framework]]
 - **Open source**: 项目页已上线;**代码/权重未见明确发布**(截至 2026-08-06)
 - **Raw tier**: URL-only(未下载 PDF)
 - **Verification status**: 机制 / τ 语义 / 记忆结构 / 结果 / 局限 **全文自读核实**(arXiv HTML v1)于 2026-08-06

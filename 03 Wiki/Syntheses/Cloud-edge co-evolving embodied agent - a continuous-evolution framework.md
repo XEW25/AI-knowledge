@@ -127,6 +127,20 @@
 
 ---
 
+## 演进通道能否去人:检测信号质量是闸门(2026-08,三点外证)
+
+三个独立团队在同一个 `trace/经验 → 分析 → 改进` 回路上,把"人"放在了不同位置——差异完全由**失败/成功信号的可信度**解释:
+
+| 系统 | 门禁位置 | 为什么 |
+|---|---|---|
+| **NVIDIA ENPIRE**(arXiv:2606.19980,GEAR+CMU+Berkeley) | **全自动**(EN 阶段一次性人工,之后 coding agent 直接改训练代码) | 专门花一个阶段让 agent 合成 reward 函数并**离线验证判别准确率**,双相机视角防假阳,延迟压到 <150ms——信号先做到可信,才敢撤人 |
+| **华为 [[openJiuwen - JiuwenSymbiosis Physical AI Assistant Framework\|JiuwenSymbiosis]]** | SkillPatchProposal → SKILL.md 之间**刻意设人工门禁** | 设计文档自陈:"Trace 只能说明'发生了什么',无法证明某条工作流规则在所有机器人和场景下都安全"——失败信号只有工具返回码 |
+| **RLinf [[RLinf - RPent Recursive Physical Agent Framework\|RPent]]**(Harness VLA 代码仓) | 记忆库写入需 **maintainer 人审,无自助上传** | 成败判断来自 planner 自述,无独立验证 |
+
+⇒ **T2(可控自演进)的自动化程度不是独立设计选项,是失败检测层信号质量的因变量。** 检测是自演进的前置条件,不是并列特性;先做演进后深化检测,做出来的必然是又一个人审门禁。这给 Open Problems 第一条("上线前验证的覆盖性")一个可操作的中间解:**验证信号本身先过"离线判别准确率"关**(ENPIRE 路径),而非直接追求全场景覆盖。
+
+另一条边界判断(Harness VLA/RPent 反例 + ENPIRE 正例):**coding agent 属于演进通道,放进运行时通道就出不了仿真**——延迟/成本/SaaS 依赖/断网即死,四条都顶撞"断网必须能活"。ENPIRE 的正确用法:coding agent 在实验室循环里改代码,机器人运行时跑的仍是朴素 policy。
+
 ## Open Problems(汇报里单独标)
 
 - **开放世界技能的上线前验证(覆盖性)**——② 唯一的硬骨头:回归测试盖不住长尾,影子只覆盖遇到过的场景。

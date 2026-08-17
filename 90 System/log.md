@@ -1031,3 +1031,10 @@
 - **[[Cloud-edge co-evolving embodied agent - a continuous-evolution framework]] 增补**："演进通道能否去人：检测信号质量是闸门"（ENPIRE 全自动 / 华为人审 / RLinf 人审三点外证）+ "coding agent 属于演进通道，进运行时环就出不了仿真"。
 - **[[Zhang et al. - Harness VLA Steering Frozen VLAs into Reliable Manipulation Primitives via Memory-Guided Agents]] 补代码发布信息**（RPent + 实现暴露的三件事）。
 - 顺带修正本 session 早前一个错误结论："NVIDIA 在具身 Agent 层没做过具体工作"为假——**ENPIRE（arXiv:2606.19980）是演进通道 harness**（自称 "a harness framework for coding agents"，8 台真机双臂 YAM，99% pass@8）；NVIDIA 的准确站位 = 造 agent harness 但只围开发/研究循环，不围机器人任务。**ENPIRE 待 ingest**；[[NVIDIA]] 实体页"运行时 harness｜没有"一行仍为真、无需改，但可补演进通道条目（待办）。
+
+## 2026-08-17（补）— PPT 画图流程沉淀
+
+- 制作《具身Agent系统逻辑架构.pptx》（库根，不进 git；经三轮迭代：深底→白底→拓扑修正为 决策层/Rail/工具层/本体接入层 + 侧挂服务，用户手改措辞均保留）。
+- 新增 [[PPT diagram workflow]]（90 System 操作文档）：pptxgenjs + PowerPoint COM 渲染 QA 五步循环、负 extent 陷阱（PowerPoint 报 0x80070570）、validate.py 中文 locale 假阳、风格约定（白底淡彩/琥珀=待建）、生成器索引。
+- 生成器脚本入库：`90 System/scripts/pptx/gen_embodied_agent_arch.js`（一图一脚本，保证可重生成）。
+- 同步写入 Claude 持久记忆三条（工具链 / 负 extent 坑 / 交付与"先提取用户手改再重生成"约定）。

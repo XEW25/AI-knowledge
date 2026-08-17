@@ -155,3 +155,4 @@
 - [[90 System/AGENTS]]
 - [[90 System/log]]
 - [[Vault linting]] — link-integrity linter (`scripts/vault_lint.py`) + usage
+- [[PPT diagram workflow]] — 本机 pptxgenjs 生成 + PowerPoint COM 渲染 QA 的画图流程；负 extent 陷阱、validate 假阳、风格约定、生成器索引（`scripts/pptx/`）

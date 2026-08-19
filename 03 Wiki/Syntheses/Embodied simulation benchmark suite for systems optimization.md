@@ -1,720 +1,402 @@
 # 面向具身计算系统优化的仿真评测套件
 
-> **定位**：为具身 Agent 架构、VLA 推理加速、渲染引擎、物理引擎与 3DGS 等系统优化建立统一的**端到端精度回归工作负载**。本页讨论的不是“如何评价一个仿真器是否逼真”，而是：替换或优化某个系统组件后，如何判断具身任务精度有没有退化，并能进一步定位退化来源。
+> **定位**：团队做具身计算系统，研究方向包括：具身模型推理优化（量化、token 压缩、flow/扩散降步、算子与编译）、具身 Agent 框架、具身仿真与真机 RL 框架、物理引擎加速（主要基于 MuJoCo）、渲染引擎加速（软件光追、3DGS）。精度评估体系分**真机、仿真、引擎**三层，本页只覆盖**仿真层**：替换或优化某个系统组件后，如何用仿真基准判断具身任务精度有没有退化，并进一步定位退化来源。真机层见 [[Real-robot evaluation]] 与 [[Real-robot eval bench - task suite design and setup checklist]]；引擎层的组件级 microbenchmark（求解器数值精度、渲染像素误差等）不在本页。
 >
-> 制定于 **2026-08-06**。当前为 **v0.6 讨论稿**，后续需要根据团队算力预算、实际引擎、本体和 Agent 接口冻结具体 manifest。
+> 公开仿真基准由**开发团队自评**；**评估团队**另行维护私有评测集 **ESAS（Embodied System Acceptance Suite，具身系统验收套件）**，承担质量管控与最终评审。
+>
+> 制定于 2026-08-06；**2026-08-18 重构为 v0.7**：按"共同任务池 → 私有集构建 → 判定标准 → 方向映射"重排，细节运行参数收进附录。任务清单、扰动范围与非劣性门槛仍需按团队算力预算与冻结的 reference 校准。
 
-## 1. 核心问题
+## 1. 核心问题与评估分工
 
-团队可能同时优化：
-
-- 具身 Agent 系统设计：规划、记忆、任务分解、失败恢复、VLA primitive 编排
-- VLA 推理系统：量化、剪枝、蒸馏、算子融合、编译、KV cache、异步执行、action scheduling
-- 渲染引擎：光栅化、光追、传感器生成、分辨率与采样策略
-- 物理引擎：碰撞、接触求解、约束、积分器、并行化、时间步长与求解迭代数
-- 3DGS：场景表示、可微或实时渲染、与物理引擎组合
-
-统一问题是：
+统一问题：
 
 > **保持任务、模型与随机输入不变，只替换被优化组件，观察端到端任务精度是否退化。**
 
-这里的“精度”不能只等同于平均成功率，还包括分阶段完成度、完成时间、轨迹质量、碰撞与异常退出等。
+这里的"精度"不能只等同于平均成功率，还包括分阶段完成度、完成时间、轨迹质量、碰撞与异常退出（判定标准见第 4 节）。
 
-## 2. 为什么不能只选一个 benchmark
-
-不同优化点会被不同任务放大：
-
-| 优化点 | 最敏感的任务性质 | 单靠 LIBERO 是否足够 |
+| 角色 | 使用的数据 | 职责 |
 |---|---|---|
-| VLA 推理加速 | 长程误差累积、精密对位、action chunk 重规划 | 否；适合共同回归，但物理与双臂覆盖不足 |
-| Agent 架构 | 多阶段规划、导航、记忆、失败恢复、部分完成 | 否；LIBERO-Long 仍偏低层连续控制 |
-| 渲染 / 3DGS | 物体辨识、空间定位、遮挡、相机和光照变化 | 部分；需增加 randomized 与家庭场景 |
-| 物理引擎 | 接触、摩擦、滑移、堆叠、插入、铰接、双臂闭链 | 否；必须增加接触丰富任务和物理探针 |
+| 开发团队 | 公开 benchmark 全量 | 日常回归、问题定位、对外可比 |
+| 评估团队 | ESAS 私有派生集 | 验收门槛、防调参过拟合、最终评审 |
 
-因此采用：
+为什么两边都需要：
 
-> **共同核心回归集 + 优化点专项集**
+- **只用公开集不够**：实例、组合和反馈长期暴露后，开发团队可能有意或无意针对公开集调参，公开成绩不再等于真实质量。
+- **只做隐藏也不够**：π0.5 在原始 LIBERO 上已接近 97%，天花板附近没有区分度。私有集必须把 reference 成功率校准到有区分度的区间（经验上约 **20%–80%**），接近 0% 或 100% 的项只能作能力压力项。
 
-而不是给所有系统优化只配一张总榜。
+## 2. 共同任务池与标准运行参数
 
-## 3. 建议的分层固定工作负载
+以 π0.5 为共同参考模型。每个 benchmark 只回答三件事：**测什么、关键运行参数、当前 π0.5 参考成绩与使用边界**。关键参数指工作负载单位与实例数、rollouts、action chunk 预测/执行步数；其余细节（相机、图像预处理、normalization、seed、初始等待等）冻结后基本不变，收进附录 A。
 
-### 3.1 `Embodied-Core`：LIBERO 四套件
+总表（细节见各小节）：
 
-所有涉及 π0.5 的系统优化共同必跑：
+| Benchmark | 工作负载单位与规模 | rollouts | π0.5 chunk 预测/执行 | flow steps | π0.5 参考成绩 |
+|---|---|---|---|---|---|
+| LIBERO 原始四套件 | 40 tasks | 50 / task | **10 / 5** | 10 | 98.8 / 98.2 / 98.0 / 92.4，均值 96.85（官方） |
+| LIBERO-Plus | **10,030 个固定扰动实例** | **1 / instance** | 10 / 5（团队规定） | 10 | 官方榜无 π0.5 |
+| LIBERO-PRO | 40 tasks × 5 profile | 50 / task / profile | 10 / 5（团队规定） | 10 | 总体约 0.53（作者 README 榜） |
+| RoboTwin 2.0 | 50 tasks × clean/randomized | 100 / task / 档 | **50 / 50**（整 chunk 开环） | 10 | 官方 cotrain 70.7 / 46.0 |
+| RoboCasa365 Public-50 | 50 tasks（18/16/16 三组） | 50 / task | **50 / 5** | 10 | 39.6 / 7.1 / 1.2，总体 16.9 |
+| BEHAVIOR 2026 | 100 tasks × 10 公开实例 | 1 / instance | 官方管线 horizon 32 / 执行步未披露 | 10 | 无公开分数；2025 届冠军（π0.5 基座）Q≈0.26 |
 
-- `LIBERO-Spatial`：空间定位与视觉几何
-- `LIBERO-Object`：物体与外观辨识
-- `LIBERO-Goal`：目标和语言条件变化
-- `LIBERO-10`：多阶段任务、长程执行与误差累积
+### 2.1 LIBERO 原始四套件：可复现共同基线
 
-四套件共 40 个任务。
+- **测什么**：Spatial（空间几何）/ Object（物体辨识）/ Goal（目标与语言条件）/ LIBERO-10（多阶段长程），四套件共 40 任务；robosuite/MuJoCo 栈。
+- **关键参数**：50 rollouts/task；π0.5 每次预测 10 actions、执行前 5 步后重新观测推理（**10/5**）；flow-matching 10 步；checkpoint `pi05_libero @ 30k`。
+- **π0.5 参考成绩**：官方 98.8 / 98.2 / 98.0 / 92.4，均值 96.85（[OpenPI LIBERO README](https://github.com/Physical-Intelligence/openpi/blob/main/examples/libero/README.md)）。
+- **使用边界**：公开、可运行、官方 checkpoint 齐全，适合所有 π0.5 优化的共同必跑回归；但整体接近饱和，接触、双臂与 Agent 级长程覆盖不足——能证明"没有破坏 π0.5-LIBERO 能力"，不能独自承担最终验收。
 
-**选择理由**：π0.5 已有官方 checkpoint、配置、评测代码和可复现结果，适合作为共同基线。OpenPI 官方报告 π0.5 @ 30k 在 Spatial / Object / Goal / 10 上分别为 **98.8 / 98.2 / 98.0 / 92.4**，平均 **96.85**（[OpenPI LIBERO README](https://github.com/Physical-Intelligence/openpi/blob/main/examples/libero/README.md)）。
+### 2.2 LIBERO-Plus：观测分布偏移与条件鲁棒性
 
-**证据边界**：
+- **测什么**：在任务结构基本不变前提下的 7 个扰动维度、21 个子维度：Objects Layout、Camera Viewpoints、Robot Initial States、Language Instructions、Light Conditions、Background Textures、Sensor Noise（[arXiv 2510.13626](https://arxiv.org/abs/2510.13626)，CVPR 2026 版标题为 "A Progressive Robustness Benchmark…"，与 arXiv 版 "In-depth Robustness Analysis…" 为同一论文的两个版本；[官方代码库](https://github.com/sylvestf/LIBERO-plus)）。
+- **关键参数**：论文从 40 个原始任务生成 14,000 个候选、过滤为 **10,030 个 test-only 固定实例**；工作负载单位是**一个固定 perturbed instance，每实例只 rollout 一次**（官方 README 明确把 `num_trials_per_task` 从 50 改为 1）。需要扩样时增加独立扰动实例，不是把同一实例重复 50 次。
+- **π0.5 参考成绩**：官方榜覆盖 π0、π0-Fast、OpenVLA 系列等十个模型，**没有 π0.5**；论文也未披露任何 π 模型的 flow steps / horizon / chunk 执行步数。团队跑 π0.5-Plus 时按附录 A 的 Policy Contract（10/10/5）执行——这是 **ESAS 规定**，不是 Plus 官方配置。
+- **使用边界**：最适合渲染/3DGS、视觉编码、相机链路与观测质量测试。注意 L1–L5 难度是按 OpenVLA-OFT/π0/π0-Fast/UniVLA 四个模型的成败**事后**分层的经验标签，不由物理扰动幅度决定，ESAS 不直接把它当验收等级。区分 zero-shot robustness 与 Plus-finetuned robustness——训练中见过 Plus 数据的成绩不再是对原始模型的 OOD 验收。
 
-- 优点：公开、可运行、π0.5 原生支持，适合持续回归和对外可比。
-- 缺点：整体接近饱和；接触、复杂动力学、双臂和真正 Agent 级长程能力不足。
-- 结论：可以证明“优化没有破坏 π0.5-LIBERO 能力”，不能单独证明物理引擎、双臂或 Agent 系统没有退化。
+### 2.3 LIBERO-PRO：grounding、任务泛化与反记忆
 
-#### LIBERO 的三层使用方式
+- **测什么**：模型是否根据当前观测和指令在线决策，而不是重放记住的场景—轨迹映射。论文概括为四类高层变化（各类过拟合观察见论文 §2，统一框架见 §4.1）；代码库实际提供五个配置轴：Object（`use_object`）、Position（`use_swap`）、Semantic（`use_language`）、Task（`use_task`）、Environment（`use_environment`），官方规定 **`use_task` 不得与其它轴组合**（README 与论文 Fig. 6 caption；[arXiv 2510.03827](https://arxiv.org/abs/2510.03827)、[官方代码库](https://github.com/Zxy-MLlab/LIBERO-PRO)）。
+- **关键参数**：每个 task × 启用 profile 跑 **50 episodes**（论文 §5.1）；max steps 沿用 LIBERO 各套件 220/280/300/520（出处是 README 的 OpenVLA 适配片段，论文未写）。论文和仓库均未披露 π0.5 推理参数，团队复现统一按附录 A，差异写入结果元数据。
+- **π0.5 参考成绩**（出自**仓库 README leaderboard**，论文正文只有图无数字表）：总体约 **0.53**；Object 0.92–0.98、Semantic 0.93–0.97、Position 0.08–0.38、Task 0.00–0.01、Environment 0.46–0.73（四个 suite 分别报告）。非 Physical Intelligence 官方成绩。
+- **使用边界**：Object、Semantic 与校准后的 Environment/Position 可用于 grounding 回归；接近地板的 Task 与困难 Position 只能作能力压力，不适合判断 1–3pp 的量化或算子回退。对 Agent、重规划与失败恢复系统，PRO 比纯视觉扰动更有价值。
+- **与 Plus 的区别**（轴名有重叠但问题不同）：Plus 问**鲁棒性**——任务和成功判定不变，只改输入条件（相机/光照/噪声/干扰物/措辞），同一件事还做不做得对；PRO 问**反记忆/任务理解**——物体外观、位置、目标乃至任务逻辑真正变化后，模型是否在线重新 grounding。逐轴看：Plus 的 Layout 是加干扰物和小幅位移，PRO 的 Position 是移到未见的新可行位置；Plus 的 Background 是换纹理，PRO 的 Environment 是换整个场景；PRO 的 Task 轴连 predicate 都改（新任务分布），Plus 完全没有；只有 Semantic/Language 改写是两者真正重叠的轴。π0.5 成绩的分裂（Object/Semantic 0.92+ vs Position/Task 0.38 以下）正说明两类问题不是一回事。ESAS 映射：Plus → Observation-Robustness（Language → Grounding）；PRO → Grounding（Object/Semantic）+ Task-Generalization（Position/Task/Environment）。
 
-原始 LIBERO 同样不应独自承担开发回归、鲁棒性诊断与最终质量验收。建议拆成：
+![[libero-plus-pro-same-task-comparison.png]]
 
-1. **Public Compatibility**：原始 LIBERO 40，复现官方 π0.5 配置和公开结果。
-2. **Public Robustness / Generalization**：开发团队运行公开的 LIBERO-Plus 与 LIBERO-PRO，发现视觉、条件和任务泛化问题。
-3. **Private Acceptance**：评估团队维护 `ESAS-LIBERO`，复用 Plus/PRO 的扰动设计，但使用隐藏的 seed、资产、指令、位置、任务组合与 Final Holdout。
+*同一底座任务（LIBERO-Goal "put the bowl on the plate"）在三个 benchmark 下的真实渲染帧：Plus 只改输入条件（绿），PRO 改任务要素（橙）。帧取自 LIBERO-Plus（arXiv:2510.13626）与 LIBERO-PRO（arXiv:2510.03827）论文图。注意：两篇论文的帧呈左右镜像——LIBERO 的 OpenGL 原始渲染是倒置的，垂直翻转（`img[::-1]`）与 180° 旋转（`img[::-1,::-1]`，OpenPI 训练预处理用后者）恰好相差一个水平镜像，属可视化约定差异而非场景扰动（PRO 未扰动的 Original Task 帧即已镜像）；图中已将 PRO 帧翻转对齐。这也说明图像方向属于 checkpoint 输入契约，喂错翻转约定会使左右空间语义反转（见附录 A）。*
 
-公开 Plus/PRO 不能替代私有验收：只要实例、组合和反馈长期暴露，开发团队仍可能直接训练或反复调参。另一方面，单纯隐藏原始 LIBERO seed 也不能解决 π0.5 接近 97% 的天花板效应；ESAS-LIBERO 还需把 reference 成功率校准到有区分度的区间。
+### 2.4 RoboTwin 2.0：双臂、接触与跨引擎参照
 
-#### LIBERO-Plus：条件鲁棒性与 covariate shift
+- **测什么**：50 个双臂任务、五类本体，SAPIEN 栈；覆盖精密对位、接触、铰接、工具使用与双臂闭链（[论文](https://arxiv.org/abs/2506.18088)、[任务页](https://robotwin-platform.github.io/doc/tasks/)）。
+- **关键参数**：每任务 50 条 clean 演示训练，clean（Easy）与 randomized（Hard）各评 **100 rollouts**；官方随机化字段共八个（背景、桌面杂乱、头部相机距离、桌高、光照等），**纯视觉/几何，没有质量、摩擦、阻尼、接触刚度或控制延迟等物理/控制字段**（[配置文档](https://robotwin-platform.github.io/doc/usage/configurations.html)）。π0.5 chunk 为 **10/50/50——预测 50 步、chunk 内零重规划，执行完整段才再推理**（`Pi0Config(pi05=True)` 默认 horizon 50 未覆写；`deploy_policy.yml` 的 `pi0_step: 50` 切整段执行；细节：`take_action` 在中途成功或步数耗尽后短路空转，成功锁存不受剩余动作影响——推理频率严格每 50 步一次，物理执行可不满额。[官方 π0.5 文档](https://robotwin-platform.github.io/doc/usage/Pi05.html)、[stable_2.0 部署代码](https://github.com/RoboTwin-Platform/RoboTwin/blob/stable_2.0/policy/pi05/deploy_policy.py)、[评测主循环](https://github.com/RoboTwin-Platform/RoboTwin/blob/stable_2.0/script/eval_policy.py)）。三家对比：LIBERO 10/5、RoboCasa 50/5、RoboTwin 50/50——RoboTwin 开环程度最高，对推理延迟最宽容、对 chunk 内扰动最脆弱；官方 cotrain 成绩即此协议，reference 复现必须沿用，改执行步数属 §2.7 的 scheduling 独立实验。另注意 RoboTwin 的单个 action 经 mplib TOPP 子轨迹执行（1/250s 仿真步长），无固定控制频率概念——Control 轴注入"延迟 N 步"的语义与 LIBERO 不同，需按时间而非步数定义。
+- **π0.5 参考成绩**：官方 leaderboard 于 **2026-08-10** 上线 RoboTwin 团队的 π0.5 cotrain 条目：**Easy 70.7 / Hard 46.0**（含 50 任务逐项；条目为 JS 渲染，普通抓取会漏）。榜单术语：**Co-train = 单一 policy 在全部 50 任务的 demo_clean 上联合训练**（训练数据不含 randomized），Single = 每任务单独 SFT 一个 checkpoint；本体固定 Aloha-AgileX。对照 Motus 作者同为联合训练的 π0.5 42.98 / 43.84（40k finetune，[Motus Table 14](https://arxiv.org/html/2512.13030)）——同类协议下不同训练 recipe 差近 30 个点，**任何借用的数字都不能当团队验收基线，必须用团队冻结的 recipe 重建 reference**。
+- **使用边界**：物理方向的**跨引擎参照**（SAPIEN，非 MuJoCo，见 §5）；双臂与接触覆盖是 LIBERO/RoboCasa 没有的。早期挑的 System-10 子集（click_bell、lift_pot 等十任务，按 Motus 表推算均值 33.8/34.2，存在明显地板/天花板项）只保留为快速诊断或能力压力候选。
 
-LIBERO-Plus 在原任务结构基本不变的前提下，构造 **10,030** 个评测实例，覆盖 7 个扰动维度、21 个子维度，并按经验难度分成 Level 1–5（[论文](https://openaccess.thecvf.com/content/CVPR2026/papers/Fei_LIBERO-Plus_A_Progressive_Robustness_Benchmark_for_Visual-Language-Action_Models_CVPR_2026_paper.pdf)、[官方代码库](https://github.com/sylvestf/LIBERO-plus)）：
+### 2.5 RoboCasa365：MuJoCo 主任务集
 
-| 维度 | 变化 | 对系统优化的价值 |
-|---|---|---|
-| Object Layout | 干扰物、目标物位移 | 空间与目标定位、视觉 shortcut |
-| Camera | 位姿、朝向、FOV | 渲染、3DGS、视角鲁棒性 |
-| Robot Initial State | 机械臂初始姿态 | 固定动作模板依赖、控制闭环 |
-| Language | 指令改写 | 语言表述鲁棒性 |
-| Light | 强度、方向、颜色、阴影 | 光照与 renderer 鲁棒性 |
-| Background | 场景和表面纹理 | 外观 shortcut |
-| Sensor Noise | 模糊、抖动、光度退化 | 视觉编码器、压缩和传感器链路 |
+- **测什么**：365 个厨房任务、2,500 个厨房场景，RoboCasa/robosuite/MuJoCo 栈；公开 leaderboard 用 50 个目标任务：**Atomic-Seen 18 / Composite-Seen 16 / Composite-Unseen 16**，Human300（300 任务）训练、`pretrain` split 评测（[leaderboard](https://robocasa.ai/leaderboard.html)、[benchmarking 文档](https://robocasa.ai/docs/build/html/benchmarking/benchmarking_overview.html)）。
+- **关键参数**：50 trials/task；π0.5 每次预测 50 actions、执行前 5 步（**50/5**，horizon 50 是 `Pi0Config` 默认值未被覆写）；flow 10 步；checkpoint `pi05_pretrain_human300 @ 75k`（RoboCasa 团队复现，batch 64，OpenPI fork commit `ca4c671`）。**注意 horizon**：该提交的 runner 代码本身就是 `get_task_horizon(env_name) * 1.5`，即公开成绩已在 1.5× horizon 下评出；RoboCasa 1.0.1 又把 1.5× 烧进了任务定义——迁移到 1.0.1 时若 runner 再乘 1.5 会变成 2.25×，**必须核对避免双重乘法**。
+- **π0.5 参考成绩**：Atomic-Seen **39.6%** / Composite-Seen **7.1%** / Composite-Unseen **1.2%**，总体 16.9%（[提交记录](https://github.com/robocasa-benchmark/leaderboard/blob/main/submissions_md/pi05_2026-04-02.md)）。冻结门槛前仍须在统一 1.0.1 协议下重跑 reference。
+- **使用边界**：物理引擎（MuJoCo）优化的**主承载**；Atomic-Seen 成功率处于有翻转空间的区间，是精度回归候选池；Composite 两组接近地板，只作能力压力（开发自报，不入 ESAS，见 §3.4）。`target` split（10 个不相交厨房 + 不相交对象）单独作场景/对象 OOD。
 
-它最适合渲染/3DGS、图像压缩、视觉编码器量化、相机变化和观测质量测试。论文先从 40 个原始任务、四个 suite 和七个维度生成 14,000 个候选实例，再过滤为 10,030 个 test-only 实例；这些实例已经把具体扰动展开成独立任务。因此全量 published protocol 的工作负载单位是 **一个固定 perturbed instance**，不是“一个原始 task 再抽 50 个 episodes”（[论文 Appendix C](https://arxiv.org/html/2510.13626)）。正式比较应让 reference 与 candidate 各运行同一批 10,030 个实例一次；需要扩样时应增加独立扰动实例，而不是把同一实例机械重复 50 次。
+### 2.6 BEHAVIOR 2026：Agent 级长程任务
 
-当前官方公开榜包含 π0、π0-Fast、OpenVLA 系列等结果，但不能把其他论文经额外 SFT 得到的 π0.5 数字称作 Physical Intelligence 官方 π0.5-LIBERO-Plus 基线。必须区分：
+- **测什么**：100 个 BEHAVIOR-1K 全长家庭任务，导航 + 移动操作 + 多阶段目标；观测限 RGB + depth + proprioception，测试时禁用分割、物体状态、目标位姿等仿真真值（[评测规则](https://behavior.stanford.edu/challenge/evaluation.html)）。
+- **关键参数**：主指标为最终满足的 BDDL goal predicates 比例（部分完成分，Q-score）；timeout 默认为人类演示平均长度的 1.5 倍；公开评测协议为 100 任务 × 前 10 个公开实例 × 1 rollout = 1,000 episodes；兼容 OpenPI 的 websocket 接口（[2026 Challenge](https://behavior.stanford.edu/challenge/index.html)、[评测规则](https://behavior.stanford.edu/challenge/evaluation.html)）。
+- **π0.5 参考成绩（截至 2026-08-18）**：2026 届**无公开 baseline 分数**——官方 π0.5 / GR00T N1.7 是"参考训练+评测管线"而非有成绩的条目，[leaderboard](https://huggingface.co/spaces/behavior-1k/2026-challenge-leaderboard) 为 0 提交（截稿 10/16、公布 11/04）。最近锚点是 2025 届（50 任务）：冠军（π0.5 基座）Q-score **0.2599**、完整任务成功率 **12.4%**（[方案](https://github.com/IliaLarchenko/behavior-1k-solution)）；NVIDIA Comet（π0.5 基座）0.2514，赛后改进版在公开实例 0.345（[arXiv:2512.10071](https://arxiv.org/abs/2512.10071)）。π0.5 级系统在此量级任务上处于深地板区间。
+- **权重与训练**：官方只放出 1/100 任务（`turning_on_radio`）的微调 checkpoint；其余需按官方管线自训——`pi05_base` + [openpi behavior 分支](https://github.com/wensi-ai/openpi)，R1Pro 本体，**action horizon 32**（又一个 checkpoint 级 horizon，区别于 LIBERO 10 / RoboCasa 50），逐任务微调。训练数据全开放：20,000 条 JoyLo 遥操演示，3.27 TB，MIT（[dataset](https://huggingface.co/datasets/behavior-1k/2026-challenge-demos)）。
+- **本地运行约束**：需 RT-core GPU（Isaac Sim 5.1 **不支持 A100/H100 渲染**），官方参考机为单张 RTX 4090 + 128 GB RAM + Ubuntu 22.04；挑战规格观测（720×720 RGB-D）下仿真 **~13.5 FPS**，1,000 episodes 单机约 2–3 周（2025 冠军实测 500 episodes 单机 ~10 天，20×4090 并行 <2 天）；资产包（31.5 GB 加密）为 **non-commercial academic EULA**；官方明确声明**仿真器非确定**——无法做 ESAS 式逐 episode 严格配对，只能多 rollout 平均。
+- **使用边界**：因成本、非确定性与深地板效应，定位为**发布级 Agent 能力压力评测**，不承担日常回归与非劣性验收；日常长程回归由 RoboCasa365 Composite 承担（有公开 π0.5/GR00T 分数、MuJoCo 便宜、可配对）。内部 `BEHAVIOR-Core-20` 按演示长度、predicate 数、是否导航/搜索/可恢复失败分层抽样（Core-20 × 10 实例 = 200 episodes ≈ 单机 4–5 天，可行）；Full-100 仅重大发布跑。Agent"大脑"层（目标解释、子目标分解、动作排序）可另用 [EAI](https://embodied-agent-interface.github.io/)（Embodied Agent Interface）做符号层诊断——它复用 BEHAVIOR 任务定义，可与执行层结果两级归因，成本极低。
 
-- **Zero-shot robustness**：只用原始 LIBERO 训练，直接在 Plus 上测试。
-- **Plus-finetuned robustness**：训练中已见 Plus 数据；它回答的是增强训练后的性能，不再是对原始模型的 OOD 验收。
+### 2.7 跨 benchmark 的 π0.5 运行契约要点
 
-LIBERO-Plus 论文没有报告 π0.5，也没有替 π0.5 冻结 flow steps、action horizon 或每 chunk 执行步数。团队运行 π0.5-Plus 时，必须把本页第 7.1–7.2 节作为内部统一 Policy Contract；这是一项 **ESAS 规定**，不能反称为 Plus 官方模型配置。
+- **各 benchmark 用各自适配/微调的 checkpoint**（LIBERO: `pi05_libero@30k`；RoboCasa: `pi05_pretrain_human300@75k`）；不能拿 `pi05_libero` 零样本跑其他本体后把低分归因于系统优化。
+- 所有结果必须分别报告 `flow_steps / predicted_action_horizon / executed_actions_per_chunk`，不许只写含糊的 "chunk size"。LIBERO 系为 **10/10/5**，RoboCasa 为 **10/50/5**，RoboTwin 为 **10/50/50**（整 chunk 开环）——三家三种组合，口头说 "chunk 50" 无法区分后两者。
+- **随机性控制**：官方 runner 只固定 NumPy/环境 seed（seed 7）；OpenPI policy server 端 flow 初始噪声默认 `jax.random.key(0)`——同一新起进程内是确定的，但依赖推理调用顺序。配对评测要么显式注入 per-episode noise，要么固定 server RNG、对齐调用顺序并记录重启。
+- **单一声明变量**：量化/算子/编译只改声明的计算实现；flow-step reduction 允许少于 10 步，但必须与 10-step BF16 reference 配对并把步数写进结果名（如 `INT8-flow6-h10-e5`）；改 horizon 或执行步数的 scheduling 优化改变了闭环协议，不进标准精度榜，单独报告。
+- 完整参数表与代码依据见附录 A。
 
-#### LIBERO-PRO：grounding、任务泛化与反记忆
+## 3. 评估团队私有评测集（ESAS）
 
-LIBERO-PRO 针对原始 LIBERO 训练任务与评测任务过度相似的问题，检查模型是否根据当前观测和指令在线决策，而不是重放记住的场景—轨迹映射（[论文](https://arxiv.org/abs/2510.03827)、[官方代码库](https://github.com/Zxy-MLlab/LIBERO-PRO)）。论文把它概括为四类高层变化；当前代码库实际提供五个配置轴：
+### 3.1 治理原则
 
-| 维度 | 变化 | 主要判断 |
-|---|---|---|
-| Object | 外观、颜色、尺度或对象变化 | 是否正确绑定视觉对象 |
-| Position | 对象移动到新的可行位置 | 是否依赖固定抓取点和轨迹 |
-| Semantic | 等价指令改写 | 是否理解语言而非记模板 |
-| Task | 改变目标对象、目标状态或任务逻辑 | 是否能组合和执行新任务 |
-| Environment | 替换工作环境 | 是否能跨场景迁移 |
+仅隐藏数据不够——若开发团队可以无限提交并拿到逐 episode 反馈，仍会通过反馈拟合内部集。评估治理至少包括：
 
-Plus 与 PRO 有对象、位置、语言和环境上的重叠，但问题不同：**Plus 主要问同一个任务在输入条件变化后是否稳健；PRO 进一步问对象、位置、目标或任务逻辑变化后，模型是否真正理解当前任务。** `Task` 因而不是普通视觉 hard，而是 task/goal shift。
+- 不公开具体 seed、初始状态、资产组合、扰动样本与 episode manifest；但评测代码、成功判定与参数范围透明，避免不可解释的"秘密规则"。
+- 开发阶段只反馈 profile / 任务族级聚合结果；逐 episode 视频按诊断需要抽样开放。
+- 限制正式验收提交频率；完整记录提交、配置与结果。
+- 定期轮换 Private Validation 的一部分实例；Final Holdout 平时不运行、不反馈，只用于正式发布验收。
+- 冻结并哈希 suite、代码、任务、资产、配置、容器、仿真器与成功判定版本。
 
-LIBERO-PRO 作者当前报告 π0.5 总体约 **0.53**；Object 与 Semantic 多在 0.92–0.98，Position 为 0.08–0.38，Task 几乎为 0–0.01，Environment 为 0.46–0.73（四个原始 suite 分别报告）。这不是 Physical Intelligence 官方成绩，但足以说明使用边界：
-
-- Object、Semantic 和经过校准的 Environment/Position 可用于 regression 或 grounding 验收。
-- 接近地板的 Task 与困难 Position 只能作为 `Capability-Stress`，不适合判断 1–3pp 的量化或算子回退。
-- 对 Agent、重规划、失败恢复和 memory/harness 系统，PRO 比单纯视觉扰动更有价值。
-
-LIBERO-PRO 明确规定每个 task 运行 **50 episodes**，并沿用 Spatial 220 / Object 280 / Goal 300 / LIBERO-10 520 的 horizon；但论文和仓库没有完整披露其 π0.5 的 flow steps、predicted horizon、executed actions、policy noise seed 与初始等待。因此其公开 π0.5 分数不能直接宣称与本页第 7.2 节的 10/10/5 协议完全同构。团队复现时仍统一采用第 7.1–7.2 节，并把差异写入结果元数据（[论文 §5.1](https://arxiv.org/html/2510.03827)、[官方配置与代码](https://github.com/Zxy-MLlab/LIBERO-PRO)）。
-
-#### `ESAS-LIBERO` 建议结构
+### 3.2 ESAS-LIBERO
 
 ```text
 ESAS-LIBERO
-├── Canonical-Heldout
-├── Covariate-Robustness
-├── Grounding
-├── Task-Generalization
-└── Compound
+├── Canonical-Heldout        # 任务/指令/谓词/配置全部不变，仅换隐藏初始状态与 seed
+├── Observation-Robustness   # 复用 Plus 扰动定义，私有重生成
+├── Grounding                # 复用 Plus Language + PRO Object/Semantic
+├── Task-Generalization      # 复用 PRO Position/Task/Environment
+└── Compound                 # 仅终检组合，不用于首轮归因
 ```
 
-- `Canonical-Heldout`：保持原始任务和正常分布，只替换评估团队持有的隐藏初始状态，并冻结环境与 policy noise；具体字段见第 6.1 节表格，承担纯计算路径的主要非劣性验收。
-- `Covariate-Robustness`：主要复用 Plus 的 Camera、Robot、Layout、Light、Background、Noise。Level 1–3 或 reference 位于约 30%–80% 的实例用于精度回归；更困难实例进入压力集。
-- `Grounding`：结合 Plus Language 与 PRO Object/Semantic，检查指令—对象—动作绑定、干扰物和目标存在性。
-- `Task-Generalization`：主要复用 PRO Position/Task/Environment；中等难度项可守门，地板项只作能力压力和未来模型突破跟踪。
-- `Compound`：只在最终验收中组合轻量 Covariate、Grounding 与 Task-Generalization 变化，不用于首轮归因。
+**Canonical-Heldout**：task/BDDL、instruction、success predicate、simulator 配置全部与 Public Canonical 相同；只有初始状态、环境 seed、policy noise 是评估团队持有的隐藏新样本，且 reference 与 candidate 逐 episode 配对共用。承担纯计算路径（量化、算子、后端迁移）的主要非劣性验收。不得混入任何视觉、语言、任务或物理 hardening。
 
-ESAS-LIBERO 不设置独立 Control 或 Physics 数据轴：推理时延、chunk scheduling 等由开发团队验证；评估团队负责冻结统一运行协议，确保所有提交使用相同 action horizon、实际执行步数和控制接口。复杂物理与接触仍由 ESAS-RoboTwin 和 ManiSkill 主承载。
+**Observation-Robustness**：不改官方 Plus 文件，复用其扰动定义私有重生成固定实例。六个必选轴（Plus 七维去掉 Language）：
 
-### 3.2 RoboTwin 2.0：公开开发回归与 ESAS 私有验收
+| 轴 | v1 扰动 | 不得改变 |
+|---|---|---|
+| `Layout` | 加干扰物；目标物合法位移 | 目标身份、instruction、成功谓词 |
+| `Camera` | 距离 1.01–2.00×；球面视角 15°–75°；姿态 2°–10° | 相机 slot、内外参接口、wrist 相机 |
+| `Robot` | 初始 qpos 扰动 0.1–0.5 | 本体、控制器、动作接口；须过可达/碰撞检查 |
+| `Light` | 颜色/方向/specular/阴影 | 几何、物理参数、成功谓词 |
+| `Background` | 场景/桌面纹理 | 目标外观、几何、任务关系 |
+| `Noise` | motion/Gaussian/zoom blur、fog、glass blur | 仿真状态；噪声只作用于送入模型的图像，paired run 共享 noise seed |
 
-RoboTwin 2.0 在本体系中分成两个用途，不能再让一个固定十任务子集同时承担开发回归、精度验收和能力压力测试：
+参数范围以 Plus Appendix A 为上限参考。运行分三层：`OR-Single-Gate`（40 task × 6 轴 × mild/medium × ≥3 独立 seed，逐实例配对，作非劣性验收）、`OR-Subdimension-Diagnostic`（展开子轴加 hard 档，定位链路，不设总门槛）、`OR-Compound-Stress`（多轴组合只作压力；Plus Appendix F 显示扰动交互显著，不能用单轴相乘外推）。冻结前用 reference 逐任务成功率把 mild/medium 校准到有区分度区间。
 
-1. **公开开发回归**：开发团队运行 RoboTwin 2.0 全部 50 个任务的 `official_clean` 与 `official_randomized`，用于日常回归、公开可比和问题定位。
-2. **评估团队验收**：评估团队维护 **ESAS（Embodied System Acceptance Suite，具身系统验收套件）**，其中 RoboTwin 派生部分命名为 `ESAS-RoboTwin`。它使用隐藏、配对、版本冻结的任务实例，作为量化、推理加速、算子替换、渲染、物理和控制优化的最终质量守门。
+**Grounding**：验证 instruction—对象—动作在线绑定，非泛化"语言总分"。四轴：`Language-Semantic`（官方名 Distraction / Common Sense / Reasoning Chain 三类改写，语义保持才进 Gate）、`Object-Attribute`（同语义类换外观，predicate 不变）、`Referent-Binding`（加视觉相似 decoy 指向原目标；目标替换/移除只作诊断并标记 `predicate_mode=remapped/unsatisfiable`）、`Instruction-Task`（改目标逻辑，归入 Task-Generalization，不进 Grounding Gate）。诊断项单独报告 `correct_target_contact_rate`、`wrong_object_contact_rate`、`empty_grasp_rate`、`instruction_sensitivity`，不伪装成任务成功率。LLM 生成的改写必须经结构化解析或人工复核才进 sealed set。
 
-`ESAS-RoboTwin` 是团队内部派生套件，不是 RoboTwin 官方 benchmark，结果不能作为官方 leaderboard 分数上报。
+**Task-Generalization**：任务生成三轴——`Position`（多物体重排，制造未见布局，predicate 可不变，与 OR-Layout 用不同 profile 与强度，不合成一个"视觉分"）、`Task`（T1 目标重映射 / T2 目标状态变化 / T3 子任务重组，均改 predicate，是新任务分布；T3 只作能力压力）、`Environment`（换场景模板，纹理光照留给 OR）。沿用官方约束：Task 轴不与其它轴交叉。所有生成任务必须过 BDDL 解析、无碰撞、可达性检查，并由 scripted/oracle controller 验证可解；生成器版本化，生成后不再运行时改写。结果同时报 `task_success`、`predicate_progress`、`subgoal_completion`、`wrong_target_rate`、`oracle_feasibility`。
 
-#### 原 `RoboTwin-System-10` 的重新定位
+ESAS-LIBERO 不设独立 Control/Physics 轴：推理时延与 chunk scheduling 由开发团队验证，评估团队只冻结统一运行协议；复杂物理由 ESAS-RoboCasa 与 ESAS-RoboTwin 承载。
 
-早期建议的十任务如下：
-
-| 任务 | 主要敏感点 |
-|---|---|
-| `click_bell` | 小幅精密控制、接触触发 |
-| `turn_switch` | 接触与关节约束 |
-| `hanging_mug` | 精密对位与悬挂接触 |
-| `stack_bowls_three` | 长程误差累积、堆叠稳定性 |
-| `stack_blocks_three` | 对位、误差累积、接触稳定性 |
-| `open_microwave` | 铰接物体与约束流形 |
-| `beat_block_hammer` | 工具使用、碰撞和接触 |
-| `shake_bottle` | 连续动态动作 |
-| `handover_block` | 双臂顺序协作 |
-| `lift_pot` | 双臂同步与闭链耦合 |
-
-这十个任务是按接触、精密、双臂、工具和动态能力覆盖挑选的**早期能力压力候选集**，不是 RoboTwin 官方套件，也没有经过 π0.5 逐任务成功率分布校准。Motus 作者自行联合训练的 π0.5 在其中存在明显地板和天花板任务，例如 `lift_pot` 为 0/0、`hanging_mug` 为 3/3、`shake_bottle` 为 91/100（clean/randomized）；十任务均值为 33.8/34.2，低于其全 50 任务均值 42.98/43.84（[Motus Table 14](https://arxiv.org/html/2512.13030)）。
-
-因此：
-
-- 它可以保留为日常快速诊断或 `Capability-Stress` 候选，不能直接作为检测 1–3 个百分点小回退的最终精度集。
-- RoboTwin 官方当前提供 π0.5 接入与训练说明，但官方 leaderboard 未发布 π0.5 全任务成功率；Motus 数字是作者自己的多任务训练复现，不能称为官方 π0.5 基线（[官方 π0.5 文档](https://robotwin-platform.github.io/doc/usage/Pi05.html)、[官方 leaderboard](https://robotwin-platform.github.io/leaderboard)）。
-- ESAS 的任务和扰动范围应根据团队冻结的 reference π0.5 重复运行结果重新校准，避免大量 0% 或 100% 项。
-
-#### 官方档位与内部扩展的边界
-
-RoboTwin 2.0 官方完整平台包含 50 个双臂任务、五类本体；官方 benchmark / leaderboard 实际提供两档（[官方任务页](https://robotwin-platform.github.io/doc/tasks/)）：
-
-- `demo_clean`：Clean / Easy
-- `demo_randomized`：Domain-randomized / Hard
-
-论文标准是每任务用 50 条 clean demonstrations 训练，Easy 与 Hard 各评测 100 次（[论文](https://arxiv.org/abs/2506.18088)）。官方公开的 domain-randomization 字段包括：
-
-- `random_background`
-- `cluttered_table`
-- `clean_background_rate`
-- `random_head_camera_dis`
-- `random_table_height`
-- `random_light`
-- `crazy_random_light_rate`
-- `random_embodiment`（实验性，尚未完全支持）
-
-因此官方 `demo_randomized` 主要是**视觉外观 + 相机 + 场景杂乱度 + 桌面几何**的综合随机化；公开通用配置里没有质量、摩擦、关节阻尼、接触刚度、控制延迟或丢帧等标准字段（[官方配置文档](https://robotwin-platform.github.io/doc/usage/configurations.html)）。它不应被解释成完整的“视觉 + 物理 + 控制”随机化。
-
-#### `ESAS-RoboTwin` 的五个 profile
+### 3.3 ESAS-RoboTwin
 
 ```text
 ESAS-RoboTwin
-├── Canonical
-├── Visual
-├── Physics
-├── Control
-└── Compound
+├── Canonical   # 正常难度，隐藏 seed/初始状态/资产组合
+├── Visual      # 改观测不改动力学
+├── Physics     # 改动力学不改视觉语义
+├── Control     # 接口注入时序扰动
+└── Compound    # 仅终检
 ```
 
-- `Canonical`：保持官方任务语义和正常难度，只隐藏 seed、初始状态、语言模板、资产变体和场景组合；用于检测纯计算路径造成的回退。
-- `Visual`：改变观测，不改变任务动力学；用于渲染、3DGS、视觉前处理及模型视觉鲁棒性验收。
-- `Physics`：改变动力学，不改变视觉语义；用于物理引擎、求解器和接触参数验收。
-- `Control`：场景和动力学不变，在 policy–environment 接口注入时序扰动；用于推理延迟、action scheduling 和控制链路验收。
-- `Compound`：组合轻量 Visual、Physics、Control 扰动，只用于最终系统压力测试，不用于首轮退化归因。
+- `Visual` 大部分复用官方随机化字段（关闭会改几何的 `random_table_height`）；更细的遮挡、内参、传感器噪声或 3DGS 退化需扩展 renderer 配置。
+- `Physics` 官方 YAML 没有物理随机化接口，需在 task reset / asset load 阶段把自定义参数写入 SAPIEN actor/articulation/material（质量、摩擦、关节阻尼、restitution、质心偏移），且**按任务绑定**：`open_microwave` 改铰链阻尼、`lift_pot` 改质量与质心、`stack_bowls_three` 改摩擦接触——不能对所有资产乘同一系数。
+- `Control` 测的是 policy–environment 接口的**时序行为**（非控制器/控制算法）。动机：标准协议是同步评测——推理时仿真暂停等待，**延迟在协议里是免费的**，量化/异步调度的时序收益与风险完全不可见，而真机上世界不等模型。Control 用官方部署接口（可定制 `eval()`、`update_obs()`、`get_action()`，[文档](https://robotwin-platform.github.io/doc/usage/deploy-your-policy.html)）在 wrapper 注入受控时序扰动：observation/action delay（感知/执行侧延迟，可分别归因）、observation drop（丢帧顶旧观测）、action repeat（推理跟不上控制频率的等效降频）、proprio–camera skew（打破多模态同步采样假设）。注入值对 reference/candidate 完全相同（与各自真实推理速度无关），仍是配对实验；使用逻辑两步——先扫延迟—精度敏感度曲线，再把各后端实测延迟映射到曲线定工作点，§2.7 的 scheduling 独立实验由此验收。注意 Control 测的是系统不是模型能力（ESAS 每个轴皆然：Visual 之于渲染、Physics 之于求解器）；且"时延过大"的阈值不是链路属性，而是 policy×任务×延迟交互的属性——链路延迟预算的 spec 只能由这条敏感度曲线定义，同时它也是真机失败时区分"数值坏了"与"时序坏了"的归因依据。放在 RoboTwin 是信号密度选址：时序扰动只在动态与双臂协调任务（`shake_bottle`、`handover_block`、`lift_pot`）上有强信号，LIBERO/RoboCasa 的准静态任务对延迟天然宽容（这正是 chunking 能工作的原因）。
+- 三者先做**单因素实验**，Compound 只作最终压力，不用于归因。
 
-开发团队应知道各 profile 的定义、参数边界、指标和验收原则，但不获得具体 episode manifest、随机种子、资产组合和扰动序列。
+`ESAS-RoboTwin` 是内部派生套件，结果不得上报官方 leaderboard。
 
-#### `Visual`：主要新增 YAML / renderer 配置
-
-大部分可以复用官方字段，不必修改底层引擎。为隔离视觉因素，应关闭会改变任务几何的 `random_table_height`：
-
-```yaml
-domain_randomization:
-  random_background: true
-  cluttered_table: true
-  random_head_camera_dis: 0.03
-  random_table_height: 0
-  random_light: true
-  random_embodiment: false
-```
-
-若要加入更细的遮挡、相机内参、传感器噪声或 3DGS 特有退化，仍需扩展 renderer / sensor 配置。
-
-#### `Physics`：需要扩展环境代码
-
-官方通用 YAML 没有完整物理随机化接口，需要在 task reset / asset load 阶段把自定义参数写入 SAPIEN actor、articulation 和 material，例如：
-
-```yaml
-physics_randomization:
-  object_mass_scale: [0.7, 1.3]
-  friction_scale: [0.6, 1.4]
-  joint_damping_scale: [0.8, 1.2]
-  restitution_range: [0.0, 0.1]
-  center_of_mass_offset_m: 0.01
-```
-
-参数必须按任务绑定：`open_microwave` 重点改铰链阻尼，`lift_pot` 改质量与质心，`stack_bowls_three` 改摩擦与接触参数，`shake_bottle` 改质量与惯量。不能对所有资产无差别乘同一个随机系数。
-
-#### `Control`：需要扩展评测 wrapper
-
-场景与物理保持不变，在 policy–environment 接口注入时序扰动：
-
-```yaml
-control_stress:
-  observation_delay_steps: 2
-  action_delay_steps: 1
-  observation_drop_rate: 0.02
-  action_repeat: 2
-  proprio_camera_skew_steps: 1
-```
-
-RoboTwin 的 policy deployment 接口允许定制 `eval()`、`update_obs()`、`get_action()`，可在 wrapper 中实现延迟队列、丢帧和不同步，而不污染任务本身（[官方部署接口](https://robotwin-platform.github.io/doc/usage/deploy-your-policy.html)）。
-
-Visual、Physics、Control 应首先采用**单因素实验**；只有最终系统压力测试才运行 Compound。Compound 可以检验综合鲁棒性，但不能用于退化归因。
-
-#### 私有数据分层与防过拟合
+### 3.4 ESAS-RoboCasa
 
 ```text
-Public Dev
-  官方 RoboTwin 2.0 全 50 任务 × clean/randomized
-        ↓
-Private Validation
-  ESAS-RoboTwin；有限次数返回 profile / 任务族聚合结果
-        ↓
-Sealed Final Holdout
-  平时不运行、不反馈；只用于正式发布验收
-```
-
-仅隐藏数据不够：如果开发团队可以无限提交并获得逐 episode 反馈，仍会通过反馈逐渐拟合内部集。评估治理至少包括：
-
-- 不公开具体 seed、初始状态、资产组合、扰动样本和 episode manifest。
-- 评测代码、成功判定和参数范围透明；具体实例私有，避免不可解释的“秘密规则”。
-- 开发阶段只反馈到 profile 或任务族的聚合结果；逐 episode 视频仅按诊断需要抽样开放。
-- 限制正式验收提交频率，完整记录提交、配置和结果。
-- 定期轮换 Private Validation 的一部分实例；Final Holdout 保持密封。
-- 冻结并哈希 suite、代码、任务、资产、配置、容器、仿真器和成功判定版本。
-
-### 3.3 RoboCasa365：MuJoCo 统一物理栈与精度回归候选
-
-RoboCasa365 适合作为本体系中的 **MuJoCo 主任务集**。它基于 RoboCasa / robosuite / MuJoCo，覆盖 365 个厨房任务与 2,500 个厨房场景；当前公开 leaderboard 使用其中 50 个目标任务，分成 **Atomic-Seen 18、Composite-Seen 16、Composite-Unseen 16**。模型使用 Human300 的 300 个预训练任务训练，并在 `pretrain` 场景/对象 split 上评测这 50 个目标任务（[官方 leaderboard](https://robocasa.ai/leaderboard.html)、[benchmarking 文档](https://robocasa.ai/docs/build/html/benchmarking/benchmarking_overview.html)）。
-
-当前公开 π0.5 结果为：
-
-| 分组 | 任务数 | π0.5 success rate | 在本体系中的用途 |
-|---|---:|---:|---|
-| Atomic-Seen | 18 | 39.6% | 精度回归候选池；有足够成败翻转空间 |
-| Composite-Seen | 16 | 7.1% | 能力压力与长程诊断；存在明显地板效应 |
-| Composite-Unseen | 16 | 1.2% | 零样本组合泛化压力；不作为小幅精度退化门槛 |
-| Overall | 50 | 16.9% | 公开兼容性总览；不能掩盖三组难度差异 |
-
-这组 π0.5 成绩由 **RoboCasa 团队复现**，不是 Physical Intelligence 发布的 RoboCasa 官方 checkpoint。提交使用 RoboCasa 1.0.0、Human300、多任务训练 75,000 steps、batch size 64，以及 OpenPI fork commit `ca4c6d710db75e276bc7c866a57bd7e4aee5b6e8`（[提交记录](https://github.com/robocasa-benchmark/leaderboard/blob/main/submissions_md/pi05_2026-04-02.md)）。RoboCasa 1.0.1 已把全部任务 horizon 统一增加到原来的 1.5 倍，而 leaderboard 只明确说明 GR00T N1.5 已按新 horizon 重跑。因此 **39.6/7.1/1.2 只能作为候选难度证据，不能直接作为 ESAS-RoboCasa v1 验收基线**；冻结门槛前必须在统一的 RoboCasa 1.0.1 协议下重跑 π0.5 reference。
-
-#### RoboCasa 的三层使用方式
-
-```text
-RoboCasa365 Public-50
-  Atomic-Seen 18 / Composite-Seen 16 / Composite-Unseen 16
-
 ESAS-RoboCasa
-  Precision-Core        # 从 Atomic-Seen 18 中校准后选择；当前任务名单待定
-  Physics-Core          # 固定 trace / oracle / π0.5 三种执行方式
-  Scene-Object-Heldout  # target split；场景与对象均和 pretrain split 不重叠
-  Capability-Stress     # Composite-Seen / Composite-Unseen
+├── Precision-Core        # 全库 atomic 任务校准后选；任务名单与实例双层隐藏
+├── Physics-Core          # 固定 trace / oracle / π0.5 三种执行方式
+└── Scene-Object-Heldout  # 官方 target split；审计职能：查训练污染、统一 harness
 ```
 
-- **Public-50**：开发团队按公开协议运行全 50 任务，复现公开兼容性结果。
-- **Precision-Core**：评估团队先在全部 18 个 Atomic-Seen 任务上跑 reference 校准，再按逐任务成功率、方差、接触类型和失败模式选择。优先保留成功率约 **20%–80%**、重复运行稳定、对目标优化敏感且任务族不重复的任务；具体名单待本轮实测后补充。
-- **Physics-Core**：优先从 fixture 交互、抓取放置、开合、接触与滑移相关 atomic 任务中产生，但不能只依赖闭环 π0.5；同一任务同时运行固定 action trace、scripted/oracle controller 与 π0.5 闭环。
-- **Scene-Object-Heldout**：官方 `target` split 使用 10 个不相交厨房和不相交对象，适合检查场景/对象 OOD；如果 reference 出现地板效应，则仅作为鲁棒性压力层。
-- **Capability-Stress**：Composite-Seen / Unseen 单独报告，不与 Precision-Core 合成一个验收总分。
+RoboCasa Composite（Seen/Unseen）不入 ESAS：地板区、不设门槛、任务公开，由开发团队在公开集自报，ESAS 仅在发布节点抽查复跑。Agent 框架将 composite 成功率抬入 20–80% 判别区间后，从全库 300 个 composite 任务中校准实例化 Agent 方向的验收 profile（任务+实例双层隐藏，框架版本升级适用同一套非劣性验收逻辑；触发条件见 §6）。
 
-RoboCasa 让物理评测统一到 MuJoCo 家族，但“同一引擎名”不等于“同一物理栈”。必须同时冻结 RoboCasa、robosuite、MuJoCo、机器人与资产版本，以及 integrator、timestep/substeps、solver、contact、friction、controller 和 action conversion。RoboTwin 仍保留为 SAPIEN、双臂和跨引擎外部验证，避免只对 MuJoCo 生态过拟合。
+- `Precision-Core`：候选池不限于公开的 Atomic-Seen 18——扩到 Human300 训练分布覆盖的全部 atomic 任务（全库 65 个 atomic，公开榜只用 18 个；可用数量待核对 Human300 构成），跑 reference 校准后保留成功率约 20%–80%、重复稳定、任务族不重复的任务。**任务选择本身也是隐藏项**：评估团队不公开选了哪些任务，与 episode 级隐藏叠加，无需扰动生成即获得真正私有性。
+- `Physics-Core`：物理引擎优化不能只用闭环 π0.5，同一批任务固定三种执行方式——①**固定 action trace 重放**（隔离引擎，比状态轨迹/接触/穿透/约束误差）、②**scripted/oracle controller**（排除视觉与推理干扰）、③**π0.5 闭环**（最终系统影响）。trace 重放放在 RoboCasa 而非 LIBERO 的理由：重放不跑模型，LIBERO 的官方 π0.5 基线优势用不上，其价值只取决于任务物理内容——两家同为 MuJoCo 栈，LIBERO 接触稀疏（分歧信号是 RoboCasa fixture/堆叠/铰接任务的真子集），在信号密度低处重复布点只浪费算力。
+- "同一引擎名"不等于"同一物理栈"：必须同时冻结 RoboCasa/robosuite/MuJoCo/资产版本与 integrator、timestep、solver、contact、controller。
+- **设计逻辑**：除 Physics-Core 外三个 profile 均为 π0.5 闭环的模型在环评测；Precision-Core 因 atomic 任务处于 ~40% 非饱和区间，成败翻转空间远大于 ~97% 的 LIBERO Canonical，是 MuJoCo 栈上检测小回退的主力（不一致率 ψ 高 → 同样本量功效高，见 §4）。ESAS-RoboCasa **不做扰动生成**——任务定义全部来自官方，私有性在任务选择层（Precision-Core 不公开任务名单）+ episode 实例层（隐藏初始状态/seed/manifest + 配对 + 聚合反馈）：扰动归因已由 ESAS-LIBERO 复用 Plus/PRO 成熟生成器承载，而 RoboCasa 的独特价值（非饱和难度、2,500 厨房与不相交 split 的原生 OOD、composite 长程、MuJoCo 物理）全部原生自带、无需生成。
+- **两个 profile 的 ESAS 正当性并不同级**（能力信号本身开发团队跑公开集就能获得，ESAS 的存在理由是验收完整性，不是测量）：**Precision-Core 必须在 ESAS**——公开协议 seed 固定为 7、episode 集完全公开，反复迭代等于对同一批实例做适应性过拟合（公共榜效应），隐藏任务+实例是唯一解药，且正式非劣门槛不得建立在被验收方自报数字上（职责分离）；**Scene-Object-Heldout 实为审计职能**——split 公开、episode 隐藏保护有限，ESAS 复跑的价值是查训练污染与统一 harness（horizon、翻转约定等自报差异的现实教训见 §2.5/§2.3），不应称作私有验收集。
 
-### 3.4 `Embodied-Agent`：BEHAVIOR-Core-20 / Full-100
+### 3.5 评估挡位与数据分层
 
-用于 Agent 系统设计、长程任务、导航、记忆、任务分解和失败恢复：
+挡位是必要的——不同扰动强度回答不同问题，混在一起会让地板项污染非劣性判定：
 
-- 日常或周度：固定 `BEHAVIOR-Core-20`
-- 版本发布：`BEHAVIOR-Full-100`
+| 挡位 | 内容 | 用途 |
+|---|---|---|
+| **Gate** | Canonical-Heldout + 校准过的 mild/medium 扰动 | 非劣性验收，判 1–3pp 回退 |
+| **Diagnostic** | 子轴展开 + hard 档 | 定位退化来源，不设总门槛 |
+| **Stress** | 地板项、多轴组合、Task 轴（RoboCasa Composite 由开发自报，不入 ESAS） | 能力压力与未来模型跟踪，单独报告 |
 
-BEHAVIOR 2026 官方赛道使用 RGB + depth + proprioception，测试时禁止 ground-truth segmentation、物体状态、目标位姿、全场景点云与机器人全局位姿等仿真器内部真值。主要指标是 100 个任务上最终满足的 BDDL goal predicates 比例，并提供部分完成分；timeout 默认是相应任务人类演示平均长度的 1.5 倍（[官方评测规则](https://behavior.stanford.edu/challenge/evaluation.html)）。官方挑战已经提供 π0.5 baseline 与兼容 OpenPI 的 websocket 接口（[2026 Challenge](https://behavior.stanford.edu/challenge/index.html)）。
+数据流转：
 
-`Core-20` 不应按“π0.5 当前会不会做”挑选，而应按以下变量分层抽样：
+```text
+Public Dev（官方全量，开发自评）
+      ↓
+Private Validation（ESAS；有限次数、聚合反馈；部分实例定期轮换）
+      ↓
+Sealed Final Holdout（平时不运行不反馈；只用于正式发布验收）
+```
 
-- 人类演示长度 / 任务 horizon
-- goal predicate 数量
-- 是否需要导航
-- 是否需要双臂或移动操作
-- 是否涉及搜索、遮挡和记忆
-- 是否存在可恢复失败与不可逆失败
+公开结果与 ESAS、Gate 与 Stress 不得混成一个不透明总分；原始 LIBERO、Plus zero-shot、Plus finetuned、PRO 与 ESAS-LIBERO 分开报告。
 
-## 4. 各类优化应该跑什么
+### 3.6 私有 manifest 与版本冻结
 
-| 优化方向 | 必跑 | 专项追加 | 主要精度观察量 |
+评估团队至少维护四份文件（字段参考见附录 B）；开发团队只见 profile 名与版本号：
+
+1. `base_task_manifest` — 原始任务的 BDDL/instruction/predicate hash，不可变基线。
+2. `perturbation_manifest` — 一行一个固定实例：轴/子轴/强度/生成器版本/全部扰动参数/派生文件 hash。
+3. `private_asset_manifest` — 干扰物、纹理、场景的真实文件映射；至少要有开发团队不可见的 held-out 资产。
+4. `runtime_pair_manifest` — simulator 版本、environment seed、policy noise seed、timeout 与 reference/candidate 的逐 episode 对齐关系。
+
+关键区分："任务定义不变"与"场景文件可派生"——派生 BDDL 可以加不参与谓词的干扰物，但必须保留 `base_task_id`、原 instruction 与 success predicate 并记录 hash 映射；一旦改了目标、谓词或控制接口，就该移入 Grounding 或 Task-Generalization。渲染器/3DGS 配对实验中，reference 与 candidate 必须读同一 manifest、同一物理状态、同一 environment/noise seed，差异才可归因于 renderer。
+
+## 4. 配对评测与精度判定
+
+ESAS 的核心判断不是 candidate 是否超过某个孤立的绝对成功率，而是：**在同一隐藏 episode 上，candidate 相对未优化 reference 是否发生超过允许范围的退化**。
+
+Reference 与 candidate 必须使用完全相同的：
+
+```text
+(task_id, initial_state_id, environment_seed, policy_noise_seed,
+ instruction, timeout, asset_version, simulator_version, profile_version)
+```
+
+π0.5 的 flow-matching 推理从随机噪声开始，只固定环境 seed 不够，环境随机性与模型噪声要分别固定并逐 episode 配对（见 §2.7 随机性控制）。
+
+**结果聚合**至少报告：每任务成功率与每 suite macro average；paired success delta 与 `success→failure` / `failure→success` 翻转计数；各 profile 分开报告、长程任务单列；最差 10% 任务的平均退化；分阶段 progress / predicate completion；time-to-success、timeout rate；成功轨迹的长度与抖动；碰撞、保护触发与 simulator error。连续诊断量用于筛选和归因，不自动替代任务验收（沿用 [[Real-robot evaluation]]）。
+
+其中"分阶段 progress"并非处处可得（2026-08 已核对三家代码）：**BEHAVIOR 原生**（BDDL partial credit 即主指标）；**LIBERO 官方只报二元**，但任务为 BDDL 定义、goal 是 1–3 个谓词的合取，`parsed_problem["goal_state"]` 可用任务无关的通用 hook 对每个 conjunct 单独调 `_eval_predicate` 插桩——仅对 libero_10/90 多谓词任务有意义，ESAS-LIBERO 的 `predicate_progress` 由此实现；**RoboCasa365 严格二元**（`info["success"]`），291 个 composite 任务各自硬编码 `_check_success` 且部分依赖历史 latch 标志，无法通用插桩——该处分阶段诊断用连续量与失败模式分类替代，不设 predicate 级指标。
+
+事件类指标（碰撞、保护触发、simulator error）的意义分三层：碰撞看**策略行为质量**——动作精度退化最早表现为擦碰增多，先于成败翻转报警，且是接触求解回归的近因观察量与真机风险代理；保护触发（关节/力矩饱和、速度超限）看**执行器边界**——量化/加速造成的动作分布尾部变胖和时序扰动下的补偿性大动作都在此显形；simulator error 看**评测有效性**——发散 episode 的处理规则不预先冻结，配对统计会被幸存者偏差破坏，且发散率本身是物理引擎优化的被测输出。三者都是"成功率不动时仍能区分两个版本"的维度。它们同样不是 LIBERO/RoboCasa 的官方输出，可得性如下：**碰撞**——两家同为 robosuite/MuJoCo 栈，`check_contact` / `sim.data.contact`（接触对与接触力）是任务无关的统一接口，ESAS runner 可通用插桩；但必须先冻结"非预期接触"的定义（机器人非末端 body × 环境、或接触力超阈值——抓取放置本身就是接触，不定义白名单该指标无意义）。**保护触发**——仿真无原生等价物（真机概念），只能用约束违规代理：关节/力矩饱和、速度或接触力超阈值，阈值由 ESAS 自定义；真机语义的保护触发归 [[Real-robot evaluation]]。**simulator error**——两家 eval 路径均无数值异常捕获（无 NaN / mjWARN 检查），episode 级异常记录、qacc/qpos NaN 与 MuJoCo warning 计数由 ESAS 统一 runner 自建，对应附录 A 的"异常记录并计入、不得静默重跑"规则。
+
+**守门用配对非劣性检验**：Macro、各 profile、任务族与关键任务分层设界并报告置信区间。示例起点：Canonical Macro ≥ reference −1pp、压力 profile ≥ −2pp、任务族 ≥ −5pp——具体数值必须按 reference 重复运行方差与业务风险校准，不能直接冻结。**评估团队的第一个执行动作就是测这个方差**：在冻结 manifest 上以不同 policy noise seed 集重复运行 reference π0.5（每 benchmark ≥5 次），报告任务级成功率方差与自翻转率——它同时是 δ 校准、功效计算和"残余非确定性"三件事的基线，此前一切门槛都是占位符。
+
+**配对统计检验**（把上面的原则落成可执行的检验栈）：
+
+- **Gate 主检验不用 vanilla McNemar**：McNemar 的 H0 是"无差异"（优效框架），不显著 ≠ 非劣——样本越少越容易"过门"，方向反了。主检验用配对比例差的 **Nam–Tango score 检验/置信区间**（Nam 1997; Tango 1998），对 Δ = p_cand − p_ref 的单侧 95% 下界 > −δ 才判非劣，举证责任在 candidate。
+- **McNemar 保留在 Diagnostic 层**：对 n₁₀/n₀₁ 翻转不对称做快速报警（不一致对少时用 exact / mid-p 版本），不作验收结论。
+- **Episodes 按任务聚类，不是 i.i.d.**：Macro/profile 层检验用按任务分层（CMH 型）或 task 级 cluster bootstrap，直接池化 episodes 会让 CI 假窄。
+- **连续指标**（progress、time-to-success、轨迹量）用 paired Wilcoxon signed-rank 或 permutation test。
+- **稀疏不一致对**（Canonical 高分区）用 exact 方法或 Bayesian beta-binomial，报后验 P(Δ > −δ)。
+- **顺序扩样 = interim analysis**：100→300→500 若每档都判定会膨胀 I 类错误；用 O'Brien–Fleming 型 alpha-spending（早期档只允许"明确失败即停"），正式非劣判定只在最终档做。
+- **多层门槛用 gatekeeping**：固定顺序（Macro → profile → 任务族）控制族错误率。
+- **功效由不一致率 ψ = p₁₀+p₀₁ 决定**：n ≳ (z_α+z_β)²·ψ/δ²。ψ≈6% 时 δ=2pp 需 ~900 对、δ=1pp 需 ~3,700 对——Macro 的 −1pp 门槛只有池化全任务后才有功效，单任务 500 对最多支撑 −5pp；"Macro 严、任务族宽"的分层界限由此而来。
+- **无法配对的基准**（BEHAVIOR，仿真非确定）退化为非配对两比例比较 + 任务聚类与多 rollout 平均，检测灵敏度显著下降，故只承担压力测试不承担非劣验收（见 §2.6）。
+
+**顺序扩样控制算力**：先 100 rollouts/task（或全量固定实例 ×1），明确通过或失败即停；仅临界项扩到 300、再到 500。若 50 任务 × 4 profile × 500 次全跑，单模型 10 万 episodes、成对 20 万——仿真便宜不等于可以忽略统计设计。日常节奏：PR smoke（LIBERO 每套件 2 任务 × 10）→ 开发日常回归（公开全量 × 10–100）→ 评估预检（ESAS 各 profile × 100 配对）→ 正式发布（公开全量 + Private Validation + Sealed Holdout）。
+
+## 5. 各研究方向的评测映射
+
+| 研究方向 | 开发团队公开自评 | 评估团队私有验收 | 主要观察量 |
 |---|---|---|---|
-| π0.5 量化 / 推理加速 | 原始 LIBERO 40 + RoboTwin 2.0 全 50 × clean/randomized + RoboCasa365 Public-50 | ESAS-LIBERO Canonical-Heldout + ESAS-RoboTwin Canonical/Control + ESAS-RoboCasa Precision-Core | paired success delta、成败翻转、长程退化、轨迹漂移、timeout |
-| Agent 架构 | LIBERO-10 + LIBERO-PRO | ESAS-LIBERO Grounding/Task-Generalization + BEHAVIOR-Core-20 / Full-100 | predicate progress、端到端成功、恢复次数、规划开销 |
-| 渲染引擎 | LIBERO-Plus + RoboTwin 2.0 全 50 × clean/randomized | ESAS-LIBERO Covariate + ESAS-RoboTwin Visual | 成功率、感知导致的动作分歧、视觉压力曲线 |
-| 3DGS | LIBERO-Plus + RoboTwin 2.0 全 50 × clean/randomized | ESAS-LIBERO Covariate 与 ESAS-RoboTwin Visual 中的固定场景 paired renderer | 任务精度 + 图像/特征差异；不能只报 PSNR |
-| 物理引擎 | RoboCasa365 Atomic-Seen + RoboTwin 2.0 全量 sanity / regression | ESAS-RoboCasa Physics-Core + ManiSkill 物理探针；ESAS-RoboTwin Physics 作跨引擎验证 | 接触事件、状态轨迹误差、任务成功、数值稳定性 |
+| 模型推理优化（量化/token 压缩/flow 降步/算子编译） | 原始 LIBERO 40 + RoboCasa Public-50（涉双臂再加 RoboTwin 全量） | ESAS-LIBERO Canonical-Heldout + ESAS-RoboCasa Precision-Core（+ ESAS-RoboTwin Canonical/Control） | paired delta、成败翻转、长程退化、轨迹漂移 |
+| 具身 Agent 框架 | LIBERO-10 + LIBERO-PRO + RoboCasa365 Composite（日常自报）；BEHAVIOR-Core-20（发布级） | ESAS-LIBERO Grounding / Task-Generalization；composite 验收集待 Agent 抬出地板区后实例化（§3.4） | predicate progress、端到端成功、恢复次数、规划开销 |
+| 仿真与真机 RL 框架 | 固定 policy 的 LIBERO / RoboCasa Canonical 配对回归（框架改动前后） | ESAS Canonical profiles 复测 | 环境语义等价性（同 seed 轨迹/成功率一致）、确定性、吞吐 |
+| 物理引擎加速（MuJoCo） | RoboCasa Atomic-Seen + LIBERO 40（同 MuJoCo 栈）+ trace/oracle/闭环三层 | ESAS-RoboCasa Physics-Core + Precision-Core | 接触事件、状态轨迹误差、数值稳定性、任务成功 |
+| 渲染引擎加速（软件光追 / 3DGS） | LIBERO-Plus 全量 + RoboTwin randomized | ESAS-LIBERO Observation-Robustness + ESAS-RoboTwin Visual（固定场景 paired renderer） | 任务成功 + 感知导致的动作分歧；不能只报 PSNR |
 
-## 5. 物理引擎专项不能只用闭环 π0.5
+方向级说明：
 
-物理引擎优化至少需要三种执行方式，优先在 RoboCasa 的同一批 Atomic 任务上形成一一对应的结果：
+- **物理引擎（MuJoCo）**：主承载是同栈的 RoboCasa 与 LIBERO；RoboTwin/ManiSkill 是 SAPIEN/PhysX，**测不到 MuJoCo 的改动**，只作跨引擎行为参照（防止只对单一引擎生态过拟合）。组件级物理探针（摩擦滑移、堆叠、插入、铰接、闭链）建议直接在 MuJoCo 上构造或复用 RoboCasa atomic 任务 + trace 重放。
+- **仿真与真机 RL 框架**：框架（并行化、数据管线、reset 逻辑）改动不应改变任务语义，验收方式是固定同一 policy、同一 seed 做改动前后配对回归，验证轨迹与成功率等价；训练侧收敛性验证与真机侧见 [[Real-robot evaluation]]，不在本页。
+- **渲染 / 3DGS**：要区分两种配对——"同一新场景比较两个模型后端"和"同一物理状态经 reference/candidate renderer 输出"；后者才能把差异归因于 renderer。
+- **Agent 框架**：LIBERO-PRO 的价值在反记忆与任务泛化；BEHAVIOR 承担导航、记忆与部分完成度。
 
-1. **固定 action trace 重放**：隔离物理引擎变化，比较状态轨迹、接触、穿透和约束误差。
-2. **scripted / oracle controller**：测试任务是否仍可稳定完成，排除视觉和 VLA 推理干扰。
-3. **π0.5 闭环 policy**：测最终系统影响。
+### 端到端验收流水线（一个提交的完整旅程）
 
-建议的 ManiSkill 物理探针类别：
+通用规则，五个方向共用：
 
-- push / slide：摩擦与滑移边界
-- StackCube：接触稳定与堆叠
-- PegInsertionSide：碰撞、插入和小容差
-- drawer / cabinet：关节、阻尼与摩擦约束
-- pick-and-place：抓取接触
-- 双臂搬运：闭链约束
+- **漏斗结构**：靠前的站零/低成本、高频、打回制；靠后的站贵、低频、验收制。任一站失败回上一站修复后重进，**不得跳站**。
+- **判据类型逐站演进**：筛查（打回制）→ 自报回归（附附录 A.3 配置指纹）→ 配对非劣（评估团队，gatekeeping，§4）→ 大效应否决（真机 R1）。
+- 开发自报必须附配置指纹，评估团队验收时复核指纹与提交一致；验收提交频率受 §3.1 治理限制。
 
-ManiSkill 的 Task Card 会明确机器人、随机化、成功/失败条件和观测，并提供 GPU 并行刚体任务，适合作为组件级探针（[ManiSkill Tasks](https://maniskill.readthedocs.io/en/latest/tasks/)）。
-
-## 6. 任务配置标准
-
-### 6.1 三类配置
-
-#### Public Canonical
-
-严格复现官方协议，用于对外可比：
-
-- 官方代码、任务和资产版本
-- 官方本体、相机、控制频率和 timeout
-- 官方初始状态与语言指令
-- 官方 success predicate
-- 不私自增加 domain randomization
-
-#### Private Canonical-Heldout
-
-保持任务语义、成功判定和正常难度分布，但由评估团队隐藏并冻结初始状态、合法对象位置、资产实例与随机种子。它用于防止开发团队针对公开实例调参，并承担纯量化、算子替换和后端迁移的主要精度非劣性验收；它不是官方 benchmark 分数。
-
-`Canonical-Heldout` 的边界必须明确为“同一任务分布下更换隐藏实例”，不能在该 profile 中混入视觉、语言、任务或物理 hardening：
-
-| 字段 | Canonical-Heldout 标准 | 评测团队的控制要求 |
-|---|---|---|
-| `task / BDDL` | **不变** | 使用与 Public Canonical 相同的 task id、BDDL、任务对象关系和目标逻辑 |
-| `instruction` | **不变** | 使用原始任务 instruction；不得改写、同义替换或注入额外提示 |
-| `success predicate` | **不变** | 使用来源 benchmark 的原始成功判定；candidate 不得特判 |
-| `simulator / config` | **不变** | 仿真器、控制器、相机接口、渲染分辨率、时间步、timeout、资产与依赖版本均冻结 |
-| `initial states` | **隐藏的新样本** | 评估团队生成并持有同分布的新初始状态、物体合法位置和关节状态；开发团队只看到 profile 级结果 |
-| `environment seed` | **隐藏并冻结** | 每个 episode 在 manifest 中固定；reference 与 candidate 必须使用相同 seed，不得运行时重新抽样 |
-| `policy noise` | **隐藏并冻结** | 每个 inference/chunk 的 flow 初始噪声或等价 RNG 状态固定并配对；不得让两版本各自自由采样 |
-
-这里的 `initial states` 与 `environment seed` 是两个不同层次：前者是 manifest 中被评测的具体初始状态，后者是生成环境与随机过程的可复现控制量；二者都必须写入隐藏 manifest 的 hash，而不是向开发团队公开具体值。`policy noise` 则属于模型推理随机性，必须和环境随机性分开记录。
-
-#### Stress（内部扩展）
-
-用于内部发现退化：
-
-- `ESAS-LIBERO/Covariate-Robustness`
-- `ESAS-LIBERO/Grounding`
-- `ESAS-LIBERO/Task-Generalization`
-- `ESAS-LIBERO/Compound`
-- `ESAS-RoboTwin/Visual`
-- `ESAS-RoboTwin/Physics`
-- `ESAS-RoboTwin/Control`
-- `ESAS-RoboTwin/Compound`
-- `ESAS-RoboCasa/Scene-Object-Heldout`
-- `ESAS-RoboCasa/Physics-Core`
-- `ESAS-RoboCasa/Capability-Stress`
-
-公开开发回归的 RoboTwin Canonical 应区分 `official_clean` 与 `official_randomized`；ESAS 的 Canonical 则使用保持正常任务分布的隐藏实例。原始 LIBERO、LIBERO-Plus zero-shot、LIBERO-Plus finetuned、LIBERO-PRO 与 ESAS-LIBERO 也必须分开报告。公开结果与 ESAS、Canonical 与 Stress 不得混成一个不透明总分。
-
-### 6.2 配对评测
-
-Reference 与优化版本必须使用完全相同的：
+以最长的**推理优化**流水线为完整示例：
 
 ```text
-(task_id,
- initial_state_id,
- environment_seed,
- policy_noise_seed,
- instruction,
- timeout,
- asset_version,
- simulator_version,
- profile_version)
+[开发·每次提交]   R0 动作分歧筛查（logged 真实观测配对推理，异常打回）
+       ↓          PR smoke：LIBERO 每套件 2 任务 × 10（崩溃/严重退化打回）
+[开发·合入前]     公开回归自报：LIBERO 40×50 + RoboCasa-50×50（涉双臂加 RoboTwin 全量）
+       ↓          判据：对本地 backend reference 的 paired delta；附配置指纹
+[评估·申请验收]   ESAS 预检：Canonical-Heldout + Precision-Core（+RoboTwin Canonical/Control）× 100 配对
+       ↓          判据：Nam–Tango 非劣 + gatekeeping；临界项扩样 300→500
+[评估·正式发布]   Sealed Final Holdout（全 Gate 非劣）
+       ↓          真机 R1：首跑安全门 → 交错 A/B（抽屉大 n 探针 + 叠碗 + 双臂交接）
+       ↓          判据：大效应检验不触发 + CI 披露；CDF / win-ratio 无显著劣化
+发布报告：全层结果 + 配置指纹 + 精度 × 加速 Pareto
 ```
 
-π0.5 的 flow-matching 推理从随机噪声开始，因此只固定环境 seed 不够。需要同时固定环境随机性与模型噪声，并做逐 episode 配对比较。
+五个方向的站位对照（站位相同，内容不同）：
 
-ESAS 的核心判断不是 candidate 是否超过一个孤立的绝对成功率，而是：在同一隐藏 episode 上，candidate 相对于未优化 reference 是否发生超过允许范围的退化。ESAS-LIBERO 的 Canonical-Heldout、Covariate、Grounding、Task-Generalization，ESAS-RoboTwin 的 Canonical、Visual、Physics、Control，以及 ESAS-RoboCasa 的 Precision/Physics，分别使用各自相同的隐藏 manifest；渲染引擎替换还要区分“同一新场景下比较两个模型后端”和“同一状态经 reference/candidate renderer 输出”的两种配对实验。
-
-### 6.3 结果聚合
-
-不能只报所有 rollout 的单个平均成功率。至少报告：
-
-- 每任务 success rate
-- 每 suite macro average，避免任务 rollout 数不同造成加权污染
-- reference → candidate 的 paired success delta
-- `success → failure` 与 `failure → success` 的成败翻转计数
-- clean、randomized 以及 ESAS 各 profile 分开报告
-- LIBERO-10 / 长程任务单列
-- 最差 10% 任务的平均退化
-- 分阶段 progress 或 predicate completion
-- time-to-success / timeout rate
-- 成功 rollout 上的轨迹长度、jerk 或动作抖动
-- 碰撞、保护触发、异常退出和 simulator error
-
-最终守门采用**配对非劣性检验**：全量 Macro、各 profile / 任务族和关键任务分别设界限，并报告置信区间。示例起点可以是 Canonical Macro 不低于 reference `-1pp`、各压力 profile 不低于 `-2pp`、任务族不低于 `-5pp`，但这些数字必须根据 reference π0.5 的重复运行方差与业务风险校准，不能直接作为冻结标准。全量平均值不能掩盖少数任务的严重退化；同时也不宜对所有单任务设置不现实的 `-1pp` 门槛。
-
-连续诊断指标与成功率的关系沿用 [[Real-robot evaluation]]：连续量主要用于筛选和归因，不能自动替代任务验收。
-
-## 7. π0.5-LIBERO Policy Contract 与 benchmark-specific 运行协议
-
-评估团队不另设 Control 扰动集，而是冻结一套所有提交都必须遵守的运行协议。配置分为三类：**模型固有配置、闭环执行配置、benchmark-specific 评测采样配置**。第 7.1–7.2 节是团队运行 π0.5 在原始 LIBERO、LIBERO-Plus、LIBERO-PRO 与 ESAS-LIBERO 上共同遵守的 **Policy Contract**；它不表示 Plus/PRO 论文已经披露或采用了全部这些参数。除非某字段正是被评估的优化变量或 benchmark 定义的扰动变量，否则 reference 与 candidate 不得改变。
-
-### 7.1 模型与 checkpoint 标准
-
-| 配置项 | ESAS-LIBERO v1 Reference |
-|---|---|
-| model | π0.5 flow-matching head |
-| checkpoint | `gs://openpi-assets/checkpoints/pi05_libero` |
-| checkpoint 阶段 | 30k finetuned；记录 checkpoint hash |
-| reference 计算精度 | BF16 |
-| VLM | PaliGemma `gemma_2b` |
-| action expert | `gemma_300m` |
-| `pi05` | `True` |
-| `discrete_state_input` | `False` |
-| max token length | 200（π0.5 默认） |
-| flow-matching integration steps | **10** |
-| predicted action horizon | **10 actions** |
-| internal action dimension | 32；LIBERO 有效输出取前 7 维 |
-| action representation | LIBERO 原生 7D delta action；`extra_delta_transform=False` |
-| normalization | 使用 checkpoint 自带 norm stats；不得重新计算或替换 |
-
-这里的 flow-matching steps 常被口头称为“降噪/降采样步数”，标准 reference 固定为 **10**。`action_horizon=10` 表示模型每次预测 10 个 actions，不等于环境会把 10 个全部执行。
-
-### 7.2 观测与闭环执行标准
-
-| 配置项 | ESAS-LIBERO v1 Reference |
-|---|---|
-| simulator render resolution | 256 × 256 |
-| 模型图像输入 | resize-with-pad 到 224 × 224，uint8 |
-| 图像方向 | agent/wrist 图像均旋转 180°，与训练预处理一致 |
-| 有效相机 | `agentview_image` + `robot0_eye_in_hand_image` |
-| 第三相机槽位 | right-wrist 使用零图并 mask，不得替换成其他视角 |
-| proprioception | EEF position + quaternion→axis-angle + gripper qpos，共 8 维后按模型规则 padding |
-| instruction | 使用 episode manifest 提供的原文；Canonical 为原任务 `task.language`，Plus Language / PRO Semantic/Task 使用其官方改写，不得额外二次改写 |
-| 每次模型预测 | 10 actions |
-| 每次实际执行 | **前 5 actions** |
-| replanning | 执行 5 步后丢弃剩余 5 步，重新观测并推理 |
-| action smoothing / ensemble | 关闭 |
-| action repeat / hold | 1 simulator step / action |
-| policy–environment 交互 | 同步；拿到新 chunk 后才继续执行 |
-
-因此标准闭环是：
-
-```text
-observe → predict 10 actions → execute actions[0:5]
-        → discard actions[5:10] → observe again
-```
-
-所有团队必须报告 `predicted_action_horizon` 与 `executed_actions_per_chunk`，不能只写一个含糊的 “chunk size”。对团队的 π0.5-LIBERO Policy Contract，二者固定为 **10/5**。
-
-Plus/PRO 的扰动可以改变观测内容，却不改变模型接口：Plus Camera 改变相机位姿/FOV但保留相机槽位，Robot Initial State 改变初始机器人状态但保留 8D schema，Light/Background/Noise 改变像素内容但保留图像预处理；PRO 的 Object/Position/Environment 改变环境内容，Semantic/Task 改变 manifest instruction，Task 还可能改变 success predicate。除此之外，图像尺寸与方向、state/action schema、normalization、flow steps 和 10/5 闭环均保持不变。
-
-### 7.3 Benchmark-specific 评测采样标准
-
-| 配置项 | Public LIBERO | LIBERO-PRO | LIBERO-Plus | ESAS-LIBERO |
+| 方向 | ① 开发自检（每提交，打回制） | ② 公开回归（合入前，自报+指纹） | ③ ESAS 验收（评估团队，非劣） | ④ 发布级 / 里程碑 |
 |---|---|---|---|---|
-| workload unit | 原始 task 的一个 rollout | 原始 task × PRO profile 的一个 rollout | 已展开的一个 fixed perturbed instance | 隐藏 manifest 中的一个 paired episode |
-| 标准规模 | 40 tasks | 40 base tasks；每个启用 profile 分开报告 | 全量 10,030 test-only instances | 按 ESAS profile 与冻结任务集 |
-| environment seed | OpenPI 复现固定 7 | 官方未完整冻结；团队复现写入 manifest | 每个固定实例自带配置；额外随机量写入 manifest | 由隐藏 episode manifest 指定 |
-| policy noise seed | 固定并记录 | 团队统一确定性派生 | 团队统一确定性派生 | 按 episode/inference index 确定性派生 |
-| 初始稳定等待 | 10 simulator steps | 官方未完整披露；团队统一固定 10 | 团队统一固定 10，除非实例定义另有要求 | 10 simulator steps |
-| rollouts / workload unit | 50 / task | **50 / task / profile** | **1 / fixed perturbed instance** | 先 100 / task/profile，临界项扩到 300–500 |
-| max action steps | Spatial 220 / Object 280 / Goal 300 / LIBERO-10 520 | 同左 | 按来源 suite：220 / 280 / 300 / 520 | 与来源 suite 相同 |
-| instruction | 原始 `task.language` | Semantic/Task 使用 PRO manifest，其余保持来源任务语义 | Language 实例使用 Plus instruction，其余按实例 manifest | 使用隐藏 manifest |
-| success | 原始 environment `done` / predicate | 保持 PRO 对应 predicate；Task profile 允许官方定义的目标变化 | 使用该 fixed instance 的 predicate | 与来源 profile 相同，不得 candidate 特判 |
-| 异常处理 | 记录并按预定义规则计入，不得静默重跑 | 同左 | 同左；不得以“实例生成失败”为由事后筛除 | 同左，并单独报告 simulator error |
+| 推理优化 | R0 动作分歧 + PR smoke | LIBERO 40 + RoboCasa-50（+RoboTwin 全量） | Canonical-Heldout + Precision-Core（+RoboTwin Canonical/Control）→ Sealed Holdout | 真机 R1 交错 A/B |
+| Agent 框架 | 框架单测 + LIBERO-10 smoke | LIBERO-10 + LIBERO-PRO + RoboCasa Composite 自报 | ESAS-LIBERO Grounding / Task-Generalization 配对 | BEHAVIOR-Core-20（统计比较，不可配对）+ 真机 R1 长程串联 + 扰动恢复 |
+| RL 框架 | R0 数据管道回归 + 固定 policy 冒烟 | 固定 policy × 新旧框架 × 公开 Canonical，统计等价（双向非劣） | ESAS Canonical 复测（等价性） | 真机框架等价性 + 安全清单；真机 RL 上线后执行 R2 环路 |
+| 物理引擎 | MuJoCo 组件探针（待建，见 §6）+ R0 real-log 重放 | RoboCasa Atomic + LIBERO 40 的 trace / oracle / 闭环三层 | ESAS-RoboCasa Physics-Core + Precision-Core | 无常驻真机；秩相关校准 +（条件触发）sim2real A/B |
+| 渲染 / 3DGS | 图像层指标 + R0 动作分歧（真实图像 vs 重渲染） | LIBERO-Plus 全量 × 1 + RoboTwin randomized | ESAS-LIBERO Observation-Robustness（双配对）+ ESAS-RoboTwin Visual | 无常驻真机；R2 3DGS real2sim 三臂环路 |
 
-因此不能把“50 episodes/task”作为所有 LIBERO 派生 benchmark 的共同规则。PRO 的50次用于对每个 task/profile 的随机初态分布估计成功率；Plus 的10,030个条目本身已经是经过生成、筛选和难度分层的不同实例，全量一次运行即产生10,030个二元结果。若在 Plus 上额外重复，同一实例的重复结果必须单列为 `repeatability`，不能伪装成新的测试实例或与 published full-set score 混合。
+真机侧各站的协议细节（R0 数据集冻结、首跑安全门、交错 A/B、统计）见 [[Real-robot eval bench - task suite design and setup checklist]]。
 
-OpenPI 官方 runner 只显式固定 NumPy/环境 seed；ESAS、PRO 和 Plus 的 reference–candidate 成对比较还应控制 flow 初始噪声。若当前后端不能从接口注入每次推理的 noise tensor，至少必须固定 policy server RNG，并记录 server restart 与 seed；不能让 reference 和 candidate 使用不可追踪的独立随机流。
+## 6. 尚未冻结的关键问题
 
-代码依据：
+1. π0.5 在 RoboTwin 与 BEHAVIOR 上的团队 checkpoint 与训练 recipe 如何固定（官方 cotrain 70.7/46.0 与 Motus 42.98/43.84 的差距说明 recipe 决定基线）？RoboTwin 官方 cotrain recipe 已可查（XPolicyLab：`pi05_base` 初始化、60k steps、batch 256、seed 0/1/2 三席），可直接采用；BEHAVIOR 仍需自训。
+2. 每日、周度、发布评测的 GPU-hour 预算？
+3. ESAS 各 profile 的任务纳入规则、扰动范围与基线可解性门槛如何冻结？
+4. RoboCasa 18 个 Atomic-Seen 在 1.0.1 + π0.5 reference 下的逐任务成功率、方差与失败模式（决定 Precision/Physics-Core 名单）？
+5. `BEHAVIOR-Core-20` 的分层抽样规则与最终清单？
+6. 非劣性界限按 Macro / profile / 任务族 / 关键任务如何分层校准？
+7. 物理 trace 重放的数据格式、状态对齐方式与容差定义？
+8. 是否把吞吐、实时因子、显存、能耗与精度做成统一 Pareto 报告？
+9. MuJoCo 组件级物理探针任务集的具体构成？
+10. Agent 框架把 RoboCasa Composite 抬出地板区后，composite 验收集的实例化触发条件（成功率区间、稳定性要求）与规模如何冻结？
 
-- `pi05_libero` 当前使用 `Pi0Config(pi05=True, action_horizon=10, discrete_state_input=False)`、`extra_delta_transform=False`，训练 30k steps（[OpenPI config](https://github.com/Physical-Intelligence/openpi/blob/main/src/openpi/training/config.py)）。
-- π0.5 默认 BF16、PaliGemma `gemma_2b` + `gemma_300m` action expert，`sample_actions` 默认 10 个 flow integration steps（[模型配置](https://github.com/Physical-Intelligence/openpi/blob/main/src/openpi/models/pi0_config.py)、[模型实现](https://github.com/Physical-Intelligence/openpi/blob/main/src/openpi/models/pi0.py)）。
-- 当前官方 runner 使用 `replan_steps=5`、224 输入、seed 7、初始等待 10 步、每任务 50 次，并按 suite 固定 max steps；每次只把预测 chunk 的前 5 步送入环境（[评测脚本](https://github.com/Physical-Intelligence/openpi/blob/main/examples/libero/main.py)）。
-- LIBERO policy adapter 输入 agent+wrist 两路图像，将不存在的 right-wrist 置零并 mask，输出只取 action 的前 7 维（[policy adapter](https://github.com/Physical-Intelligence/openpi/blob/main/src/openpi/policies/libero_policy.py)）。
-
-### 7.4 允许改变什么
-
-标准验收采用“**单一声明变量**”原则：
-
-- 量化、算子、编译器、框架迁移：保持 flow steps=10、horizon=10、execute=5，只改变声明的计算实现或数值精度。
-- flow-step reduction：允许 candidate 使用少于 10 步，但必须与 10-step BF16 reference 配对，并把步数写入结果名称，例如 `INT8-flow6-h10-e5`。
-- action-horizon 或 chunk-execution 优化：不进入标准 LIBERO 精度榜；作为独立 scheduling 实验报告，因为它改变了闭环控制协议。
-- 渲染或输入降质：模型与闭环参数保持 10/10/5，只改变声明的 renderer、分辨率、压缩或传感器变量。
-
-每个结果必须附带配置指纹：
+## 7. 摘要
 
 ```text
-model/checkpoint hash
-openpi commit + LIBERO commit
+共同任务池（开发自评 + 评估复用）
+  LIBERO 40 (10/5) ·  LIBERO-Plus 10,030×1 · LIBERO-PRO 40×5×50
+  RoboTwin 50×100×2 · RoboCasa365 Public-50×50 (50/5) · BEHAVIOR 100
+
+ESAS（评估团队私有）
+  ESAS-LIBERO   Canonical-Heldout / Observation-Robustness / Grounding
+                / Task-Generalization / Compound
+  ESAS-RoboTwin Canonical / Visual / Physics / Control / Compound
+  ESAS-RoboCasa Precision-Core / Physics-Core / Scene-Object-Heldout（审计）
+                （Composite 能力压力由开发自报，Agent 抬出地板区后再实例化验收集）
+  挡位：Gate / Diagnostic / Stress；Private Validation → Sealed Holdout
+
+判定：逐 episode 配对 + 分层非劣性 + 顺序扩样（100→300→500）
+
+方向映射：
+  推理优化   → LIBERO + RoboCasa ⇒ Canonical-Heldout + Precision-Core
+  Agent      → LIBERO-PRO + BEHAVIOR ⇒ Grounding / Task-Gen + Core-20
+  RL 框架    → 固定 policy 配对回归 ⇒ Canonical 复测
+  物理(MuJoCo)→ RoboCasa + LIBERO + trace/oracle/闭环 ⇒ Physics-Core
+  渲染/3DGS  → LIBERO-Plus + RoboTwin randomized ⇒ OR + Visual paired renderer
+
+验收流水线：自检（打回制）→ 公开自报（附指纹）→ ESAS 非劣（gatekeeping）
+            → 真机 R1（大效应否决）；任一站失败回上一站，不得跳站
+```
+
+## 附录 A：π0.5 详细运行协议与代码依据
+
+除声明的被测变量外，reference 与 candidate 不得改变下列任何字段。
+
+### A.1 LIBERO 系（原始 / Plus / PRO / ESAS-LIBERO 共同 Policy Contract）
+
+| 配置项 | Reference 值 |
+|---|---|
+| checkpoint | `gs://openpi-assets/checkpoints/pi05_libero`（30k finetuned，记录 hash） |
+| 模型配置 | `Pi0Config(pi05=True, action_horizon=10, discrete_state_input=False)`；数据配置 `extra_delta_transform=False` |
+| 计算精度 / 结构 | BF16；PaliGemma `gemma_2b` + `gemma_300m` action expert；max token 200；内部 action 32 维取前 7 维 |
+| flow steps / chunk | **10 / 预测 10 / 执行 5**；执行 5 步后丢弃剩余重新观测推理；smoothing/ensemble 关闭；同步交互 |
+| 观测 | 仿真渲染 256×256 → resize-with-pad 224×224 uint8；agent + wrist 双相机均旋转 180°；right-wrist 槽位零图并 mask；proprio 8 维（EEF pos + quat→axis-angle + gripper qpos） |
+| 采样 | 50 rollouts/task；env seed 7；初始等待 10 步；max steps 220/280/300/520；normalization 用 checkpoint 自带 norm stats |
+| 异常 | 记录并按预定义规则计入，不得静默重跑或事后筛除 |
+
+代码依据：[OpenPI config](https://github.com/Physical-Intelligence/openpi/blob/main/src/openpi/training/config.py)、[模型配置](https://github.com/Physical-Intelligence/openpi/blob/main/src/openpi/models/pi0_config.py)（`sample_actions` 默认 10 步）、[评测脚本](https://github.com/Physical-Intelligence/openpi/blob/main/examples/libero/main.py)（`replan_steps=5`、seed 7、等待 10 步、按 suite 固定 max steps）、[policy adapter](https://github.com/Physical-Intelligence/openpi/blob/main/src/openpi/policies/libero_policy.py)。
+
+Benchmark 差异：Plus 用固定实例自带配置 ×1 rollout；PRO 用 50/task/profile 且官方未冻结 env seed，团队复现写入 manifest；Plus/PRO 论文均未披露 π0.5 推理参数，本契约是 ESAS 规定。
+
+### A.2 RoboCasa 系
+
+| 配置项 | Reference 值 |
+|---|---|
+| checkpoint | [RoboCasa π0.5 Human300 @ 75k](https://huggingface.co/robocasa/robocasa365_checkpoints/tree/main/pi05_pretrain_human300/multitask_learning/75000)；OpenPI fork commit `ca4c671` |
+| 模型配置 | `Pi0Config(pi05=True, max_token_len=200)`；action_horizon 未覆写继承默认 **50**；discrete state 随 `pi05` 继承为 True；BF16；32 维 action 取前 12 维经官方 `convert_action()` |
+| flow steps / chunk | **10 / 预测 50 / 执行 5** |
+| 观测 | 三路相机均 224×224：left agentview → image、eye-in-hand → wrist_image、right agentview → right_image（π0.5 下不可省略）；proprio 16 维（EEF 相对位姿 + base 位姿 + gripper）pad 到 32 |
+| 采样 | 50 trials/task；seed 7；split `pretrain`；**max steps = `get_task_horizon × 1.5`（1.0.0 提交的 runner 已含此乘法；1.0.1 已把 1.5× 烧进任务定义，迁移时严防 2.25× 双重乘法）**；success = `info["success"]` |
+
+代码依据：[提交记录](https://github.com/robocasa-benchmark/leaderboard/blob/main/submissions_md/pi05_2026-04-02.md)、[训练配置](https://github.com/robocasa-benchmark/openpi/blob/ca4c6d710db75e276bc7c866a57bd7e4aee5b6e8/src/openpi/training/config.py)、[评测脚本](https://github.com/robocasa-benchmark/openpi/blob/ca4c6d710db75e276bc7c866a57bd7e4aee5b6e8/examples/robocasa/main.py)、[policy adapter](https://github.com/robocasa-benchmark/openpi/blob/ca4c6d710db75e276bc7c866a57bd7e4aee5b6e8/src/openpi/policies/robocasa_policy.py)。
+
+### A.3 结果配置指纹（每个结果必附）
+
+```text
+model/checkpoint hash + norm_stats hash
+openpi / benchmark / simulator commits or versions
 backend/framework + dtype/quantization
-flow_steps / predicted_horizon / executed_actions
-image preprocessing + cameras
-norm_stats hash
+flow_steps / predicted_horizon / executed_actions_per_chunk
+cameras + preprocessing + observation-state schema
 episode manifest hash + environment/policy seeds
-simulator/dependency versions
+integrator/timestep/solver/contact（物理方向）
+task-horizon table hash + success-predicate version
 ```
 
-### 7.5 两个 reference，而不是一个
+## 附录 B：私有 manifest 字段参考
 
-系统优化最好保留两个参照：
-
-1. **Official reference**：官方 JAX / BF16 / 官方 checkpoint，用于验证能否复现公开结果。
-2. **Local backend reference**：团队实际后端在“未优化”状态的 BF16/FP16 实现，用于与量化、编译或算子优化做公平配对。
-
-若直接拿官方 JAX 与本地 PyTorch + 自定义 kernel 比，差异会同时包含框架、预处理、checkpoint 转换和系统优化，难以归因。
-
-## 8. π0.5-RoboCasa 标准 baseline 与运行协议
-
-RoboCasa 与 LIBERO 虽然都通过 OpenPI 部署 π0.5，但模型 horizon、有效 action 维度、相机和 proprioception 均不同，不能复用 LIBERO 的 10/5 配置。ESAS-RoboCasa v1 应先以公开 checkpoint 和其提交 commit 为复现起点，再统一迁移到 RoboCasa 1.0.1 重建 reference。
-
-### 8.1 模型与 checkpoint 标准
-
-| 配置项 | ESAS-RoboCasa v1 Reference |
-|---|---|
-| model | π0.5 flow-matching head |
-| checkpoint | [RoboCasa π0.5 Human300 @ 75k](https://huggingface.co/robocasa/robocasa365_checkpoints/tree/main/pi05_pretrain_human300/multitask_learning/75000) |
-| checkpoint 来源 | RoboCasa 团队复现；Human300，多任务训练 75k steps，batch size 64 |
-| OpenPI | RoboCasa fork commit `ca4c6d710db75e276bc7c866a57bd7e4aee5b6e8` |
-| reference 计算精度 | BF16 |
-| VLM / action expert | PaliGemma `gemma_2b` / `gemma_300m` |
-| `pi05` / discrete state | `True` / `True` |
-| max token length | 200 |
-| flow-matching integration steps | **10** |
-| predicted action horizon | **50 actions** |
-| executed actions per chunk | **5 actions** |
-| internal / effective action dimension | 32 / RoboCasa 输出前 12 维 |
-| normalization | checkpoint 自带 norm stats；记录并校验 hash |
-
-`pi05_pretrain_human300` 没有覆写 `action_horizon`，因此继承 `Pi0Config` 的默认值 **50**；`sample_actions` 默认执行 **10** 个 flow integration steps。官方 RoboCasa runner 的 `replan_steps=5`，所以标准闭环是：
+`perturbation_manifest`（OR / Grounding / Task-Generalization 通用骨架，按 profile 增删）：
 
 ```text
-observe → predict 50 actions → execute actions[0:5]
-        → discard actions[5:50] → observe again
+episode_id / parent_episode_id
+base_task_id / suite / base_bddl_hash / derived_bddl_hash
+instruction_hash / success_predicate_hash / predicate_mode   # same / remapped / unsatisfiable
+axis / subaxis / severity
+扰动参数（object pose/distractor、camera、qpos、light、texture、noise type+params+seed）
+grounding 专用：instruction_variant_id / semantic_equivalence / decoy_object_ids / target_exists
+task-gen 专用：task_recipe_id / goal_graph / feasibility_status（parseable/collision_free/reachable/oracle_solved）
+generator_version / asset_manifest_hash
+environment_seed / policy_noise_seed
+simulator_config_hash / manifest_version
 ```
-
-所有结果都必须分别记录 `flow_steps / predicted_action_horizon / executed_actions_per_chunk`，RoboCasa v1 reference 固定为 **10/50/5**。量化、算子替换、编译器和后端迁移不得顺手改变后两项；flow-step reduction 作为被测变量时，仍与 10-step BF16 reference 配对。
-
-### 8.2 观测、action 与闭环标准
-
-| 配置项 | ESAS-RoboCasa v1 Reference |
-|---|---|
-| 模型图像输入 | 三路图像均 resize-with-pad 到 224 × 224，转 `uint8` |
-| 左外部相机 | `video.robot0_agentview_left` → `observation/image` |
-| 腕部相机 | `video.robot0_eye_in_hand` → `observation/wrist_image` |
-| 右外部相机 | `video.robot0_agentview_right` → `observation/right_image`；π0.5 下不可省略 |
-| proprioception | EEF relative position + relative rotation + base position + base rotation + gripper qpos，共 16 维，再 pad 到 32 |
-| instruction | `annotation.human.task_description` 原文 |
-| action | 模型输出前 12 维，随后使用官方 `convert_action()` 再送入环境 |
-| action smoothing / ensemble | 关闭 |
-| policy–environment 交互 | 同步；拿到新 chunk 后执行 5 步再请求下一次推理 |
-| success | `info["success"]` |
-
-相机顺序、图像方向、resize/padding、状态拼接次序、action 维度与 `convert_action()` 都属于 checkpoint 接口的一部分。渲染降质实验只能改变声明的 renderer/传感器变量，不能同时静默改变这些适配逻辑。
-
-### 8.3 评测采样与版本标准
-
-| 配置项 | Public RoboCasa365-50 | ESAS-RoboCasa |
-|---|---:|---:|
-| RoboCasa | 先复现提交的 1.0.0；正式 reference 统一冻结到 1.0.1 | 与正式 reference 完全相同 |
-| evaluation split | `pretrain` | Precision/Physics 使用隐藏的同分布 manifest；OOD 单独使用 `target` |
-| environment seed | 官方 runner 默认 7 | 由隐藏 episode manifest 指定 |
-| policy noise | 固定并记录 policy server RNG | 按 episode/inference index 确定性派生 |
-| episodes / task | 官方协议 50 | 先 100；临界任务顺序扩到 300，再到 500 |
-| max action steps | `get_task_horizon(task)`；1.0.1 使用统一增加 1.5× 后的任务 horizon | 与 reference 版本逐任务一致 |
-| task success | binary `info["success"]` | 同一 success predicate；另报连续诊断量 |
-| 异常处理 | 记录并按预定义规则计入，不得静默重跑 | 同左，另报 simulator error |
-
-迁移到 RoboCasa 1.0.1 时，必须先完整重跑 reference 并重新校准各任务成功率与方差，不能把 1.0.0 的公开分数当成验收常数。公开 `pretrain` 和 OOD `target` split 必须分开报告：后者同时更换厨房与对象，测的是场景/对象泛化，不是纯物理精度。
-
-代码依据：
-
-- π0.5 提交给出 checkpoint、训练步数、batch size、RoboCasa 版本和 OpenPI commit（[submission](https://github.com/robocasa-benchmark/leaderboard/blob/main/submissions_md/pi05_2026-04-02.md)）。
-- `pi05_pretrain_human300` 使用 `Pi0Config(pi05=True, max_token_len=200)`；`Pi0Config` 默认 BF16、32D action、50-step horizon、`gemma_2b` + `gemma_300m`（[训练配置](https://github.com/robocasa-benchmark/openpi/blob/ca4c6d710db75e276bc7c866a57bd7e4aee5b6e8/src/openpi/training/config.py)、[模型配置](https://github.com/robocasa-benchmark/openpi/blob/ca4c6d710db75e276bc7c866a57bd7e4aee5b6e8/src/openpi/models/pi0_config.py)）。
-- runner 固定 224 输入、`replan_steps=5`、`split=pretrain`、50 trials、seed 7，并使用三路相机、16D state、任务原始指令、`convert_action()` 与 `info["success"]`（[评测脚本](https://github.com/robocasa-benchmark/openpi/blob/ca4c6d710db75e276bc7c866a57bd7e4aee5b6e8/examples/robocasa/main.py)）。
-- policy adapter 在 π0.5 下要求三路相机，将 state/action pad 到 32，输出截取前 12 维（[policy adapter](https://github.com/robocasa-benchmark/openpi/blob/ca4c6d710db75e276bc7c866a57bd7e4aee5b6e8/src/openpi/policies/robocasa_policy.py)）。
-
-### 8.4 结果配置指纹
-
-每个 RoboCasa 结果至少附带：
-
-```text
-checkpoint hash + norm_stats hash
-openpi / RoboCasa / robosuite / MuJoCo commits or versions
-robot / assets / controller / action-conversion version
-integrator / timestep / substeps / solver / contact / friction
-dtype / quantization / backend / flow_steps
-predicted_horizon / executed_actions_per_chunk
-cameras / preprocessing / observation-state schema
-task set / split / episode-manifest hash / environment and policy seeds
-task-horizon table hash / success-predicate version
-```
-
-## 9. 不同频率的运行规模
-
-| 级别 | 建议规模 | 目的 |
-|---|---|---|
-| PR smoke | LIBERO 每套件 2 个任务 × 10 rollouts | 排除崩溃与严重精度问题 |
-| 开发日常回归 | 原始 LIBERO 40 + RoboTwin 全 50 × clean/randomized × 10–100；RoboCasa365 Public-50 × 50 | 开发团队发现明显退化与任务级问题 |
-| 开发专项回归 | LIBERO-Plus 全量 10,030 fixed instances × 1；LIBERO-PRO 各启用 profile × 40 tasks × 50 episodes | 公开鲁棒性、grounding 与泛化诊断；两者不得套用同一重复次数 |
-| 评估预检 | ESAS-LIBERO / ESAS-RoboTwin 各 profile + ESAS-RoboCasa Precision/Physics × 100 个配对 episodes / task | 评估团队筛出明确通过、失败与临界项 |
-| 临界项扩样 | 可疑 task/profile 扩展到 300，再到 500 | 降低波动干扰，支持小差异判断 |
-| 正式发布 | 公开全量回归 + ESAS Private Validation + Sealed Final Holdout；必要时 BEHAVIOR Full-100 | 最终非劣性验收与跨层验证 |
-
-若 50 个任务、4 个主要 profile、每任务固定 500 次，则单模型需要 100,000 episodes；reference 与 candidate 成对运行约 200,000 次。因此优先采用顺序扩样：先跑 100，明确通过或失败即停止，只把临界项扩到 300–500。具体数字仍应根据算力预算、最小关注退化幅度和成败翻转率做功效分析。仿真 rollout 便宜不等于可以忽略统计设计。
-
-## 10. 尚未冻结的关键问题
-
-1. 团队实际使用哪些仿真器和引擎：MuJoCo / SAPIEN / Isaac / OmniGibson / 自研？
-2. π0.5 在 RoboTwin 与 BEHAVIOR 上使用官方、社区还是团队自训 checkpoint？训练 recipe 如何固定？
-3. 每日、周度、发布评测的 GPU-hour 预算分别是多少？
-4. ESAS-RoboTwin 各 profile 的任务纳入规则、扰动范围和基线可解性门槛如何冻结？
-5. ESAS-LIBERO 从 Plus/PRO 采用哪些生成器、难度层和资产，如何建立不泄漏的私有实例池？
-6. `BEHAVIOR-Core-20` 的分层抽样规则和最终任务清单是什么？
-7. 相对 reference 的非劣性界限如何按 Macro、profile、任务族和关键任务分层校准？
-8. 渲染与物理优化的固定 trace 数据格式、状态对齐方式与容差如何定义？
-9. 是否需要将吞吐、实时因子、显存、能耗与精度做成统一 Pareto 报告？
-10. RoboCasa 18 个 Atomic-Seen 任务在 1.0.1 + π0.5 reference 下的逐任务成功率、重复方差和失败模式是什么？据此哪些任务进入 Precision-Core / Physics-Core？
-
-## 11. 当前建议摘要
-
-```text
-Embodied-Core
-  LIBERO-Spatial / Object / Goal / 10
-
-LIBERO Public Robustness / Generalization
-  LIBERO-Plus
-  LIBERO-PRO
-
-RoboTwin Public Dev
-  50 tasks × official_clean / official_randomized
-
-RoboCasa365 Public-50
-  Atomic-Seen 18 / Composite-Seen 16 / Composite-Unseen 16
-
-ESAS (Embodied System Acceptance Suite)
-  ESAS-LIBERO
-    Canonical-Heldout / Covariate-Robustness / Grounding
-    Task-Generalization / Compound
-    Private Validation / Sealed Final Holdout
-  ESAS-RoboTwin
-    Canonical / Visual / Physics / Control / Compound
-    Private Validation / Sealed Final Holdout
-  ESAS-RoboCasa
-    Precision-Core (task list TBD after calibration) / Physics-Core
-    Scene-Object-Heldout / Capability-Stress
-
-Embodied-Agent
-  BEHAVIOR-Core-20
-  BEHAVIOR-Full-100
-```
-
-- 原始 LIBERO：所有 π0.5 优化共同必跑，承担可复现基础回归，但不独自承担最终验收。
-- LIBERO-Plus：公开的条件鲁棒性和视觉/传感器压力层，尤其适合渲染、3DGS、视觉编码和相机链路。
-- LIBERO-PRO：公开的 grounding、任务泛化和反记忆层；地板任务作为能力压力，不作为小精度回退门槛。
-- ESAS-LIBERO：复用 Plus/PRO 设计但隐藏具体实例，承担 LIBERO 体系的最终私有验收。
-- RoboTwin 官方全量：由开发团队承担公开、可复现的日常回归与任务级定位。
-- ESAS-RoboTwin：由评估团队维护隐藏、配对、分轴、版本冻结的最终系统验收集；原 System-10 只保留为能力压力或快速诊断候选。
-- RoboCasa365 Public-50：统一到 MuJoCo 任务栈的公开兼容性回归；π0.5 的 Atomic-Seen 具备精度候选价值，Composite 两组当前主要作为能力压力。
-- ESAS-RoboCasa：承担 MuJoCo 物理优化的 Precision/Physics 验收；具体 Atomic-Seen 任务待 1.0.1 reference 实测后冻结，当前不预选名单。
-- BEHAVIOR：承担 Agent、长程、导航、记忆与部分完成评估。
-- ManiSkill：作为物理引擎的组件级任务探针，不强求全部由 π0.5 驱动。
-- 不同 benchmark 必须使用各自适配或微调的 π0.5 checkpoint；不能用 `pi05_libero` 零样本运行其他本体后，把低分归因于系统优化。
 
 ## Related
 

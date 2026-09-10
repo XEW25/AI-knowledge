@@ -4,7 +4,7 @@
 >
 > 公开仿真基准由**开发团队自评**；**评估团队**另行维护私有评测集 **ESAS（Embodied System Acceptance Suite，具身系统验收套件）**，承担质量管控与最终评审。
 >
-> 制定于 2026-08-06；**2026-08-18 重构为 v0.7**：按"共同任务池 → 私有集构建 → 判定标准 → 方向映射"重排，细节运行参数收进附录。任务清单、扰动范围与非劣性门槛仍需按团队算力预算与冻结的 reference 校准。
+> 制定于 2026-08-06；**2026-08-18 重构为 v0.7**：按"共同任务池 → 私有集构建 → 判定标准 → 方向映射"重排，细节运行参数收进附录。任务清单、扰动范围与非劣性门槛仍需按团队算力预算与冻结的 reference 校准。**2026-09-01 / 09-07 勘误**（结构不变，仍为 v0.7）：§3.4 Precision-Core 的 ψ 功效表述纠正；§2.6 EAI 补第四模块（状态转移建模）；§2.5 / §3.4 / §4 RoboCasa365 任务数按代码核实（composite 291→300、其中 48 个仅环境无演示、atomic 65 全在 Human300）；§5 加方向优先三档视图链接。
 
 ## 1. 核心问题与评估分工
 
@@ -74,7 +74,7 @@
 
 ### 2.5 RoboCasa365：MuJoCo 主任务集
 
-- **测什么**：365 个厨房任务、2,500 个厨房场景，RoboCasa/robosuite/MuJoCo 栈；公开 leaderboard 用 50 个目标任务：**Atomic-Seen 18 / Composite-Seen 16 / Composite-Unseen 16**，Human300（300 任务）训练、`pretrain` split 评测（[leaderboard](https://robocasa.ai/leaderboard.html)、[benchmarking 文档](https://robocasa.ai/docs/build/html/benchmarking/benchmarking_overview.html)）。
+- **测什么**：365 个厨房任务（**65 atomic + 300 composite**，composite 分 60 个 activity；300 个 composite 中 **252 个有演示数据、48 个仅有环境定义无演示**；Human300 = 全部 65 atomic + 235 composite——2026-09-07 按代码仓 `dataset_registry.py` 与 `docs/composite_tasks/task_attributes.json` 核实）、2,500 个厨房场景，RoboCasa/robosuite/MuJoCo 栈；公开 leaderboard 用 50 个目标任务：**Atomic-Seen 18 / Composite-Seen 16 / Composite-Unseen 16**，Human300（300 任务）训练、`pretrain` split 评测（[leaderboard](https://robocasa.ai/leaderboard.html)、[benchmarking 文档](https://robocasa.ai/docs/build/html/benchmarking/benchmarking_overview.html)）。
 - **关键参数**：50 trials/task；π0.5 每次预测 50 actions、执行前 5 步（**50/5**，horizon 50 是 `Pi0Config` 默认值未被覆写）；flow 10 步；checkpoint `pi05_pretrain_human300 @ 75k`（RoboCasa 团队复现，batch 64，OpenPI fork commit `ca4c671`）。**注意 horizon**：该提交的 runner 代码本身就是 `get_task_horizon(env_name) * 1.5`，即公开成绩已在 1.5× horizon 下评出；RoboCasa 1.0.1 又把 1.5× 烧进了任务定义——迁移到 1.0.1 时若 runner 再乘 1.5 会变成 2.25×，**必须核对避免双重乘法**。
 - **π0.5 参考成绩**：Atomic-Seen **39.6%** / Composite-Seen **7.1%** / Composite-Unseen **1.2%**，总体 16.9%（[提交记录](https://github.com/robocasa-benchmark/leaderboard/blob/main/submissions_md/pi05_2026-04-02.md)）。冻结门槛前仍须在统一 1.0.1 协议下重跑 reference。
 - **使用边界**：物理引擎（MuJoCo）优化的**主承载**；Atomic-Seen 成功率处于有翻转空间的区间，是精度回归候选池；Composite 两组接近地板，只作能力压力（开发自报，不入 ESAS，见 §3.4）。`target` split（10 个不相交厨房 + 不相交对象）单独作场景/对象 OOD。
@@ -167,9 +167,9 @@ ESAS-RoboCasa
 └── Scene-Object-Heldout  # 官方 target split；审计职能：查训练污染、统一 harness
 ```
 
-RoboCasa Composite（Seen/Unseen）不入 ESAS：地板区、不设门槛、任务公开，由开发团队在公开集自报，ESAS 仅在发布节点抽查复跑。Agent 框架将 composite 成功率抬入 20–80% 判别区间后，从全库 300 个 composite 任务中校准实例化 Agent 方向的验收 profile（任务+实例双层隐藏，框架版本升级适用同一套非劣性验收逻辑；触发条件见 §6）。
+RoboCasa Composite（Seen/Unseen）不入 ESAS：地板区、不设门槛、任务公开，由开发团队在公开集自报，ESAS 仅在发布节点抽查复跑。Agent 框架将 composite 成功率抬入 20–80% 判别区间后，从全库 300 个 composite 任务中校准实例化 Agent 方向的验收 profile（其中 48 个仅有环境、无任何演示数据——对开发团队零训练暴露，是天然的 held-out 候选池）（任务+实例双层隐藏，框架版本升级适用同一套非劣性验收逻辑；触发条件见 §6）。
 
-- `Precision-Core`：候选池不限于公开的 Atomic-Seen 18——扩到 Human300 训练分布覆盖的全部 atomic 任务（全库 65 个 atomic，公开榜只用 18 个；可用数量待核对 Human300 构成），跑 reference 校准后保留成功率约 20%–80%、重复稳定、任务族不重复的任务。**任务选择本身也是隐藏项**：评估团队不公开选了哪些任务，与 episode 级隐藏叠加，无需扰动生成即获得真正私有性。
+- `Precision-Core`：候选池不限于公开的 Atomic-Seen 18——扩到 Human300 训练分布覆盖的全部 atomic 任务（全库 65 个 atomic，公开榜只用 18 个；2026-09-07 代码核实：65 个全部有演示数据且全部在 Human300/pretrain300 训练集内，候选池即 65），跑 reference 校准后保留成功率约 20%–80%、重复稳定、任务族不重复的任务。**任务选择本身也是隐藏项**：评估团队不公开选了哪些任务，与 episode 级隐藏叠加，无需扰动生成即获得真正私有性。
 - `Physics-Core`：物理引擎优化不能只用闭环 π0.5，同一批任务固定三种执行方式——①**固定 action trace 重放**（隔离引擎，比状态轨迹/接触/穿透/约束误差）、②**scripted/oracle controller**（排除视觉与推理干扰）、③**π0.5 闭环**（最终系统影响）。trace 重放放在 RoboCasa 而非 LIBERO 的理由：重放不跑模型，LIBERO 的官方 π0.5 基线优势用不上，其价值只取决于任务物理内容——两家同为 MuJoCo 栈，LIBERO 接触稀疏（分歧信号是 RoboCasa fixture/堆叠/铰接任务的真子集），在信号密度低处重复布点只浪费算力。
 - "同一引擎名"不等于"同一物理栈"：必须同时冻结 RoboCasa/robosuite/MuJoCo/资产版本与 integrator、timestep、solver、contact、controller。
 - **设计逻辑**：除 Physics-Core 外三个 profile 均为 π0.5 闭环的模型在环评测；Precision-Core 因 atomic 任务处于 ~40% 非饱和区间，成败翻转空间远大于 ~97% 的 LIBERO Canonical，是 MuJoCo 栈上检测小回退的主力（非饱和区同等损伤表现为更多翻转即更大效应量，更易检出；注意配对方差 ≈ ψ/n，ψ 本身升高并不降低所需样本量，见 §4）。ESAS-RoboCasa **不做扰动生成**——任务定义全部来自官方，私有性在任务选择层（Precision-Core 不公开任务名单）+ episode 实例层（隐藏初始状态/seed/manifest + 配对 + 聚合反馈）：扰动归因已由 ESAS-LIBERO 复用 Plus/PRO 成熟生成器承载，而 RoboCasa 的独特价值（非饱和难度、2,500 厨房与不相交 split 的原生 OOD、composite 长程、MuJoCo 物理）全部原生自带、无需生成。
@@ -223,7 +223,7 @@ Reference 与 candidate 必须使用完全相同的：
 
 **结果聚合**至少报告：每任务成功率与每 suite macro average；paired success delta 与 `success→failure` / `failure→success` 翻转计数；各 profile 分开报告、长程任务单列；最差 10% 任务的平均退化；分阶段 progress / predicate completion；time-to-success、timeout rate；成功轨迹的长度与抖动；碰撞、保护触发与 simulator error。连续诊断量用于筛选和归因，不自动替代任务验收（沿用 [[Real-robot evaluation]]）。
 
-其中"分阶段 progress"并非处处可得（2026-08 已核对三家代码）：**BEHAVIOR 原生**（BDDL partial credit 即主指标）；**LIBERO 官方只报二元**，但任务为 BDDL 定义、goal 是 1–3 个谓词的合取，`parsed_problem["goal_state"]` 可用任务无关的通用 hook 对每个 conjunct 单独调 `_eval_predicate` 插桩——仅对 libero_10/90 多谓词任务有意义，ESAS-LIBERO 的 `predicate_progress` 由此实现；**RoboCasa365 严格二元**（`info["success"]`），291 个 composite 任务各自硬编码 `_check_success` 且部分依赖历史 latch 标志，无法通用插桩——该处分阶段诊断用连续量与失败模式分类替代，不设 predicate 级指标。
+其中"分阶段 progress"并非处处可得（2026-08 已核对三家代码）：**BEHAVIOR 原生**（BDDL partial credit 即主指标）；**LIBERO 官方只报二元**，但任务为 BDDL 定义、goal 是 1–3 个谓词的合取，`parsed_problem["goal_state"]` 可用任务无关的通用 hook 对每个 conjunct 单独调 `_eval_predicate` 插桩——仅对 libero_10/90 多谓词任务有意义，ESAS-LIBERO 的 `predicate_progress` 由此实现；**RoboCasa365 严格二元**（`info["success"]`），300 个 composite 任务各自硬编码 `_check_success`（2026-09-07 复核：此前记 291 是只数了直接继承 `Kitchen` 的类，漏了 10 个继承 atomic 基类 `ManipulateDrawer`/`OpenOven` 的 composite 任务；代码仓另有一个与 atomic 同名的 `AdjustWaterTemperature` composite 类，不在官方 365 清单内） 且部分依赖历史 latch 标志，无法通用插桩——该处分阶段诊断用连续量与失败模式分类替代，不设 predicate 级指标。
 
 事件类指标（碰撞、保护触发、simulator error）的意义分三层：碰撞看**策略行为质量**——动作精度退化最早表现为擦碰增多，先于成败翻转报警，且是接触求解回归的近因观察量与真机风险代理；保护触发（关节/力矩饱和、速度超限）看**执行器边界**——量化/加速造成的动作分布尾部变胖和时序扰动下的补偿性大动作都在此显形；simulator error 看**评测有效性**——发散 episode 的处理规则不预先冻结，配对统计会被幸存者偏差破坏，且发散率本身是物理引擎优化的被测输出。三者都是"成功率不动时仍能区分两个版本"的维度。它们同样不是 LIBERO/RoboCasa 的官方输出，可得性如下：**碰撞**——两家同为 robosuite/MuJoCo 栈，`check_contact` / `sim.data.contact`（接触对与接触力）是任务无关的统一接口，ESAS runner 可通用插桩；但必须先冻结"非预期接触"的定义（机器人非末端 body × 环境、或接触力超阈值——抓取放置本身就是接触，不定义白名单该指标无意义）。**保护触发**——仿真无原生等价物（真机概念），只能用约束违规代理：关节/力矩饱和、速度或接触力超阈值，阈值由 ESAS 自定义；真机语义的保护触发归 [[Real-robot evaluation]]。**simulator error**——两家 eval 路径均无数值异常捕获（无 NaN / mjWARN 检查），episode 级异常记录、qacc/qpos NaN 与 MuJoCo warning 计数由 ESAS 统一 runner 自建，对应附录 A 的"异常记录并计入、不得静默重跑"规则。
 

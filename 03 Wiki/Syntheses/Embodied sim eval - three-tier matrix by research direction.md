@@ -46,7 +46,7 @@
 - 【开源 · 条件必跑】**RoboTwin 2.0 全量 clean + randomized**：涉双臂 / 接触的优化必跑；70.7 / 46.0 均在判别区（官方 cotrain 数字；不同训练 recipe 差近 30 点，团队 recipe 重建 reference 后须复核仍在判别区，主页 §2.4）。注意 10/50/50 整 chunk 开环协议——对推理延迟最宽容、对 chunk 内数值误差最敏感。
 - 【开源 · 校准后】**LIBERO-Plus 判别子集（Plus-Sensitive）**：从 10,030 实例中按团队 reference 逐子维成功率选出 20%–80% 判别区的子维度（官方榜无 π0.5，名单须待 reference 跑分后冻结；与渲染方向共用同一份跑分）。入档理由：量化误差与输入分布相关——PTQ 的敏感度分析与 rotation 校准都在校准集分布上离线完成（见 [[VLA quantization]]），观测偏移把 activation 推到校准集外，clean Canonical 测不到这个失效面；且固定实例 ×1 天然逐实例配对，判别子维池化后功效可支撑 2pp 级判定，池化规模 ≳3.7k 对时达 1pp（主页 §4 公式）。
 - 【私有】**ESAS-LIBERO Canonical-Heldout**：任务 / 指令 / 谓词 / 配置全部不变，仅隐藏初始状态与 seed，逐 episode 配对；纯计算路径主验收。
-- 【私有】**ESAS-RoboCasa Precision-Core**：全库 atomic 校准后选 20%–80% 任务，任务名单 + 实例双层隐藏；检测 1–3pp 回退的主力（非饱和区里同等系统损伤表现为更多成败翻转即更大效应量，故更易检出——不是因为不一致率 ψ 高：配对方差 ≈ ψ/n，ψ 高反而增大所需 n）。
+- 【私有】**ESAS-RoboCasa Precision-Core**：全库 65 个 atomic（均有演示、均在 Human300 内，已代码核实）校准后选 20%–80% 任务，任务名单 + 实例双层隐藏；检测 1–3pp 回退的主力（非饱和区里同等系统损伤表现为更多成败翻转即更大效应量，故更易检出——不是因为不一致率 ψ 高：配对方差 ≈ ψ/n，ψ 高反而增大所需 n）。
 - 【私有】**ESAS-RoboTwin Canonical + Control**：Control 先扫延迟—精度敏感度曲线，再把各后端实测延迟映射到曲线定工作点——同步协议下延迟免费，量化 / 异步调度的时序收益与风险只有这里能看见。
 
 主要观察量：paired delta、`success→failure` 翻转计数、长程任务退化、轨迹漂移、碰撞率。
@@ -81,7 +81,7 @@
 - 【开源】**LIBERO-PRO Task 轴**（0.00–0.01）与 T3 子任务重组：能力压力。
 - 【开源】**RoboCasa365 Composite Seen / Unseen**：地板区——该方向的核心产出目标就是把它抬进判别区；抬出后触发 ESAS composite 验收集实例化（主页 §3.4）。
 - 【开源】**BEHAVIOR-Core-20**（发布级，Core-20 × 10 实例 = 200 episodes ≈ 单机 4–5 天）；**Full-100** 仅重大发布。仿真非确定、不可配对，退化为统计比较。
-- 【私有 · 待实例化】**ESAS composite 验收 profile**：从全库 300 个 composite 任务校准选取，任务 + 实例双层隐藏。
+- 【私有 · 待实例化】**ESAS composite 验收 profile**：从全库 300 个 composite 任务校准选取（252 个有演示数据、48 个仅环境无演示——后者对开发团队零训练暴露，优先作 held-out 候选），任务 + 实例双层隐藏。
 
 ## 5. 方向三：仿真与真机 RL 框架
 

@@ -61,6 +61,11 @@
 
 fast 路径（小脑侧）另算：rail 体系在那边失效（无 ModelContext），检测靠算子内看门狗 + 后置条件确认——见 [[Harness granularity]]。
 
+### Pigey 对照（2026-09-03 加，[[Galanti et al. - Pigey Addressing the Orchestration Gap in Generalist Robots via Physical Agency|Pigey]]，Princeton/Together，真机）
+
+同一“冻结 VLA + 编排层”路线里**第一篇真机工作**，且**harness 行为的分布比 RPent 靠代码得多**：可判定的（传感器、计数、次数）全在代码守卫，语义的在提示词或独立 LLM 调用。按四特性记分：**检测 ✅**（传感器覆盖 > 独立验证器 LLM > 几何计数 > 自省，真机误判 2/150）/ **重试 ✅**（同参重试→强制重接地→换后端→双向回退，比 RecoveryRail 第一格完整）/ **记忆 ◐**（仅回合内）/ **持续学习 ❌**。
+
+**值得搬进 DetectionRail 的三样**：①“后端自报成功但传感器说没有 ⇒ 改判”这一行 `if`，就是 `is_grasp_confirmed` fail-closed 的推广；②**动作后独立裁判调用**（Detection 与 Diagnosis 分成两次 LLM 调用，恰是本页“裁判 vs 解说员”的实现；⚠️ Pigey 的实现是 **fail-open**——API 失败即放行——搬入时改 fail-closed）；③**守卫以工具返回值的形式拦截**（不执行、返回 `rule_violated` + 理由给 LLM），这与 rail 抛异常让 LLM 自纠是同一模式，但多了“为什么被拦”的结构化字段。**不搬的**：路由启发式住提示词（与 RPent 同病，程度轻）；真机硬编码 Anthropic API + Gemini-ER 云感知（断网即停，与本页“部署终局”判据冲突）。
 ## π0.5 纯 VLA 架构实验（第二条执行器路线）
 
 在同一基座上跑"π0.5 单模型 + harness"完全可行，且 π0.5 直接吃语言指令、可关掉 planner。唯一真问题是粒度（详见 [[Harness granularity]]）：episode 包成一个工具则 rail 对执行中失明 ⇒ 建 **`vla_until` 复合算子**（照 `track_grasp` 模式：内藏 chunk 循环 + chunk 级监控器 STAC/进展预算/安全边界，结构化返回 termination_reason + 监控统计），episode 级 harness（后置裁决/恢复/记忆/trace）原样走 rails。要新写的：`vla_until` 本体 + chunk 监控器（大几百行）；要认真设计的只有真机上的关节动作流 Driver 协议（仿真走 `chunk_step` 现成）。ESAS 的 π0.5 Policy Contract（flow steps / horizon / 每 chunk 执行步数）恰好就是 `vla_until` 的参数表——评测契约与执行代码第一次同源。
@@ -72,7 +77,7 @@ fast 路径（小脑侧）另算：rail 体系在那边失效（无 ModelContext
 | planner + 原语 | 基线 A | A+rails |
 | 纯 π0.5 | 基线 B | B+rails |
 
-"harness 的价值是否依赖执行器范式"目前无任何已发表工作能答（Harness VLA 只有范式 A、[[Zeng et al. - HELM Harness-Enhanced Long-horizon Memory for VLA Manipulation|HELM]] 只有范式 B，协议互不相通）——这张表本身是一篇论文的骨架。这也是在自家屋檐下检验 HELM/[[Shin et al. - B2FF Failure Recovery for VLA Policies via Pre-Imagined Milestone Selection|B2FF]] 路线（B2FF 的 milestone 锚点恰落在 `vla_until` 失败后的恢复选项里）。
+"harness 的价值是否依赖执行器范式"目前无任何已发表工作能答（[[Galanti et al. - Pigey Addressing the Orchestration Gap in Generalist Robots via Physical Agency|Pigey]] 给了半个答案：同一回路套在 TAMP 与 VLA 上都为正，但两后端在回路里互为回退、未分开跑）（Harness VLA 只有范式 A、[[Zeng et al. - HELM Harness-Enhanced Long-horizon Memory for VLA Manipulation|HELM]] 只有范式 B，协议互不相通）——这张表本身是一篇论文的骨架。这也是在自家屋檐下检验 HELM/[[Shin et al. - B2FF Failure Recovery for VLA Policies via Pre-Imagined Milestone Selection|B2FF]] 路线（B2FF 的 milestone 锚点恰落在 `vla_until` 失败后的恢复选项里）。
 
 ## 诚实标注
 

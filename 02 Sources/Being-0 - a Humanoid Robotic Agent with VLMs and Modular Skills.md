@@ -52,7 +52,7 @@
 
 | 类型 | 贡献是什么 | 模型是否全冻结 | 例子 |
 |---|---|---|---|
-| **纯 harness** | 脚手架本身 | ✅ | Harness VLA |
+| **纯 harness** | 脚手架本身 | ✅ | Harness VLA（仿真）、[[Galanti et al. - Pigey Addressing the Orchestration Gap in Generalist Robots via Physical Agency|Pigey]]（**真机**，Franka FR3） |
 | **harness + 训练的粘合层** | 框架 + 一个专训中间件 | ❌ 中间层要训 | **Being-0**（Connector）、HELM（SV） |
 | **模型方案** | 架构即模型 | ❌ 端到端训 | π0.5 / GR00T / G0.5 |
 

@@ -21,6 +21,7 @@
 1. **伺服环**（JiuwenSymbiosis 已实现）：`ServoController` 每 tick 闭环，内置四种终止原因 `reached` / `timeout`（**连续无进展**，刻意不是总时长）/ `target_lost` / `stopped`。rail 看不见 tick，但算子返回结构化的 `ServoResult.reason`。
 2. **VLA chunk 循环**（[[RLinf - RPent Recursive Physical Agent Framework|RPent]] 的 `pi0_pick` 已有雏形；完整设计见[[Harness development base - JiuwenSymbiosis selection and build plan|选型页]]的 `vla_until`）：chunk 级监控器（时序一致性 STAC 类、进展预算、逐 chunk 安全边界）住在算子内。
 
+**另一条路径：把复合算子拆开，让边界落在可验证点上**（[[Galanti et al. - Pigey Addressing the Orchestration Gap in Generalist Robots via Physical Agency|Pigey]]，真机）。TiPToP 的 pick-and-place 原是一次算完、执行期全盲的开环原语；Pigey 把它切成 `Pick` 和 `DropAbove` 两个工具，抓取这个有天然传感器信号（夹爪宽度）的时刻正好成了工具边界，边界 rail 就看得见了——对照类任务 80→100，多步 / 遮挡 / 恢复类 25/0/0→100/90/90。**适用条件**：能拆的拆（决策点有本体可测信号），拆不了的（VLA chunk 循环内部、伺服环）才内藏监控。两条路是互补的，不是替代。
 ## 内外两层的分工（不可互相替代）
 
 | | 算子内监控（during） | 边界 rail（before/after） |

@@ -12,7 +12,7 @@
 - **Open source**: 项目页已上线;**代码/权重未见明确发布**(截至 2026-08-06)
 - **Raw tier**: URL-only(未下载 PDF)
 - **Verification status**: 机制 / τ 语义 / 记忆结构 / 结果 / 局限 **全文自读核实**(arXiv HTML v1)于 2026-08-06
-- **Related**: [[Harness design]], [[Embodied failure detection]], [[VLA - Vision-Language-Action Models]], [[Task Decomposition as OOD Mitigation]], [[Physical Intelligence - pi0.5 a VLA with Open-World Generalization]], [[Huang et al. - ChemBot Long-Term Memory for VLA-based Agents]], [[Future embodied Agent framework - integrated view]]
+- **Related**: [[Galanti et al. - Pigey Addressing the Orchestration Gap in Generalist Robots via Physical Agency]]（**真机对照组**，2026-09-03 加）, [[Harness design]], [[Embodied failure detection]], [[VLA - Vision-Language-Action Models]], [[Task Decomposition as OOD Mitigation]], [[Physical Intelligence - pi0.5 a VLA with Open-World Generalization]], [[Huang et al. - ChemBot Long-Term Memory for VLA-based Agents]], [[Future embodied Agent framework - integrated view]]
 - **Tags**: #agentic #harness #vla #frozen-policy #memory #failure-detection #retry #primitive-library #embodied #tsinghua
 
 ## Summary
@@ -138,6 +138,8 @@ primitive 终止后引擎回传 `o_{t+1}` + robot state + **execution / diagnost
 > **注意公平之处**：作者在**空间 oracle 上是克制的**——明确不给物体坐标（*"prevent any reliance on oracle-level environment access during decision making"*），强制从 RGB-D 自行定位。所以问题不在感知作弊，**恰恰在"谁告诉你成功了"**。
 
 **结论（本库判断）**：这套编排逻辑（责任划分、re-staging、记忆）**在真机上大体可迁移**——它要求的是"机器人能退回来换个角度再试"（真机可以），不是"世界能 undo"（真机不行）。真正的真机化难点**不在 planner，而在把那个成功判据换掉**。
+
+> **2026-09-03 后记：这个判断被 [[Galanti et al. - Pigey Addressing the Orchestration Gap in Generalist Robots via Physical Agency|Pigey]] 证实。** Princeton/Together 用同样的“冻结 π0.5 + 编排层”结构上了真机（Franka FR3，30 任务 × 5 次），把上表六条逐条换成真机做法：成功判据 = 夹爪传感器覆盖后端自报 + 独立验证器 LLM + Done 前几何计数；重试计入 3–15 次调用 / $0.02–0.50 / 2–6 分钟；验证器误判 **2/150**。⚠️ 两篇 LIBERO-PRO 数字（82.4 vs 53.3）**不可直接比**：Pigey 是严格零样本、无跨回合记忆、oracle 仅做 VLA 早停与试验终止而不参与 LLM 判断（但其仿真含一个论文未写的 phase 0：先静默跑裸 π0.5，成功则不调 LLM）；本篇消掉 TSM 后的 31.0/79.0 才是可比量级。详见 Pigey 笔记“与 Harness VLA 对照”一节。
 
 ## Why it matters（对本库）
 

@@ -235,6 +235,8 @@ Harness VLA 列的 τ 四种形式，逐个看真机可行性：
 
 **关键发现：现有工业管线的"裁决"段是空的**——DiagnosisRail 的 `_is_failed` 三条通道（exception > `success=False` > entry.error）**全是自报信号，自己零判断**。⇒ 工具说成功但世界没到位的失败（semantic），整条管线是瞎的，防线只剩 VLM prompt。**Diagnosis（写病历）≠ Detection（做检查）**——先有报告员、没有检查科，是收口本页机制①⑤时最该防的实现走样。补 DetectionRail 时的接线技巧：裁决后直接翻 `success=False`，下游善后与转述一行不改（它们本来就监听这两条通道）。⚠️ 已知接缝：RecoveryRail 只挂 `on_tool_exception`，听不到 after_tool_call 里的翻案。
 
+> **裁决段的一份真机参考实现（2026-09-03，[[Galanti et al. - Pigey Addressing the Orchestration Gap in Generalist Robots via Physical Agency|Pigey]]，代码级核实）**：真机编排器 `agent.ts` 里裁决是**四层、按可判定性排序**——①**传感器覆盖**：TAMP 后端自报 `success=true` 但夹爪宽度 `is_grasped=false` ⇒ 一行 `if` 改判失败（注释原话 *"Trust the … width sensor over the parsed log"*；⚠️ `is_grasped` 本身的判定逻辑在私有服务器、未公开，仿真侧为闭合后两指间距 > 5 mm）；②**独立验证器**：每次改变世界的动作（放置 / VLA rollout / 释放）后自动重感知，**另起一次 LLM 调用**对照任务 + 动作史 + 场景裁决，不通过则把动作降级为失败——“做检查的”与“写病历的”是两次调用（⚠️ 但该层 **fail-open**：验证器 API 出错或超时即放行 `ok:true`，与本页 fail-closed 立场相反，搬用时须翻转）；③**几何计数**：Done 前若任务含可检谓词（"empty"），用检测足迹框内物体计数拒绝 Done；④规划 LLM 自己的视觉核对（提示词）。裁决后**直接翻 `success` 并附 `fail_reason`**，下游恢复 / 转述不改——与本页上文的接线技巧一致。真机 150 次里**验证器误判成功 2 次**（遮挡），是本库首个真机测得的 false-success 量级。
+
 **② 挂载粒度决定 during 那一列住哪**：rail 站在工具边界上，对执行单元**内部的循环**（伺服环、VLA chunk 循环）整段失明 ⇒ **本页三个时机里的"事中"必须住进复合算子内部**（伺服看门狗 / chunk 级监控器），且内外证据基础不同——**算子内消费策略侧信号（可中止、无权定罪），边界 rail 消费世界侧证据（正式裁决）**。展开见 [[Harness granularity]]。
 
 另一条廉价 L2 机制（来自 [[RLinf - RPent Recursive Physical Agent Framework|RPent]]）：**把分割叠加图（而非原始帧）回传给 VLM planner**——"检测器高置信度锁错物体"在坐标数字里不可见，看一眼 mask 压在哪就能发现；成本只是一次已有 VLM 的 look，机制上只需改视觉反馈的注入内容。

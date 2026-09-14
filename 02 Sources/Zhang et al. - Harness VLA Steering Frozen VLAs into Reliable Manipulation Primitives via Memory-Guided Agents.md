@@ -23,6 +23,8 @@
 
 核心主张明确反对扩库：*"keep the primitive library fixed and small, and let the agent learn how to orchestrate it"*——因为扩库要求 agent 判断"新写的技能是否有效/可复用/在变化场景下是否安全"，而具身场景**无法便宜地验证这件事**。
 
+> **2026-09-14 补：这一主张的极限形式是 [[Chen et al. - Show-Harness Just a VLM Agent Can Play Robots|Show-Harness]]**——库缩到 9 个零参数符号（六方向一步 / 开 / 合 / 完成），连接触密集局部也不留给 VLA，VLM 一步一步自己走。真机十任务 89% vs 本篇被搬到真机当基线时的 50%（⚠️ 搬法未说明）。代价对称：库越小参数越少，VLM 每步负担越轻、接地越可验证，但步数（30–50/任务）、延迟与连续轨迹表达力同时恶化。两篇合看，"原语库该多大、该不该带参数"成了一根可测的轴。
+
 被包的冻结 VLA 三选一：**π0.5-SFT**（LIBERO/LIBERO-Pro）、**RLDX-1**（RoboCasa365）、**LingBot-VLA**（RoboTwin C2R）。
 
 ## planner 是什么：现成的编码 agent，零微调

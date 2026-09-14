@@ -372,6 +372,7 @@ Gemini Robotics-ER 是闭源 API 模型，**参数量未公开**（Google 从未
 
 ## Related
 - [[Zhang et al. - Harness VLA Steering Frozen VLAs into Reliable Manipulation Primitives via Memory-Guided Agents]] — 仿真对照组；协议差异见对照表
+- [[Chen et al. - Show-Harness Just a VLM Agent Can Play Robots]] — 同为真机纯 harness，但**下层无任何学习策略**、原子动作零参数、VLM 管到每一步；接口粒度轴的另一端（本篇 3–15 次调用 vs 它 30–50 步）
 - [[Embodied failure detection]] — 四段分工的真机实现；false-success 2/150
 - [[Harness granularity]] — "拆开复合算子"这条反向路径
 - [[Harness development base - JiuwenSymbiosis selection and build plan]] — 裁决段参考实现；四特性记分

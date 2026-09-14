@@ -43,9 +43,11 @@
 | **Coder** | Python 代码 / API call | Code-as-Policies, ProgPrompt | 表达力强、可组合、可调试 | 需要强代码能力 LLM |
 | **Constraint** | 约束函数 / 关键点 | [[Huang et al. - ReKep Spatiotemporal Reasoning Keypoint Constraints for Robotic Manipulation]], VoxPoser | 物理直觉强 | 约束设计空间需 LLM 内化 |
 | **Affordance** | 3D affordance / value map | VoxPoser, MOKA | 空间推理可微 | 表征空间限制泛化 |
+| **Atomic**（2026-09 加） | **离散零参数语义单元**（`MV_FWD` 等 9 个 token），确定性解释器落成 2 cm 一步 | [[Chen et al. - Show-Harness Just a VLM Agent Can Play Robots|Show-Harness]] | 跨本体只换解释器；精度改配置即得；小模型可用原生词表微调；接地可逐步验证 | 每步一次 VLM 调用（30–50 步/任务）；离散步做不了连续轨迹任务；视角泛化弱 |
 
 **已退出主流的子分支**：
 - ~~MCP-Toolkit / 直接 LLM 操控机械臂~~：过分依赖 LLM 自身能力，时效差，作为当前过渡方案存在，但不会成为主流
+  > ⚠️ **修正记录（2026-09-14）**：[[Chen et al. - Show-Harness Just a VLM Agent Can Play Robots|Show-Harness]]（NUS Show Lab）把这条路线带着真机数字做回来了——离散零参数语义单元 + 文字约定 + 确定性解释器 + 本体文字反馈，真机十任务 89%（Harness VLA 同场 50%、π0.5 39%），且 2B 小模型微调后 86%。**"过分依赖 LLM 自身能力"被接口设计化解了一半**（动作表示消融：任意符号 + 约定 ≈ 语义名，约定提供绝大部分接地）；**"时效差"未被推翻**（每步一次 VLM 调用、每任务 30–50 步、只报步数不报墙钟）。该子分支应从"已退出"改列为上表 **Atomic** 行，保留延迟为其硬伤。
 
 **当前硬伤**（详见 Open Questions 节）：物理可行性盲区、闭环反馈缺失、推理延迟、接口可学习性、失败可调试性。
 
@@ -304,7 +306,7 @@ TwinBrainVLA 把范式 A 的"双专家"从"VLM + 小 action expert"扩成"**两�
 |------|------|---------|
 | **物理可行性盲区** | LLM/VLM 训练数据里没有 affordance、力学、关节限制 | SayCan 的 affordance grounding 是开端，但很弱 |
 | **闭环反馈缺失** | 小脑失败如何回流到大脑？大脑重规划代价多大？ | 几乎没有工作严肃研究 |
-| **推理延迟** | 一次推理 1-3 秒，长程任务里 latency 加起来很大 | 蒸馏小 VLM / 缓存机制是出路，未成熟 |
+| **推理延迟** | 一次推理 1-3 秒，长程任务里 latency 加起来很大 | 蒸馏小 VLM / 缓存机制是出路，未成熟 → **2026-09 有初步真机证据**：[[Chen et al. - Show-Harness Just a VLM Agent Can Play Robots|Show-Harness]] FT 模式用 Qwen3.5-2B LoRA（2 小时单卡、原生词表出动作 token）在同 164 条演示下 86% vs π0.5 39%，本地单卡部署；但每任务仍 30–50 步 |
 | **接口可学习性** | 自然语言/约束接口是人设计的，能否端到端学接口？ | 完全开放 |
 | **失败模式可调试性** | VLM 输出的子任务模糊，定位失败原因困难 | 工程问题，缺乏方法学 |
 

@@ -52,9 +52,9 @@
 
 | 类型 | 贡献是什么 | 模型是否全冻结 | 例子 |
 |---|---|---|---|
-| **纯 harness** | 脚手架本身 | ✅ | Harness VLA（仿真）、[[Galanti et al. - Pigey Addressing the Orchestration Gap in Generalist Robots via Physical Agency|Pigey]]（**真机**，Franka FR3） |
+| **纯 harness** | 脚手架本身 | ✅ | Harness VLA（仿真）、[[Galanti et al. - Pigey Addressing the Orchestration Gap in Generalist Robots via Physical Agency|Pigey]]（**真机**，Franka FR3）、[[Chen et al. - Show-Harness Just a VLM Agent Can Play Robots|Show-Harness]] ZS 模式（**真机，且下层无任何学习策略**） |
 | **harness + 训练的粘合层** | 框架 + 一个专训中间件 | ❌ 中间层要训 | **Being-0**（Connector）、HELM（SV） |
-| **模型方案** | 架构即模型 | ❌ 端到端训 | π0.5 / GR00T / G0.5 |
+| **模型方案** | 架构即模型 | ❌ 端到端训 | π0.5 / GR00T / G0.5；[[Chen et al. - Show-Harness Just a VLM Agent Can Play Robots|Show-Harness]] FT 模式是**边界形态**——训的是 VLM 原生词表上的 9-token 分类器（harness 的接口定义即训练目标），无动作头 |
 
 > **这一格的存在说明:纯 harness 有天花板。** 当基座模型在**某个具体能力**上不行（此处 = 3D 场景理解 + 延迟），**prompt / 记忆 / 检索补不上，必须训个东西**。
 >

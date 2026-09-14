@@ -1144,3 +1144,11 @@
 - **新发现并记入三处**：验证器 **fail-open**（API 出错/超时即 `ok:true` 放行）——源笔记验证节 + limitations、[[Embodied failure detection]] 裁决段、[[Harness development base - JiuwenSymbiosis selection and build plan]] “值得搬的三样”② 均加“搬入须翻转为 fail-closed”注。
 - 源笔记新增“调用节奏”小节（按工具类型的 Gemini-ER / 规划 / 验证调用数表）与“上下文与记忆”一节（无状态重发、图像剪裁、两层文字场景记忆、长程记忆任务靠文字而非回看图）；四特性“记忆 ◐”补机制细节；limitations 加 fail-open、单图上下文、一轮多工具与论文“每步一个”不一致三条。
 - 本轮确认结束，提交。
+
+## [2026-09-14] ingest | Show-Harness（NUS Show Lab）：harness 簇接口粒度轴的最底端，复活"直接 VLM 操控机械臂"路线的一半
+
+- Ethan 给 [arXiv:2609.10522](https://arxiv.org/abs/2609.10522)，评估后**完整入库**：新建 [[Chen et al. - Show-Harness Just a VLM Agent Can Play Robots]]。理由：给 harness 簇补上"接口粒度"这根轴（Harness VLA / Pigey 是"VLM 定什么 + 冻结策略定怎么"，本篇把"怎么"也交给 VLM）；动作表示消融是可迁移的设计知识；开源完整度最高（Apache-2.0，代码 + 6 adapter + 语料 + 训练管线）。
+- **确认轮四问全部代码级核实**：①**无仿真评测**，仿真（ManiSkill 100 + RoboLab 130 条）只做数据源；Sim-to-real 一行 = 仅用仿真演示训、真机评，FT 13/20 vs VLA 0/20；②**FT 列混两个 checkpoint**（`ft` 真机语料 / `sim` 仿真语料，`docs/finetuned.md` 命名），不是两阶段训练；③**原子动作集**：论文 11 词（旋转称配 x/y/z 轴），代码 9 token——`primitives_*.yaml` 只有竖轴偏航、Piper 禁用旋转、FT 提示词无旋转 ⇒ 90° 外推实验只能是 ZS；④**每个单元零参数**，VLM 影响幅度只有三条间接通道（`WRIST: YES/NO` 二值 → 插件选 2/5 cm；`PLAN:` ≤3 个 MV 序列；CW/CCW 二选一，角度为常量）。
+- **FT 模式的论证角色**写入笔记："收益来自接口而非前沿模型智力"的受控变量——同 164 条 GUMI 演示，2B token 策略 86% vs π0.5 39% / GR00T 35%；推理任务 FT 单独 10%、喂规划器子任务后 70%（π0.5 5%）⇒ 接口把推理与控制切干净。打折：164 条对 VLA 微调太少，基线可能低估。
+- 联动八处：[[Embodied Brain Models]] 子分支表加 **Atomic** 行、"直接 LLM 操控机械臂已退出"加修正记录（复活一半：接口化解"过分依赖 LLM"，"时效差"未推翻）、硬伤表"蒸馏小 VLM 未成熟"加初步真机证据；Harness VLA 源笔记"反对扩库"段加极限形式注（含真机基线搬法未说明）；Pigey 源笔记 Related；[[Being-0 - a Humanoid Robotic Agent with VLMs and Modular Skills]] 分类学纯 harness 格加 ZS、模型方案格加 FT 边界形态；[[Harness granularity]] 加"执行单元缩到一步、during 被消解"第三情形与三路径粒度排序；[[Harness development base - JiuwenSymbiosis selection and build plan]] 加 Show-Harness 对照（插件 disabled 恒等契约 / 2B 蒸馏配方 / 同数据对照方法学 / 待答"约定即接地"在带参数原语上是否成立）；具身地图；index。
+- 未提交，待 Ethan 复核。

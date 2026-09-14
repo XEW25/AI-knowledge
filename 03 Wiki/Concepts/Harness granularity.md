@@ -22,6 +22,7 @@
 2. **VLA chunk 循环**（[[RLinf - RPent Recursive Physical Agent Framework|RPent]] 的 `pi0_pick` 已有雏形；完整设计见[[Harness development base - JiuwenSymbiosis selection and build plan|选型页]]的 `vla_until`）：chunk 级监控器（时序一致性 STAC 类、进展预算、逐 chunk 安全边界）住在算子内。
 
 **另一条路径：把复合算子拆开，让边界落在可验证点上**（[[Galanti et al. - Pigey Addressing the Orchestration Gap in Generalist Robots via Physical Agency|Pigey]]，真机）。TiPToP 的 pick-and-place 原是一次算完、执行期全盲的开环原语；Pigey 把它切成 `Pick` 和 `DropAbove` 两个工具，抓取这个有天然传感器信号（夹爪宽度）的时刻正好成了工具边界，边界 rail 就看得见了——对照类任务 80→100，多步 / 遮挡 / 恢复类 25/0/0→100/90/90。**适用条件**：能拆的拆（决策点有本体可测信号），拆不了的（VLA chunk 循环内部、伺服环）才内藏监控。两条路是互补的，不是替代。
+**第三种情形：把执行单元缩到一步，问题被消解**（[[Chen et al. - Show-Harness Just a VLM Agent Can Play Robots|Show-Harness]]，真机）。原子动作 = 末端 2 cm 单轴一步或开合夹爪，零参数，没有任何内部循环 ⇒ rail 天然站在每一步边界上，`recovery` 插件每步之后查空抓，"during"这一列不存在。代价是把事中监控的成本**全部换成 VLM 调用次数**（每任务 30–50 步、每步一次调用），且离散步做不了连续轨迹任务。三条路径按执行单元粒度排：**一步（Show-Harness）< 可拆的复合算子（Pigey 的 Pick/DropAbove）< 不可拆的复合算子（VLA chunk 环、伺服环，内藏监控）**——粒度越细越不需要 during 机制，但越依赖高层调用频率。
 ## 内外两层的分工（不可互相替代）
 
 | | 算子内监控（during） | 边界 rail（before/after） |

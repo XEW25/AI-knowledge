@@ -66,6 +66,11 @@ fast 路径（小脑侧）另算：rail 体系在那边失效（无 ModelContext
 同一“冻结 VLA + 编排层”路线里**第一篇真机工作**，且**harness 行为的分布比 RPent 靠代码得多**：可判定的（传感器、计数、次数）全在代码守卫，语义的在提示词或独立 LLM 调用。按四特性记分：**检测 ✅**（传感器覆盖 > 独立验证器 LLM > 几何计数 > 自省，真机误判 2/150）/ **重试 ✅**（同参重试→强制重接地→换后端→双向回退，比 RecoveryRail 第一格完整）/ **记忆 ◐**（仅回合内）/ **持续学习 ❌**。
 
 **值得搬进 DetectionRail 的三样**：①“后端自报成功但传感器说没有 ⇒ 改判”这一行 `if`，就是 `is_grasp_confirmed` fail-closed 的推广；②**动作后独立裁判调用**（Detection 与 Diagnosis 分成两次 LLM 调用，恰是本页“裁判 vs 解说员”的实现；⚠️ Pigey 的实现是 **fail-open**——API 失败即放行——搬入时改 fail-closed）；③**守卫以工具返回值的形式拦截**（不执行、返回 `rule_violated` + 理由给 LLM），这与 rail 抛异常让 LLM 自纠是同一模式，但多了“为什么被拦”的结构化字段。**不搬的**：路由启发式住提示词（与 RPent 同病，程度轻）；真机硬编码 Anthropic API + Gemini-ER 云感知（断网即停，与本页“部署终局”判据冲突）。
+### Show-Harness 对照（2026-09-14 加，[[Chen et al. - Show-Harness Just a VLM Agent Can Play Robots|Show-Harness]]，NUS Show Lab，真机，Apache-2.0 全开源）
+
+与本页选型直接相关的三样：①**插件即 rail 的参照实现**——一个布尔、关掉后主循环**字节级不变**（`plugins/README.md` 契约：所有 hook 返回空 / 恒等）、各自带提示词与测试，正是"基线是配置不是代码"，且多了一条可验证的 disabled 恒等契约，值得写进 rails 规范；②**"蒸馏小模型"路线的现成配方**——Qwen3.5-2B LoRA（LlamaFactory、只训语言层 ≈1%、原生词表出 9 个动作 token、无动作头、单 H200 < 2 小时、24 GB 卡可跑、vLLM 本地服务），同 164 条演示下 86% vs π0.5 39%，是小脑侧候选；③**同数据对照方法学**——GUMI 一条演示同时记语义 token 与连续轨迹，让"接口 vs 模型"能被隔离，是团队 2×2 配对实验的数据侧前提。
+
+**不搬的**：ZS 全程云 API；原子动作零参数 + 2 cm 离散步（每任务 30–50 步、连续轨迹任务做不了），与本页执行器路线（IK 原语 / π0.5 chunk）粒度不同；视角泛化弱（FT 13/20）。**待答**："约定即接地"（任意符号 + 文字约定 ≈ 语义名）只在零参数动作上验证过，团队原语库带参数时是否仍成立，决定要不要在原语描述里花力气写约定。
 ## π0.5 纯 VLA 架构实验（第二条执行器路线）
 
 在同一基座上跑"π0.5 单模型 + harness"完全可行，且 π0.5 直接吃语言指令、可关掉 planner。唯一真问题是粒度（详见 [[Harness granularity]]）：episode 包成一个工具则 rail 对执行中失明 ⇒ 建 **`vla_until` 复合算子**（照 `track_grasp` 模式：内藏 chunk 循环 + chunk 级监控器 STAC/进展预算/安全边界，结构化返回 termination_reason + 监控统计），episode 级 harness（后置裁决/恢复/记忆/trace）原样走 rails。要新写的：`vla_until` 本体 + chunk 监控器（大几百行）；要认真设计的只有真机上的关节动作流 Driver 协议（仿真走 `chunk_step` 现成）。ESAS 的 π0.5 Policy Contract（flow steps / horizon / 每 chunk 执行步数）恰好就是 `vla_until` 的参数表——评测契约与执行代码第一次同源。

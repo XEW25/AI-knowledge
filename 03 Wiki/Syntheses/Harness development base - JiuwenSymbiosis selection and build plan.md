@@ -61,6 +61,8 @@
 
 fast 路径（小脑侧）另算：rail 体系在那边失效（无 ModelContext），检测靠算子内看门狗 + 后置条件确认——见 [[Harness granularity]]。
 
+> **④ 的一份可对照规范（2026-09 加，[[Tan et al. - MetaRSI-v1 A Meta-Recursive Self-Improving System for Recursive Self-Improving Systems Themselves|MetaRSI-v1]]）**：`trace_feedback/` 缺的三样各有对应——target_skill 解析 ↔ **失败签名**三层（评估器报告 / agent 行为 / **模型归因机制**，只有第三层是假设）；自动应用 + 回滚 ↔ 七阶段内核的 Validate / Select / Export（模型只提议，代码裁决，**实际 diff 必须等于声明的修改**）；gate 指标 ↔ **密封评估器 + 严格优于历史最优才发布**。两条硬约束值得直接搬：**信号新鲜度**（改变行为的一步让此前所有证据作废 ⇒ 特性①②③④之间的调用顺序要检查“消费的证据描述的是不是当前系统”）与**评估器不可写**。⚠️ 它的环是离线的、候选免费——只该住演进通道，与本页划分一致；核心代码未开源，只放了被改进的 harness（RSIH / Genome）。
+
 ### Pigey 对照（2026-09-03 加，[[Galanti et al. - Pigey Addressing the Orchestration Gap in Generalist Robots via Physical Agency|Pigey]]，Princeton/Together，真机）
 
 同一“冻结 VLA + 编排层”路线里**第一篇真机工作**，且**harness 行为的分布比 RPent 靠代码得多**：可判定的（传感器、计数、次数）全在代码守卫，语义的在提示词或独立 LLM 调用。按四特性记分：**检测 ✅**（传感器覆盖 > 独立验证器 LLM > 几何计数 > 自省，真机误判 2/150）/ **重试 ✅**（同参重试→强制重接地→换后端→双向回退，比 RecoveryRail 第一格完整）/ **记忆 ◐**（仅回合内）/ **持续学习 ❌**。

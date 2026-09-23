@@ -1167,3 +1167,10 @@
 - 核实：架构 / 训练 / 表 I / 附录表 II / 延迟扫描 HTML 自读；代码仓 README + LICENSE 已读（MIT 叠 OpenVLA-OFT / ViNT / OmniVLA 三份上游版权，GitHub 标 NOASSERTION，论文 NC-ND）；HF 权重存在。OmniVLA / ViNT / NoMaD 导航线本库无源笔记，标待补。
 - 笔记重点：**“位置 vs 架构”隔离**（同模型全放工作站 0.30 vs 分离 0.85）；**“不做端到端”0.25 ⇒ 须开源权重**，推论闭源云端大脑只能退到子目标级接口（接 Harness VLA / Pigey）；附录分拆 OmniVLA 无行人 0.90 / 有行人 0.00 ⇒ 尾延迟致命。
 - 联动六处：[[Embodied Cerebellum Models]] 四种来源①加首个实例、“抖动比均值致命”加真机证据；[[Embodied Brain Models]] 解耦光谱路线 2 加唯一跨网络实例与闭源限制；云边协同页加网络通信口最小实现注（并标明只做推理分工）；具身地图 VLA 节；index；[[Sergey Levine]] 实体。
+
+## [2026-09-23]（补）| ingest MetaRSI-v1（CosmosMind-ai）：harness 作为可写面的形式化 + “验证是自演进闸门”的跨领域证据
+
+- Ethan 给 [arXiv:2609.06396](https://arxiv.org/abs/2609.06396)，评估后**完整入库**：新建 [[Tan et al. - MetaRSI-v1 A Meta-Recursive Self-Improving System for Recursive Self-Improving Systems Themselves]]。理由：给 [[Harness design]] 的 meta-harness / load-bearing 补上形式化骨架（五槽 genome、上下文税、M→H 退休），给云边协同页“检测信号质量是自演进闸门”补上 45 系统 / 22 领域的量化证据（ρ = −0.75），§6.5 物理世界差分清单与本库失败检测 / 真机评测 / 验证门逐条同构。
+- **代码核实**：开源的 RSI-Harness（719 stars，MIT）= RSIH，Pi coding agent + Genome 配置层，**是被改进的对象**；Data-RSI / Model-RSI / RSI2 调度器 / MetaRSI2 元层 / 信号编译器**均未发布**。笔记头部与 limitations 醒目标出。
+- 定位写清：**框架 + 代码切片实证**，非通用能力证据——实验全在其自己批评的“机器可验证切片”（Terminal-Bench / SWE-bench Pro / 自选 GPQA-D-hard100 / AIME）；完整三算子环仅一个 35B MoE；前沿模型只走 D+H；五种子无区间；新机构 30 人。
+- 联动八处：[[Harness design]] 加形式化注 + Open question 答；云边协同页演进通道加跨领域证据与 §6.5 三项新增；[[Harness development base - JiuwenSymbiosis selection and build plan]] ④持续学习加可对照规范（失败签名 / 七阶段内核 / 密封评估器 / 信号新鲜度）；[[Embodied failure detection]] 前置守卫加“可恢复性第二准入”旁证；Agent 地图；Harnesses 主题页；index；[[Alex Zhang - The Mismanaged Geniuses Hypothesis]] 加同向证据与 Law 5 上界。

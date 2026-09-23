@@ -32,6 +32,7 @@ One useful framing is to separate:
 
 This kind of abstraction allows harness implementations to evolve while keeping the broader system architecture stable. In that sense, harness design can grow into a broader concern with platform abstractions or meta-harness design.
 
+> **形式化（2026-09 加，[[Tan et al. - MetaRSI-v1 A Meta-Recursive Self-Improving System for Recursive Self-Improving Systems Themselves|MetaRSI-v1]]）**：harness 可枚举为**五槽 genome**（系统提示 / 记忆 / 内置工具 / 技能 / MCP 挂载），改动是对命名字段的**类型化补丁**而非任意代码；每个添加在**每次推理付上下文税**，被权重吸收后由 M→H 冗余对账适配器**提议退休**（回放不掉精度才删）。“load-bearing” 由此从判断变成算法：**只有 scaffold + weights 双基底的环能表达“退休”**，单基底环成本单调累积、止于成本而非能力（其 Law 3）。前沿模型只改 harness 自改进 Terminal-Bench +7.3，但其 Law 5 给上界：harness 路线只放大已有能力，不进口新知识。⚠️ 实证全在代码 / 封闭 QA，核心代码未放。
 ## Relevance to long-horizon agent systems
 Harness design is especially important for:
 - long-running coding agents
@@ -57,7 +58,7 @@ It is a useful concept for understanding when capability gains come from better 
 ## Open questions
 - Which harness components generalize across domains?
 - How do we tell whether a harness component is still load-bearing for a newer model?
-- Which parts of a harness should remain engineered versus learned?
+- Which parts of a harness should remain engineered versus learned?（[[Tan et al. - MetaRSI-v1 A Meta-Recursive Self-Improving System for Recursive Self-Improving Systems Themselves|MetaRSI-v1]] 的答案：**提议**可学、**裁决**必须是不可写的确定性代码——评估器 / 任务集 / 发布规则 / 账本放在所有写面之外，否则“能力更好”与“成功定义更宽”从环内不可区分）
 - How should artifact interfaces be designed for long-running collaboration?
 
 ## Related

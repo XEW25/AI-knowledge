@@ -10,6 +10,7 @@ This map collects the cluster of pages in the vault that deal with agent organiz
 - [[Li et al. - MemPO Self-Memory Policy Optimization for Long-Horizon Agents]]
 - [[Prithvi Rajasekaran - Harness design for long-running application development]]
 - [[Anthropic - Scaling Managed Agents Decoupling the brain from the hands]]
+- [[Tan et al. - MetaRSI-v1 A Meta-Recursive Self-Improving System for Recursive Self-Improving Systems Themselves]] — **RSI 框架 + 45 系统普查**（CosmosMind-ai，2026-09）：被改进对象 = ⟨数据, 模型, harness⟩三元组，三算子各写一面、共用“模型提议 / 代码裁决”七阶段内核，**信号新鲜度**定五条合法转移（唯 H→M 非法），两轴调度 + 元层改调度器。**harness = 五槽 genome + 类型化补丁 + 退休机制**（load-bearing 的算法化）；**验证格式而非学科限制 RSI**（ρ = −0.75）；五条铁律；§6.5 物理世界差分清单。Qwen3.5-35B 四基准均值 +10.9、比最强单算子 +4.3；六前沿模型只改 harness +7.3。⚠️ 实验全在代码 / 封闭 QA；核心代码未放，开源的 RSIH 只是配置层
 
 ### Concepts
 - [[LLM Wiki]]

@@ -91,3 +91,5 @@ An experimental figure arguing:
 - Create or expand [[Recursive Language Models]]
 - Extend into [[Self-managing memory as an in-distribution control problem]]
 - Add this source to a future synthesis on long-horizon agent architectures
+
+> **2026-09 同向证据 + 上界**：[[Tan et al. - MetaRSI-v1 A Meta-Recursive Self-Improving System for Recursive Self-Improving Systems Themselves|MetaRSI-v1]] 让六个前沿模型只改自己的 harness（不动权重、无教师）在 Terminal-Bench 2.1 上 +5.6 到 +9.2（均值 +7.3）——MGH 在代码 agent 上的又一量化；但其 Law 5 给出上界：harness 路线只能**放大**模型已展现的能力，**进口**新知识必须来自环外信息源。

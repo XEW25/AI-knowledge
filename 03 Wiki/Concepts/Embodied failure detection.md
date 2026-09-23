@@ -55,6 +55,8 @@
 > **Harness VLA 的做法与取舍**（[[Zhang et al. - Harness VLA Steering Frozen VLAs into Reliable Manipulation Primitives via Memory-Guided Agents|源笔记]]）：它有 **post-condition**（`τ`，由 planner 在调用时下发），但**没有显式前置条件**——"何时该调 `vla_act`"交给 planner 依 Global Memory 的自然语言经验规则判断。⚠️ 这是**设计选择而非遗漏**：按 [[Harness design]] 的 **load-bearing 原则**，显式前置契约编码的假设是"planner 判断不可靠"；planner 够强时该部件就不承重、不该加。
 >
 > 但**前置守卫在一处有独立价值**：它是**最便宜的事前拦截**，位于"什么都不做"和"世界模型验证（机制⑦，最贵）"之间。很多不可逆事故的前置条件是可直接判定的廉价量——物体离桌沿太近、夹爪里已有东西、目标离人太近、力矩已接近上限。**用它挡掉一部分不可逆失败，比事后重试划算得多。**
+> 
+> 跨领域旁证（2026-09，[[Tan et al. - MetaRSI-v1 A Meta-Recursive Self-Improving System for Recursive Self-Improving Systems Themselves|MetaRSI-v1]] §6.5）：自改进框架搬到物理世界时，**“可恢复性”必须成为与“证据新鲜”并列的第二个准入条件**，不可恢复的步要当**承诺**而非候选，且人类授权点要放在所有写面之外——与本条“事前拦截不可逆失败”同一结论，来自完全不同的出发点（候选不再免费）。
 
 **2｜停滞检测.** 动作在发、状态不变 = 卡住。**性价比最高的一个**：几乎不要钱，却吃掉长程任务里最大的静默失败源。建议**每个 primitive 都带 no-progress 超时**。
 

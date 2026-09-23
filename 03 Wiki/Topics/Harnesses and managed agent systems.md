@@ -21,6 +21,7 @@ This topic covers:
 ### Sources
 - [[Prithvi Rajasekaran - Harness design for long-running application development]]
 - [[Anthropic - Scaling Managed Agents Decoupling the brain from the hands]]
+- [[Tan et al. - MetaRSI-v1 A Meta-Recursive Self-Improving System for Recursive Self-Improving Systems Themselves]] — harness 作为可写面的形式化（五槽 genome / 上下文税 / 退休）；验证阶梯与 RSI 普查；自演进搬到物理世界的差分清单
 
 ### Entities
 - [[Anthropic]]

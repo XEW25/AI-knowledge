@@ -1152,3 +1152,11 @@
 - **FT 模式的论证角色**写入笔记："收益来自接口而非前沿模型智力"的受控变量——同 164 条 GUMI 演示，2B token 策略 86% vs π0.5 39% / GR00T 35%；推理任务 FT 单独 10%、喂规划器子任务后 70%（π0.5 5%）⇒ 接口把推理与控制切干净。打折：164 条对 VLA 微调太少，基线可能低估。
 - 联动八处：[[Embodied Brain Models]] 子分支表加 **Atomic** 行、"直接 LLM 操控机械臂已退出"加修正记录（复活一半：接口化解"过分依赖 LLM"，"时效差"未推翻）、硬伤表"蒸馏小 VLM 未成熟"加初步真机证据；Harness VLA 源笔记"反对扩库"段加极限形式注（含真机基线搬法未说明）；Pigey 源笔记 Related；[[Being-0 - a Humanoid Robotic Agent with VLMs and Modular Skills]] 分类学纯 harness 格加 ZS、模型方案格加 FT 边界形态；[[Harness granularity]] 加"执行单元缩到一步、during 被消解"第三情形与三路径粒度排序；[[Harness development base - JiuwenSymbiosis selection and build plan]] 加 Show-Harness 对照（插件 disabled 恒等契约 / 2B 蒸馏配方 / 同数据对照方法学 / 待答"约定即接地"在带参数原语上是否成立）；具身地图；index。
 - 未提交，待 Ethan 复核。
+
+## [2026-09-21] ingest | GE-Act 2.0（AgiBot）：WAM 谱系"第二代改良"、首条从零预训练 scaling 曲线、validity gap / KASO
+
+- Ethan 给 [arXiv:2609.05588](https://arxiv.org/abs/2609.05588)（"另一个领域的"），评估后**完整入库**：新建 [[AgiBot - GE-Act 2.0 Pretraining and Scaling a World-Action Model for Robotic Manipulation]]。理由：WAM 谱系此前五代全部继承预训练视频生成器、全部无 scaling 曲线，本篇补上"从零预训练 + 300 → 30,000 h 真机零样本 OOD"这一维；validity gap 是任何"生成器 + 动作头"都会碰到的可迁移概念；单步生成让 IDM 单独吃失败 / rollout 数据，接数据引擎"第四类数据怎么消费"。
+- **核实与未核实分开写在 Metadata**：三部件 / KASO 算法 / 表 1 探针 / 表 2 消融 / scaling 四档 / 指令接地 295 次 / 附录 A 三仿真表 / 附录 B 架构 PDF + HTML 自读核实；**图 7 数据配比百分比在图内抽不出**、**三种本体硬件规格论文未写**、**代码权重未发布**（项目页 Coming soon，HF 无 repo，GitHub 仅前作 Genie-Envisioner-V1 / GE-Sim-V2）、**推理延迟未报**。
+- Ethan 追问 KASO，会话中按"问题（validity gap）→ 五步流程 → 两个设计细节（动作空间比 / 高噪声打分）→ 玩具与真机证据 → 打折项"讲清，同内容写入笔记。
+- 联动七处：[[World-Action Models]] 加"第二代改良"小节（对"要不要生成视频"主轴的第三种回答）、对比表、Open Questions 两条（scaling 天花板有了曲线；validity gap 在隐空间 WAM 是否存在）、Related；[[AgiBot 智元]] Flagship 与关联加第二条世界模型线；[[Robot data engine]] 加失败 / rollout 数据的架构级消费通道注；数据采集综合页 §1.3 加"第四类数据第二种消费方式"（判别器筛 vs 架构分离）；[[World model trends - architecture, scale, function, hardware]] 参考表加一行；具身地图 WM 节；index。
+- 未提交，待 Ethan 复核。

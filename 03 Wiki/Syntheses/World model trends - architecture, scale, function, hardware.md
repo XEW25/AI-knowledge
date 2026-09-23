@@ -70,6 +70,7 @@ LLM 的 I/O 被固定成 `text → text`;**WM 的 I/O 本身是设计自由度**
 | DINO-WM | 隐 | ~300M(冻结 DINOv2)| 冻结 encoder + ViT 动力学 |
 | LeWM | 隐 | 15M | ViT JEPA(2 损失)|
 | LaWAM | 隐子目标(WAM)| 230M(LaWM)| 冻结 DINOv3 + LAM-decoder 当 WM,单次非迭代;比像素 WAM 快 ~24× |
+| [[AgiBot - GE-Act 2.0 Pretraining and Scaling a World-Action Model for Robotic Manipulation|GE-Act 2.0]] | 可解码压缩 latent 未来(WAM)| 2.51B SVP + 0.56B IDM(+冻结 Qwen3.5-2B)| 从零预训练;CoAE 64× 压缩 24 token/帧 + 单步 MeanFlow DiT + IDM;KASO 对齐;300→30,000 h scaling;延迟未报 |
 | MuZero | 价值/奖励 | 小 | 隐动力学 + MCTS |
 | OccWorld | 3D occupancy | — | occupancy tokenizer + ST-Transformer |
 

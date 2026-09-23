@@ -63,6 +63,8 @@ UMI 与 human-centric **不是一种数据**。UMI 的本质是**人通过"机�
 
 **真机自演进的数据配方 = 双组分杠杆**（2026-07 追问收口）：少量高价值**人类信号**（支点）撬动大量免费**自主经验**（杠杆臂），质量信号机制是转换器。
 
+> **第四类数据的第二种消费方式（2026-09 加，[[AgiBot - GE-Act 2.0 Pretraining and Scaling a World-Action Model for Robotic Manipulation|GE-Act 2.0]]）**：π*₀.6 Recap 是用 value function 给部署经验打分后进策略目标；GE-Act 2.0 是让 WAM 的 **IDM 单独吃失败轨迹与部署 rollout**（只需观测-动作对齐，不需指令 / 成功标注 / 质量分），再经 KASO 协同训练把这部分动力学知识接到策略上。前者靠**判别器**筛，后者靠**架构**把不需要筛的部分分离出去——两条路对“第四类数据如何自动增长后被消费”给出了不同答案。⚠️ GE-Act 2.0 未消融该数据的贡献。
+
 ![[fig-self-improvement-data-lever.svg]]
 
 已有工作的定量证据（均已核实）：

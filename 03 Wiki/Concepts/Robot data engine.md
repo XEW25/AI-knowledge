@@ -60,6 +60,7 @@
 - **数据管理架构空白**:五类存储各有失格点,连标准 benchmark 都没有(EAI-DM survey)。
 - 数据新鲜度与**本体演进耦合**:硬件改版 → 真机数据贬值;仿真管线可重跑但触发**突发式重生成 GPU 负载**。
 
+> **2026-09 补：失败 / 部署 rollout 数据的一条架构级消费通道**（[[AgiBot - GE-Act 2.0 Pretraining and Scaling a World-Action Model for Robotic Manipulation|GE-Act 2.0]]）——WAM 里把逆动力学模型（IDM）做成**可单独预训练**的部件（前提是世界模型单步生成、动作梯度能穿过完整未来），IDM 只需观测-动作对齐、不需指令与成功标注 ⇒ 失败轨迹与部署 rollout **不必先过质量判别**就能进训练。这与本页“昂贵金标准的多级代理层级”互补：代理层级解决“哪些数据值得进策略目标”，IDM 通道解决“不进策略目标的数据还能喂谁”。⚠️ 论文没有消融去掉这类数据 IDM 掉多少，收益是论证的。
 ## Related
 - [[Real-robot evaluation]] — **姊妹页,边界须分清**:本页把评测当**被调用的金标准**(怎么少调用它:代理层级、吞吐);那页把评测当**被设计的测量仪器**(调用一次能买到多少信息:任务覆盖、样本量、指标信息密度)。同一优化问题的两项——最小化调用次数 × 最大化单次信息产出
 - [[Real-robot data collection - teleop vs UMI-class, and the model-in-the-loop quality problem|三层数据金字塔综述(Embodied data)]] — **本页的证据基座**(三层特征/例子/趋势、质量评估三代、L0–L3 评估栈、计算系统四大挑战、完整 Sources)。⚠️ 注意其**文件名仍是旧标题**(改版未改名),链接须用文件名

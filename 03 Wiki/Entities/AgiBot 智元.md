@@ -5,7 +5,7 @@
 - **Headquarters**: 上海（China）
 - **Founders**: 邓泰华（Deng Taihua，前华为）+ 彭志辉（Peng Zhihui，"稚晖君"，前华为"天才少年"）
 - **Focus**: 人形机器人（工业 + 服务）+ 具身基础模型 + 大规模数据集
-- **Flagship**: GO-1（Genie Operator-1, ViLLA）；AgiBot World 数据集；AgiBot A2 人形
+- **Flagship**: GO-1（Genie Operator-1, ViLLA）；**Genie Envisioner / GE-Act 1.0 → 2.0**（世界-动作模型线）；AgiBot World 数据集；AgiBot A2 人形
 - **里程碑**: 2024-12 量产；估值 2025 年中超 $1B；2 年内 8+ 轮融资；A2 创吉尼斯纪录（行走 106 km）
 
 ## 在具身领域的站位
@@ -17,6 +17,7 @@
 ## 与知识库主题的关联
 
 - [[AgiBot - GO-1 ViLLA Generalist Embodied Foundation Model]] — GO-1 / ViLLA / latent action 详解
+- [[AgiBot - GE-Act 2.0 Pretraining and Scaling a World-Action Model for Robotic Manipulation]] — **第二条世界模型线**（2026-09）：与 GO-1 的 latent action token 并行，走**显式生成未来 + IDM** 路线；CoAE / 单步 SVP / IDM 三部件从零预训练，KASO 对齐；300 → 30,000 h 真机零样本 OOD 17.1 → 44.1%；**⚠️ 代码权重未发布**（前作 Genie-Envisioner-V1 与 GE-Sim-V2 已开源）。三种本体 G1-OP / G2-OP / G2-90D 规格论文未写
 - [[AgiBot - BFM-2 Motion-Between Whole-Body Motion Foundation Model]] — **运动小脑**基座（生成式全身运控，2026-05；⚠️ PR-only 无论文无代码）
 - [[Embodied Brain Models]] — latent action token 系统接口；范式 A 内部耦合；"从视频学动作"synthesis 候选
 - [[Home robot architecture - a hierarchical embodied agent]] — latent action 是家庭"廉价监督学技能"的关键路径

@@ -15,7 +15,7 @@
 
 小脑的约束**质不同于**大脑——不是"参数更少的规划器"，而是受三条硬约束支配：
 
-1. **硬实时**：控制有 deadline，延迟**方差（抖动）**比均值更致命。P99 延迟决定系统能否闭环，而非平均延迟。
+1. **硬实时**：控制有 deadline，延迟**方差（抖动）**比均值更致命。P99 延迟决定系统能否闭环，而非平均延迟。（真机证据：[[Hirose et al. - AsyncVLA An Asynchronous VLA for Fast and Robust Navigation on the Edge|AsyncVLA]] 原版 OmniVLA 5 Hz 在无行人场景 SR 0.90、一有行人即 0.00——平均延迟够用、尾延迟致命；加端侧 Adapter 后 WiFi 抖动跨 20 倍仍 0.85）
 2. **可靠性 > 能力**（capability vs dependability gap，见 [[Home robot architecture - a hierarchical embodied agent]]）：小脑宁可能力封顶，也必须可预测、可验证、断网可活。
 3. **多速率分层**：小脑不是一个模型，而是一条**频率阶梯**——越往下频率越高、智能越低、确定性越强、可学习性越弱。
 
@@ -40,7 +40,7 @@
 
 | 形态 | 怎么来的 | 代表 |
 |------|---------|------|
-| **① VLA action expert 下端** | 一体化 VLA 在云-端压力下裂解，action expert 蒸馏/拆分到端侧 | π 系列裂解（[[Embodied Brain Models]] 的核心预判）|
+| **① VLA action expert 下端** | 一体化 VLA 在云-端压力下裂解，action expert 蒸馏/拆分到端侧 | π 系列裂解（[[Embodied Brain Models]] 的核心预判）；**首个实例（2026-09 加）**：[[Hirose et al. - AsyncVLA An Asynchronous VLA for Fast and Robust Navigation on the Edge|AsyncVLA]]——8.26B 导航 VLA 留工作站 5 Hz，**76M Edge Adapter** 在 Jetson Orin 8 Hz，接口 = 基座动作 token 嵌入 8 × 1024，跨 WiFi 实测延迟 0.28–6.0 s；行人场景 SR 0.85 vs 同模型全放工作站 0.30（⚠️ 导航、2D 位姿、20 次、须端到端微调开源基座）|
 | **② 原生快系统 fast head** | 双系统架构里天生的高频执行头 | [[Figure AI - Helix a VLA for Generalist Humanoid Control\|Helix S1]]（80M@200Hz）|
 | **③ 边缘世界模型** | 把"想象/预测"压到端侧实时 | [[ACE Robotics - Kairos 3.0 a Real-Time Generative Video World Model\|Kairos 3.0]]（4B 视频世界模型冲 Jetson Thor）|
 | **④ 经典控制层** | 不是学出来的——PD/阻抗/伺服 | 任何机器人的底层栈（永远端侧、永远经典、可靠性兜底）|

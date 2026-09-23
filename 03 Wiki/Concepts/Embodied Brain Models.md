@@ -204,7 +204,7 @@ TwinBrainVLA 把范式 A 的"双专家"从"VLM + 小 action expert"扩成"**两�
 
 > 部署导向玩家都追求**系统级解耦 + 压缩接口**，但有**两条路线**：
 > - **路线 1：单模型 + 干净内部断点（范式 B）** —— GR00T、PhysVLA
-> - **路线 2：显式多系统 + 压缩接口（latent 向量/token/语言）** —— Helix、GO-1、G0、ChemBot
+> - **路线 2：显式多系统 + 压缩接口（latent 向量/token/语言）** —— Helix、GO-1、G0、ChemBot、[[Hirose et al. - AsyncVLA An Asynchronous VLA for Fast and Robust Navigation on the Edge|AsyncVLA]]（**唯一真跨网络的实例**：接口 = 8 × 1024 动作 token 嵌入，WiFi 0.28–6 s 抖动下端侧 76M 适配头用当前帧改写过时引导；⚠️ 须端到端微调 ⇒ 闭源云端大脑用不了嵌入级接口，只能退到子目标级）
 >
 > 共同点：**都避开"紧耦合单模型 joint-MoE"（π 的范式 A）**——那是最难拆分的。
 > VLA 内部耦合（A/B）与系统级解耦**正交**。

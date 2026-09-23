@@ -1160,3 +1160,10 @@
 - Ethan 追问 KASO，会话中按"问题（validity gap）→ 五步流程 → 两个设计细节（动作空间比 / 高噪声打分）→ 玩具与真机证据 → 打折项"讲清，同内容写入笔记。
 - 联动七处：[[World-Action Models]] 加"第二代改良"小节（对"要不要生成视频"主轴的第三种回答）、对比表、Open Questions 两条（scaling 天花板有了曲线；validity gap 在隐空间 WAM 是否存在）、Related；[[AgiBot 智元]] Flagship 与关联加第二条世界模型线；[[Robot data engine]] 加失败 / rollout 数据的架构级消费通道注；数据采集综合页 §1.3 加"第四类数据第二种消费方式"（判别器筛 vs 架构分离）；[[World model trends - architecture, scale, function, hardware]] 参考表加一行；具身地图 WM 节；index。
 - 未提交，待 Ethan 复核。
+
+## [2026-09-23] ingest | AsyncVLA（Berkeley / Toyota / Princeton）：首篇导航源笔记，首个真跨网络的云大脑 + 端小脑实例
+
+- Ethan 给 [arXiv:2602.13476](https://arxiv.org/abs/2602.13476)，评估后**完整入库**：新建 [[Hirose et al. - AsyncVLA An Asynchronous VLA for Fast and Robust Navigation on the Edge]]。理由：库内“云脑 + 端小脑”部署主线此前全是预判（π 裂解）、厂商自报（Helix 全在机身）、框架设计（云边协同页），这是第一个开源、可复现、有真实 WiFi 延迟分布（0.28–6.0 s）的实例；同时开了导航领域。
+- 核实：架构 / 训练 / 表 I / 附录表 II / 延迟扫描 HTML 自读；代码仓 README + LICENSE 已读（MIT 叠 OpenVLA-OFT / ViNT / OmniVLA 三份上游版权，GitHub 标 NOASSERTION，论文 NC-ND）；HF 权重存在。OmniVLA / ViNT / NoMaD 导航线本库无源笔记，标待补。
+- 笔记重点：**“位置 vs 架构”隔离**（同模型全放工作站 0.30 vs 分离 0.85）；**“不做端到端”0.25 ⇒ 须开源权重**，推论闭源云端大脑只能退到子目标级接口（接 Harness VLA / Pigey）；附录分拆 OmniVLA 无行人 0.90 / 有行人 0.00 ⇒ 尾延迟致命。
+- 联动六处：[[Embodied Cerebellum Models]] 四种来源①加首个实例、“抖动比均值致命”加真机证据；[[Embodied Brain Models]] 解耦光谱路线 2 加唯一跨网络实例与闭源限制；云边协同页加网络通信口最小实现注（并标明只做推理分工）；具身地图 VLA 节；index；[[Sergey Levine]] 实体。

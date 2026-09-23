@@ -12,6 +12,7 @@
 - [[Physical Intelligence (π)]] — 联合创始人 / Chief Scientist
 - [[VLA - Vision-Language-Action Models]] — VLA 路线主要推动者之一
 - [[Physical Intelligence - pi0 a Vision-Language-Action Flow Model for General Robot Control]]
+- [[Hirose et al. - AsyncVLA An Asynchronous VLA for Fast and Robust Navigation on the Edge]] — Berkeley 导航线（OmniVLA / ViNT / NoMaD 系）；云边异步双系统
 - [[Chelsea Finn]] — PI 联合创始人（同为机器人学习领域核心人物）
 
 ## tags

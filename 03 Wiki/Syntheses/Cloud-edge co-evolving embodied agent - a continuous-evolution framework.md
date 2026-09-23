@@ -141,6 +141,7 @@
 
 另一条边界判断(Harness VLA/RPent 反例 + ENPIRE 正例):**coding agent 属于演进通道,放进运行时通道就出不了仿真**——延迟/成本/SaaS 依赖/断网即死,四条都顶撞"断网必须能活"。ENPIRE 的正确用法:coding agent 在实验室循环里改代码,机器人运行时跑的仍是朴素 policy。
 
+> **网络通信口的一个最小可运行实现（2026-09 加，[[Hirose et al. - AsyncVLA An Asynchronous VLA for Fast and Robust Navigation on the Edge|AsyncVLA]]）**：机器人缓存历史帧 + 时间戳，云端 VLA 出的动作 token 嵌入携带原图时间戳下行，端侧按时间戳配对出对应的过时观测、与当前帧做差分后喂 76M 适配头——这就是本页“异步 / store-and-forward”在推理链路上的具体形态，且量化了它要吞的抖动：WiFi 往返 0.28–6.0 s，跨 20 倍。⚠️ 它只做**推理时**的云边分工，不涉及本页核心的端侧演进 / 经验回传；且要求端到端微调开源基座。
 ## Open Problems(汇报里单独标)
 
 - **开放世界技能的上线前验证(覆盖性)**——② 唯一的硬骨头:回归测试盖不住长尾,影子只覆盖遇到过的场景。

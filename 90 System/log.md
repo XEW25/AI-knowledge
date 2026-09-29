@@ -1174,3 +1174,10 @@
 - **代码核实**：开源的 RSI-Harness（719 stars，MIT）= RSIH，Pi coding agent + Genome 配置层，**是被改进的对象**；Data-RSI / Model-RSI / RSI2 调度器 / MetaRSI2 元层 / 信号编译器**均未发布**。笔记头部与 limitations 醒目标出。
 - 定位写清：**框架 + 代码切片实证**，非通用能力证据——实验全在其自己批评的“机器可验证切片”（Terminal-Bench / SWE-bench Pro / 自选 GPQA-D-hard100 / AIME）；完整三算子环仅一个 35B MoE；前沿模型只走 D+H；五种子无区间；新机构 30 人。
 - 联动八处：[[Harness design]] 加形式化注 + Open question 答；云边协同页演进通道加跨领域证据与 §6.5 三项新增；[[Harness development base - JiuwenSymbiosis selection and build plan]] ④持续学习加可对照规范（失败签名 / 七阶段内核 / 密封评估器 / 信号新鲜度）；[[Embodied failure detection]] 前置守卫加“可恢复性第二准入”旁证；Agent 地图；Harnesses 主题页；index；[[Alex Zhang - The Mismanaged Geniuses Hypothesis]] 加同向证据与 Law 5 上界。
+
+## [2026-09-29] ingest | Morphometric Imitation：人手示范到灵巧手技能的三阶段生产管线
+
+- Ethan 讨论形态/接触匹配、残差 RL 与行为克隆蒸馏的接口后确认入库。新建 [[Sadjadpour et al. - Morphometric Imitation From Morphology and Contact Aware Hand Retargeting to Sim-to-Real Visuomotor Policy]]，按 v2 HTML 核对机制、主表 II–V、统计说明与局限；arXiv 保留 URL，不保存 PDF。
+- 沉淀会话澄清：第一步输出第二步的参考关节目标；第二步训练闭环教师并 rollout 产演示，不是动力学预测模型；第三步是特权状态教师到传感器学生的监督模仿学习；与 cuRobo 的类比只限专家演示生成角色。
+- 证据边界：10 条动捕、三种手仿真、单臂手真机 89.33% / 300 次、每类独立训练；不能写成任意视频规模化或开放任务泛化。官方仓库 README 仍称代码待发布，未做实现核实或复现。
+- 联动 Robot data engine、三层数据金字塔、端云持续演进框架（补示范引导 sim RL 混合路线）、具身地图与 index。入库前 lint 为零断链、根 AGENTS 一孤页、AGENTS 同名一组；入库后复查同基线。

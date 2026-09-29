@@ -21,6 +21,8 @@
 3. **判别**(valuation):从规则启发式 → 模型判别(influence/datamodels)→ 质量条件化(判别器内化成训练组件)。三代并存,工业实践滞后学术一代。
 4. **评估/裁决**(evaluation):L0 人工真机 → L1 自动化真机 → L2 real-to-sim → L3 世界模型评估器。**每上一层,物理瓶颈换成一层 GPU 负载。**
 
+**加工与产出的具体连接（2026-09）**：[[Sadjadpour et al. - Morphometric Imitation From Morphology and Contact Aware Hand Retargeting to Sim-to-Real Visuomotor Policy|Morphometric Imitation]] 把人手动捕示范经形态/接触匹配转为参考关节轨迹，再训练仿真残差 RL 教师生成演示，监督训练点云学生。它是生产型引擎中的技能生成部件；几何相似、动力学可执行与传感器观测下可部署是三道不同门槛。真机 89.33% 的范围是单臂手、10 类物体、逐类策略，未验证任意视频规模化转化或常驻数据飞轮。
+
 ## 核心结构:昂贵金标准的多级代理层级
 全行业质量体系的统一解释——它们都是给"**全训练 + 真机评测**"这个昂贵金标准(权威但贵到调不起的那个判定;文献中多称 *oracle*)建的**代理/缓存层级**:
 

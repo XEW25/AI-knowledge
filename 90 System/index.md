@@ -17,6 +17,7 @@
 - [[2026-08-17 - RLinf - RPent GitHub repository]] — 代码仓 raw capture(clone 审计);与 Harness VLA 论文的关系证据 + harness-in-markdown 证据分布 + 无 LICENSE 记录
 
 ## Sources
+- [[Sadjadpour et al. - Morphometric Imitation From Morphology and Contact Aware Hand Retargeting to Sim-to-Real Visuomotor Policy]] — Berkeley 灵巧手技能生产管线（arXiv:2609.28660v2）：MMO 形态/接触匹配输出参考关节轨迹 → 仿真残差 RL 教师 → 教师演示上监督训练点云学生。10 条动捕、三种手仿真、单臂手真机 89.33% / 300 次；逐类训练、代码尚待发布。含 BC/SFT 与 cuRobo 类比边界、v2 统计限制，连接数据引擎 / 三层数据金字塔 / 技能工厂。
 - [[Andrej Karpathy - LLM Wiki]] — source note on the LLM Wiki pattern proposed by Andrej Karpathy
 - [[Alex Zhang - The Mismanaged Geniuses Hypothesis]] — source note on learned decomposition, orchestration, and the claim that frontier LMs are underutilized by brittle scaffolds
 - [[Li et al. - MemPO Self-Memory Policy Optimization for Long-Horizon Agents]] — source note on training memory as an explicit agent action and policy for long-horizon tasks

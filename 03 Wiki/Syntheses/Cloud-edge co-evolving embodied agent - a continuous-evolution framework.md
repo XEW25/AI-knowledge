@@ -75,7 +75,10 @@
 
 > **判断(前瞻)**:技能供给应是**双轨**——teleop 覆盖难仿真/难判定的长尾,sim RL 批量吃下可仿真可判定的部分。**亚线性成立的程度 ≈ sim RL 能吃下多大比例**;这也让"能不能把新技能问题化归为一个可判定的仿真任务"成为技能工厂的关键工程能力。⚠️ 注意 LEACL 只在 10⁴ 参数 MLP 上验证,**VLA 尺度的专家能否这样生产,尚无证据**。
 
+**混合供给路线（2026-09 补充）**：[[Sadjadpour et al. - Morphometric Imitation From Morphology and Contact Aware Hand Retargeting to Sim-to-Real Visuomotor Policy|Morphometric Imitation]] 提供“人类示范 → 几何重定向参考 → 残差 RL 教师 → 仿真演示 → 视觉运动学生”的实例。上表 sim RL 的“零演示”描述的是从零探索路线，不是 sim RL 的必要属性；示范可作为参考和任务信号降低探索难度。本文验证到单臂手、逐物体类别的真机策略，可作云③技能生产方法的参考，未验证云端部署、车队协同或规模化成本收益。
+
 ### 演进接口(B 之下,大脑↔专家传什么)
+
 大脑演进后**不需要推权重给专家**——更好的指令经**运行时通道**自然下发。演进平面只需显式同步三样:**① 能力画像**(专家变了→更新云对它的能力模型,而非传权重);**② 接口契约共版本化**(子任务/约束/验证"语言"两侧对齐);**③ 能力缺口信号**(大脑要的技能没有→催生新专家)。
 
 > **"能力画像"到底是什么(2026-08 精确化)** —— [[Zhang et al. - Harness VLA Steering Frozen VLAs into Reliable Manipulation Primitives via Memory-Guided Agents|Harness VLA]] 给了实证形态,可把这条从抽象说法收紧:

@@ -86,6 +86,7 @@ This map collects the vault's embodied-AI cluster: vision-language-action (VLA) 
 - [[RLinf - RPent Recursive Physical Agent Framework]] — **Harness VLA 的代码仓真身**（README 明认；279 stars，Pre-Alpha）。**实现暴露论文没说的三件事**：harness 策略在 markdown+prompt 不在代码（Python 中 staging/postcondition/verif 命中 0）、记忆写入 maintainer 人审无自助上传、**仅 LIBERO 零真机**（编码 agent 在运行时环 ⇒ 出不了仿真的结构原因）。值得搬的三样：**记忆两层 + "存过程不存坐标"铁律**（HF 数据集托管）、VLA HTTP 服务边界、**分割叠加图回传 planner**（廉价 L2 语义核对）。⚠️ 无 LICENSE 文件、无测试
 
 ### Sources — skill acquisition / training methodology
+- [[Sadjadpour et al. - Morphometric Imitation From Morphology and Contact Aware Hand Retargeting to Sim-to-Real Visuomotor Policy|Morphometric Imitation]] — 人手示范经形态/接触重定向、残差 RL 教师、点云学生蒸馏形成技能；真机 89.33%（单臂手、10 类、300 次），逐类训练、动捕输入、实现待发布。连接数据引擎与技能工厂。
 - [[Heravi et al. - LEACL LLM-Enhanced Automatic Curriculum Learning for RL in Long-Horizon Manipulation|LEACL]] — LLM 生成**任务空间 + 难度排序**(而非 dense reward)喂给现成 ACL,长程操控**只用稀疏奖励**训练(UT Austin / Peter Stone, 2026)。技能工厂"新专家怎么训"的一环;**实测反证:拆解+稀疏奖励≈0%,段内还需课程**
 
 ### Entities

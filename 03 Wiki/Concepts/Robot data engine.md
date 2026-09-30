@@ -45,6 +45,9 @@
 
 ## 统一引擎必须容纳的两个异构性
 
+**精度预算的系统因素**：[[Xu et al. - The Curse of Precision A Data Scaling Law for High-Precision Robotic Manipulation|The Curse of Precision]] 用三项仿真 BC 任务拟合接近系统容差边界时的数据成本急升。局部相机、示范策略与容量都影响趋势；更低成功率专家的成功轨迹可能更易学，但被舍弃的采集成本仍须计算。应分别量化专家成功率、有效演示可学性与采集成本；拟合 c 不是普适硬极限，未验证真机/VLA/RL。
+
+
 **受限接口案例（2026-09）**：[[Chen et al. - CLIFT Turning Gemini Robotics On-Device into Humanoid Specialists via Non-Invasive Closed-Loop Iterative Fine-Tuning|CLIFT]] 把质量信号写成普通指令文本，经闭源 GROD 的托管 SFT 更新策略。它继承 Recap 二值优势条件化，用一次训练的偏好奖励模型＋相似状态实际回报排名替代逐轮值函数拟合。奖励模型判断逐步质量，值函数预测未来累计回报，二者应分清。三项 G1 任务验证固定套件熟练化；训练数据与评测复用，不是车队泛化证据。
 
 1. **质量度量异构**:三层"坏"的定义各不相同——顶层=**教坏策略**、中层=**不够真**、底层=**转化不出**。⇒ **不存在统一质量分**。

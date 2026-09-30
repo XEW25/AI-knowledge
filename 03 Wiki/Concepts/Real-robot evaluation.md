@@ -209,6 +209,8 @@ PhAIL（⚠️ 未核实）把 **time-to-success CDF** 当评测原语。关键�
 
 ## Related
 
+- [[Xu et al. - The Curse of Precision A Data Scaling Law for High-Precision Robotic Manipulation|The Curse of Precision]] — 容差×数据量扫描可辅助精密操作诊断；证据仅仿真 BC。每点单次训练、选训练中最高三次评测，使 Wilson 区间不覆盖训练随机性和选择偏差；拟合边界不能当实测精度。
+
 - [[Chen et al. - CLIFT Turning Gemini Robotics On-Device into Humanoid Specialists via Non-Invasive Closed-Loop Iterative Fine-Tuning|CLIFT]] — 固定 6/10/5 配置、每轮每任务 100 次；评测 rollout 同时供下一轮训练，最终结果测固定套件上的熟练化，不能当独立留出泛化。
 
 - [[Tao et al. - ForeTac-VLA A Forecasting-Based Tactile-Vision-Language-Action Model for Contact-Rich Robotic Manipulation|ForeTac-VLA]] — 四任务各 20 次的消融归因案例：单向融合加预测仅多成功 1 次，不能将完整组合收益全归因于预测；暗光/杂乱测试不等于跨技能泛化。

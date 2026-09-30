@@ -17,6 +17,7 @@
 - [[2026-08-17 - RLinf - RPent GitHub repository]] — 代码仓 raw capture(clone 审计);与 Harness VLA 论文的关系证据 + harness-in-markdown 证据分布 + 无 LICENSE 记录
 
 ## Sources
+- [[Xu et al. - The Curse of Precision A Data Scaling Law for High-Precision Robotic Manipulation|The Curse of Precision]] — 仿真 BC 的容差/演示量 scaling：log N=m/(P−c)+n；c 为系统配置相关拟合边界，含腕部观测与示范策略消融。记录单训练、最佳三次评测、两层拟合/外推和成功轨迹采集成本；非真机/VLA/RL 普适定律。
 - [[Chen et al. - CLIFT Turning Gemini Robotics On-Device into Humanoid Specialists via Non-Invasive Closed-Loop Iterative Fine-Tuning|CLIFT]] — GROD 托管 SFT 接口上的真机数据飞轮；偏好奖励模型固定、相似状态检索估计优势、文本正负条件化。含 Recap 对比：奖励模型≠值函数，两者均用文本 token；G1 三任务两轮 100/98/96%，固定套件兼作下轮训练，代码待发布。
 - [[Tao et al. - ForeTac-VLA A Forecasting-Based Tactile-Vision-Language-Action Model for Contact-Rich Robotic Manipulation|ForeTac-VLA]] — π₀.₅ 触觉历史融合与未来压力预测；四真机任务 76/80。含任务、前缀/KV 推断边界和消融归因；单向融合加预测仅 +1/80，代码/数据官方待发布，原文 URL-only。
 - [[Ji et al. - Catch Me If You Can Real-Time Feedback Denoising for Responsive VLAs|VLA-Feedback]] — GR00T 近最终动作块 + 最新腕部视觉完成最后去噪，实现块内反馈；含生成/物理时间轴、训练共享范围未明、泛化边界，以及 2 ms 网络推理与 10 Hz 真机闭环的区别。原文 URL-only，代码状态未核实。

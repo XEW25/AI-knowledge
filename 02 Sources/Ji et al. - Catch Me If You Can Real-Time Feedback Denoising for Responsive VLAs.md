@@ -56,6 +56,8 @@
 
 ## Related
 
+- [[Tao et al. - ForeTac-VLA A Forecasting-Based Tactile-Vision-Language-Action Model for Contact-Rich Robotic Manipulation|ForeTac-VLA]] — 最新视觉快速修正与接触趋势预测是不同设计轴；后者改造 π₀.₅ 的条件前缀，具体 KV 实现待核实。
+
 - [[Embodied Cerebellum Models]] — 多速率执行与块内闭环
 - [[NVIDIA - GR00T N1 An Open Foundation Model for Generalist Humanoid Robots]] — 基座谱系；本文实现未做代码核实
 - [[Real-robot evaluation]] — 网络延迟与全路径延迟的评测口径

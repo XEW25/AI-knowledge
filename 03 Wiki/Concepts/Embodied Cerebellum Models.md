@@ -117,6 +117,8 @@
 
 ## Related
 
+- [[Tao et al. - ForeTac-VLA A Forecasting-Based Tactile-Vision-Language-Action Model for Contact-Rich Robotic Manipulation|ForeTac-VLA]] — 补充“控制器感知什么”：触觉历史与预测共同条件化动作，与快速视觉反馈形成对照；四接触任务，未验证高频端侧部署，代码待发布。
+
 - [[Embodied Brain Models]] — 对位页（大脑侧）；部署驱动框架、三流派、接口谱系
 - [[Home robot architecture - a hierarchical embodied agent]] — 把大脑/小脑/脊髓分层落到家庭机器人的具体架构；capability-vs-dependability
 - [[Cloud-edge co-evolving embodied agent - a continuous-evolution framework]] — 端云持续演进框架;关键技术 T1(高效自演进)/T2(安全)正落在小脑层

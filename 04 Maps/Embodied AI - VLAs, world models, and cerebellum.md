@@ -39,6 +39,7 @@ This map collects the vault's embodied-AI cluster: vision-language-action (VLA) 
 - [[Harness development base - JiuwenSymbiosis selection and build plan]] — **⚠️ 团队专属选型决策记录**(2026-08-17):四特性(失败检测/重试/记忆/持续学习)开发基座选 **JiuwenSymbiosis 而非 RPent**;根本原因 = **机制 vs 嘱咐**(行为放代码可测可消融 vs 放 prompt 不可观测)+ 部署终局(真机/本地模型/断网可活)+ **rails-off 即基线**;推进次序 8 步(评测环境与成功信号先于一切特性);四特性→rails 落点表(DetectionRail 裁判 vs DiagnosisRail 解说);**π0.5 纯 VLA 路线的 `vla_until` 设计 + 2×2 paired 实验**(harness 价值是否依赖执行器范式——无已发表工作能答)
 
 ### Sources — VLA models
+- [[Tao et al. - ForeTac-VLA A Forecasting-Based Tactile-Vision-Language-Action Model for Contact-Rich Robotic Manipulation|ForeTac-VLA]] — 触觉预测辅助接触操作：融合接触历史、预测未来压力并条件化动作。四任务 95%，单一本体；完整组合有效，不将收益全归因于预测。代码待发布。
 - [[Ji et al. - Catch Me If You Can Real-Time Feedback Denoising for Responsive VLAs|VLA-Feedback]] — 慢规划保留最后去噪更新，快支路逐动作读新视觉；补块内闭环，与 RTC 衔接、DVAC 自适应块长区分。动态仿真三任务均值 27.5→85%；2 ms 仅网络计算，真机控制 10 Hz；非通用云边或跨任务零样本证据。
 - π series (范式 A source): [[Physical Intelligence - pi0 a Vision-Language-Action Flow Model for General Robot Control|π₀]] · [[Physical Intelligence - pi0.5 a VLA with Open-World Generalization|π₀.5]] · [[Physical Intelligence - pi0.6 a VLA That Learns From Experience|π*₀.6]] · [[Physical Intelligence - pi0.7 a Steerable Generalist Robotic Foundation Model|π₀.7]] · [[Physical Intelligence - RL Tokens Precise Manipulation with Efficient Online RL|RL Tokens]]
 - [[NVIDIA - GR00T N1 An Open Foundation Model for Generalist Humanoid Robots|GR00T N1]] — 范式 B (cross-attention), code-verified

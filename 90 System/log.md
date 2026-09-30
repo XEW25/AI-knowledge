@@ -1195,3 +1195,10 @@
 - 沉淀生成去噪时间轴与物理动作时间轴的区别；冻结规划器后的监督训练不等于免训练，逐任务示范预算不等于逐任务独立 checkpoint。共享训练范围、公开代码状态保留待核实。
 - 记录主表动态任务结果、速度外推限制；区分 2 ms 网络计算、约 71 ms 真机全路径和 10 Hz 控制。未把未读取的结果图作为精确数字依据。
 - 联动小脑概念、DVAC、Hirose 等 AsyncVLA、具身地图与 index，区分块间衔接、重规划时机、块内反馈和跨网络部署证据。
+
+## [2026-09-30] ingest | ForeTac-VLA：触觉预测辅助接触操作
+
+- Ethan 讨论任务、触觉融合、预测器与 KV Cache 后确认收录 [[Tao et al. - ForeTac-VLA A Forecasting-Based Tactile-Vision-Language-Action Model for Contact-Rich Robotic Manipulation]]。原文 v1 URL-only，不下载或跟踪 PDF。
+- 记录四真机任务、压力历史编码、双向融合、未来压力变化预测和条件训练课程；将 openpi 标准缓存机制与 ForeTac-VLA 未公开的具体实现分开。
+- 官方项目页直连读取成功：Code / Dataset Coming soon，检索仅发现展示网站仓库；修正此前仅能说“未核实”的状态。
+- 突出单向融合增加预测仅 +1/80 的归因限制，关联小脑、真机评测、VLA-Feedback、具身地图与 index。

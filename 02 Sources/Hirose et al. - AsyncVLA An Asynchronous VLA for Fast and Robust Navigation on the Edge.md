@@ -109,6 +109,7 @@
 - 端小脑要不要也吃基座的**语言**条件？本篇 Adapter 不读语言，语言只经嵌入间接进入——与 GE-Act 2.0 "IDM 不收语言"同一设计选择。
 
 ## Related
+- [[Ji et al. - Catch Me If You Can Real-Time Feedback Denoising for Responsive VLAs|VLA-Feedback]] — 操控侧慢规划/快视觉反馈对照。冻结规划器后可训练反馈头，但仍需内部动作特征；不证明黑盒接口可用，也没有本文的真实网络部署验证。
 - [[Embodied Cerebellum Models]] — 四种来源第一条的首个实例；延迟方差证据
 - [[Embodied Brain Models]] — 解耦光谱路线 2；嵌入级接口
 - [[Cloud-edge co-evolving embodied agent - a continuous-evolution framework]] — 网络通信口的最小实现

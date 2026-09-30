@@ -1188,3 +1188,10 @@
 - 明确几何/相机/接口对齐、Grounding DINO + SAM 初始化、任务级人工偏移及逐轨迹回放重试的区别；真实/仿真分别微调，不能代替固定 checkpoint 的量化/引擎回归证据。
 - 写入 VLM 描述→偏好→BT 排名、人类与顺序审计、二项 bootstrap 范围、前期准备/计算未计入成本；保留表 IV Avg. 91.9% 与八行重算 90.9375% 的不一致。项目页访问失败，公开实现状态未核实。
 - 联动 Real-robot evaluation、真机 eval bench、Isaac Lab-Arena 源笔记、具身地图和 index，定位候选筛选/诊断，不替代真机验收。
+
+## [2026-09-30] ingest | VLA-Feedback：动作块内部的实时视觉反馈
+
+- Ethan 讨论流程、最后一步去噪和泛化后确认收录 [[Ji et al. - Catch Me If You Can Real-Time Feedback Denoising for Responsive VLAs]]。原文 v1 URL-only，不下载或跟踪 PDF。
+- 沉淀生成去噪时间轴与物理动作时间轴的区别；冻结规划器后的监督训练不等于免训练，逐任务示范预算不等于逐任务独立 checkpoint。共享训练范围、公开代码状态保留待核实。
+- 记录主表动态任务结果、速度外推限制；区分 2 ms 网络计算、约 71 ms 真机全路径和 10 Hz 控制。未把未读取的结果图作为精确数字依据。
+- 联动小脑概念、DVAC、Hirose 等 AsyncVLA、具身地图与 index，区分块间衔接、重规划时机、块内反馈和跨网络部署证据。

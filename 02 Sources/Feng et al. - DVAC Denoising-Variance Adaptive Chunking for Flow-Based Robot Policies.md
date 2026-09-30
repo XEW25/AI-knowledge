@@ -102,6 +102,7 @@ NVIDIA GEAR 的 **ENPIRE** 让 coding agent **通过搜索**才找到"该把自�
 - 高方差区段能否直接用作**自动复位点 / 数据采集加密点 / 评测切片点**（接 ENPIRE 的做法）？
 
 ## Related
+- [[Ji et al. - Catch Me If You Can Real-Time Feedback Denoising for Responsive VLAs|VLA-Feedback]] — DVAC 决定何时重规划；VLA-Feedback 在既定块内用新视觉完成最后去噪。后者需要训练，组合收益尚未验证。
 - [[Embodied Cerebellum Models]] — 执行时域属该页"chunk 消费层"；补上了"块该多长"这一半
 - [[Embodied failure detection]] — **同族信号的另一种消费方式**（变速箱 vs 刹车）；作者自陈可作为检测器的输入之一
 - [[Physical Intelligence - pi0.5 a VLA with Open-World Generalization]] — 主要实验基座

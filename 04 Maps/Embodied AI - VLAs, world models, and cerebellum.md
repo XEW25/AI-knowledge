@@ -64,6 +64,7 @@ This map collects the vault's embodied-AI cluster: vision-language-action (VLA) 
 - [[Zheng et al. - DyQ-VLA Temporal-Dynamic-Aware Quantization for Embodied Vision-Language-Action Models|DyQ-VLA]] · [[Zhang et al. - QuantVLA Scale-Calibrated Post-Training Quantization for Vision-Language-Action Models|QuantVLA]] · [[Wang et al. - Omega-QVLA Robust Quantization for Vision-Language-Action Models via Composite Rotation and Per-step Scaling|Ω-QVLA]] · [[Lin et al. - DuQuant Distributing Outliers via Dual Transformation Makes Stronger Quantized LLMs|DuQuant]]
 
 ### Sources — evaluation infrastructure
+- [[Wang et al. - R2S-Eval Robot Evaluation with Real-to-Sim Calibration via Vision-Language Models|R2S-Eval]] — 校准仿真产视频 + VLM 偏好 + BT 排名；6 VLA、7 任务，真实/仿真成功率均差 2.13 pp。**两侧分别微调**，不验证固定 checkpoint 回归；含人工校准/回放重试、成本排除项、表 IV 数字不一致。定位筛选/诊断。
 - [[NVIDIA - Isaac Lab-Arena Scalable Robot Policy Evaluation in Simulation|Isaac Lab-Arena]] — NVIDIA × **Lightwheel**,**pre-alpha 开源**;把"造 benchmark + 跑评测"本身做成框架:**Object/Scene/Embodiment/Task 乐高式即时编译** + **Affordance 系统**(`Openable`/`Pressable`)跨物体泛化;策略无关;GR00T N1.5 × 10 RoboCasa 任务 × 每任务 **4096 同构变体** × 8 卡 → **0.76h**(串行 34.9h)。生态:Lightwheel **250+ 任务**、LeRobot Env Hub、RoboTwin 2.0 扩展。**⚠️ 只解决"可比+快",未报 sim-to-real 相关性("可信"未碰);40× 是内部并行 vs 串行对照**
 
 ### Sources — failure detection / runtime monitoring

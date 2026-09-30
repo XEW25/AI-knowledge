@@ -88,6 +88,7 @@ env   = IsaacLabArenaEnvironment(name=..., embodiment=embodiment, scene=scene, t
 - 厂商博客，**无同行评审**；GitHub 仓库与文档本次未核对。
 
 ## Related
+- [[Wang et al. - R2S-Eval Robot Evaluation with Real-to-Sim Calibration via Vision-Language Models|R2S-Eval]] — 后续应用案例：基于 Arena 校准场景，分别训练真实/仿真策略并检验模型排名对应，再用 VLM 视频偏好排序。它补充特定配置上的相关性实证，不代表 Arena 自带普适 sim-real 保真保证。
 - [[Real-robot evaluation]] — **仿真侧对位**：Arena 攻"可比且快"，那页攻"可信"
 - [[Robot data engine]] — L0–L3 评估栈；评估算力成为预算项
 - [[Real-robot data collection - teleop vs UMI-class, and the model-in-the-loop quality problem]] — §5.4 供给侧优化的第 6 层（仿真评测层）

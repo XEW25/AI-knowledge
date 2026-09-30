@@ -1181,3 +1181,10 @@
 - 沉淀会话澄清：第一步输出第二步的参考关节目标；第二步训练闭环教师并 rollout 产演示，不是动力学预测模型；第三步是特权状态教师到传感器学生的监督模仿学习；与 cuRobo 的类比只限专家演示生成角色。
 - 证据边界：10 条动捕、三种手仿真、单臂手真机 89.33% / 300 次、每类独立训练；不能写成任意视频规模化或开放任务泛化。官方仓库 README 仍称代码待发布，未做实现核实或复现。
 - 联动 Robot data engine、三层数据金字塔、端云持续演进框架（补示范引导 sim RL 混合路线）、具身地图与 index。入库前 lint 为零断链、根 AGENTS 一孤页、AGENTS 同名一组；入库后复查同基线。
+
+## [2026-09-30] ingest | R2S-Eval：校准仿真与 VLM 视频偏好排序
+
+- Ethan 讨论贡献和 real-to-sim 校准流程后确认收录 [[Wang et al. - R2S-Eval Robot Evaluation with Real-to-Sim Calibration via Vision-Language Models]]。保留 v1 原文链接，URL-only，不下载或 Git 跟踪 PDF。
+- 明确几何/相机/接口对齐、Grounding DINO + SAM 初始化、任务级人工偏移及逐轨迹回放重试的区别；真实/仿真分别微调，不能代替固定 checkpoint 的量化/引擎回归证据。
+- 写入 VLM 描述→偏好→BT 排名、人类与顺序审计、二项 bootstrap 范围、前期准备/计算未计入成本；保留表 IV Avg. 91.9% 与八行重算 90.9375% 的不一致。项目页访问失败，公开实现状态未核实。
+- 联动 Real-robot evaluation、真机 eval bench、Isaac Lab-Arena 源笔记、具身地图和 index，定位候选筛选/诊断，不替代真机验收。

@@ -44,6 +44,9 @@
 **自演进型的配方 = 双组分杠杆**:少量高价值**人类信号**(支点)撬动大量免费**自主经验**(杠杆臂),质量信号机制做转换器。它把"数据获取"问题转化为"**质量信号提取**"问题。注意:自主经验免费,但**打分算力不免费**(常驻在线负载)。
 
 ## 统一引擎必须容纳的两个异构性
+
+**受限接口案例（2026-09）**：[[Chen et al. - CLIFT Turning Gemini Robotics On-Device into Humanoid Specialists via Non-Invasive Closed-Loop Iterative Fine-Tuning|CLIFT]] 把质量信号写成普通指令文本，经闭源 GROD 的托管 SFT 更新策略。它继承 Recap 二值优势条件化，用一次训练的偏好奖励模型＋相似状态实际回报排名替代逐轮值函数拟合。奖励模型判断逐步质量，值函数预测未来累计回报，二者应分清。三项 G1 任务验证固定套件熟练化；训练数据与评测复用，不是车队泛化证据。
+
 1. **质量度量异构**:三层"坏"的定义各不相同——顶层=**教坏策略**、中层=**不够真**、底层=**转化不出**。⇒ **不存在统一质量分**。
 2. **算力瓶颈异构**:**顶层贵在评估、中层贵在生成、底层贵在清洗**——瓶颈落在管线的不同段。⇒ 三层 QA 基础设施形态迥异。
 
@@ -64,6 +67,7 @@
 
 > **2026-09 补：失败 / 部署 rollout 数据的一条架构级消费通道**（[[AgiBot - GE-Act 2.0 Pretraining and Scaling a World-Action Model for Robotic Manipulation|GE-Act 2.0]]）——WAM 里把逆动力学模型（IDM）做成**可单独预训练**的部件（前提是世界模型单步生成、动作梯度能穿过完整未来），IDM 只需观测-动作对齐、不需指令与成功标注 ⇒ 失败轨迹与部署 rollout **不必先过质量判别**就能进训练。这与本页“昂贵金标准的多级代理层级”互补：代理层级解决“哪些数据值得进策略目标”，IDM 通道解决“不进策略目标的数据还能喂谁”。⚠️ 论文没有消融去掉这类数据 IDM 掉多少，收益是论证的。
 ## Related
+- [[Chen et al. - CLIFT Turning Gemini Robotics On-Device into Humanoid Specialists via Non-Invasive Closed-Loop Iterative Fine-Tuning|CLIFT]] — 受限托管接口也能接自演进引擎：固定奖励模型评逐步质量，检索实际回报标动作块优势，正负数据经 SFT 更新策略。替代 Recap 的值函数标签估计环节，不是取消评价模型训练。
 - [[Real-robot evaluation]] — **姊妹页,边界须分清**:本页把评测当**被调用的金标准**(怎么少调用它:代理层级、吞吐);那页把评测当**被设计的测量仪器**(调用一次能买到多少信息:任务覆盖、样本量、指标信息密度)。同一优化问题的两项——最小化调用次数 × 最大化单次信息产出
 - [[Real-robot data collection - teleop vs UMI-class, and the model-in-the-loop quality problem|三层数据金字塔综述(Embodied data)]] — **本页的证据基座**(三层特征/例子/趋势、质量评估三代、L0–L3 评估栈、计算系统四大挑战、完整 Sources)。⚠️ 注意其**文件名仍是旧标题**(改版未改名),链接须用文件名
 - [[Cloud-edge co-evolving embodied agent - a continuous-evolution framework]] — 云③技能工厂(供给侧成本结构)/ 云④验证门

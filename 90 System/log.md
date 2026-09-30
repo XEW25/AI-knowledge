@@ -1202,3 +1202,10 @@
 - 记录四真机任务、压力历史编码、双向融合、未来压力变化预测和条件训练课程；将 openpi 标准缓存机制与 ForeTac-VLA 未公开的具体实现分开。
 - 官方项目页直连读取成功：Code / Dataset Coming soon，检索仅发现展示网站仓库；修正此前仅能说“未核实”的状态。
 - 突出单向融合增加预测仅 +1/80 的归因限制，关联小脑、真机评测、VLA-Feedback、具身地图与 index。
+
+## [2026-09-30] ingest | CLIFT：受限 SFT 接口的真机数据飞轮与 Recap 对比
+
+- Ethan 讨论托管微调、文本标签及奖励模型/值函数区别后确认收录 [[Chen et al. - CLIFT Turning Gemini Robotics On-Device into Humanoid Specialists via Non-Invasive Closed-Loop Iterative Fine-Tuning]]。原文 v1 URL-only，不保存 PDF。
+- 明确继承 Recap 的二值优势条件化；替换的是优势标签估计，非文本/token差异。CLIFT 仍训练一次奖励模型，以实际回报检索比较代替逐轮值函数拟合；缺乏与值函数同条件直接对照。
+- 记录 G1 三任务两轮主结果、固定套件兼训练数据的结论范围、正文后段数字对应关系未明、代码待发布。
+- 联动 Recap、数据引擎、云端持续演进、真机评测、具身地图与 index；澄清 Recap 原笔记“坏数据不提供模仿目标”的歧义：坏动作仍是负条件支路的监督目标。

@@ -120,7 +120,7 @@ min_θ  E_D [ −log π_θ(a_t | o_t, ℓ)  −  α·log π_θ(a_t | I_t, o_t, �
 >
 > 这正是相对 AWR 类方法的核心差别（原文）：加权回归 *"**discard or significantly downweight a significant portion of the data**, effectively implementing a kind of filtered imitation technique"*；而 advantage conditioning *"the policy is trained on **all** of the data with supervised learning, but with an additional input indicating how optimal the action is"*。
 >
-> ⇒ 对应它列的**第三条设计准则**："必须能同时用好数据和坏数据"——**自主经验里绝大部分本来就是次优的**，按 AWR 过滤掉，从部署经验学习这件事本身就不成立。**坏数据在这里提供对比，不提供模仿目标。**
+> ⇒ 对应它列的**第三条设计准则**："必须能同时用好数据和坏数据"——**自主经验里绝大部分本来就是次优的**，按 AWR 过滤掉，从部署经验学习这件事本身就不成立。**坏动作仍是 I=False 条件下的监督目标；它们帮助区分两支，部署时选择 I=True。**
 
 **人类干预强制 `I_t = True`** —— 原文标明这是一个**假设**：*"This choice is reasonable if we assume that human experts always provide good corrective actions."*
 
@@ -227,6 +227,12 @@ PI 同时探索了两条互补路线：
 - 隐式记忆（π*₀.6）：通过 RL 把操作经验融入底层执行
 
 这正好对应我们之前讨论的"理想情况下两层都应有记忆"。
+
+## 与 CLIFT 的关系（2026-09）
+
+[[Chen et al. - CLIFT Turning Gemini Robotics On-Device into Humanoid Specialists via Non-Invasive Closed-Loop Iterative Fine-Tuning|CLIFT]] 明确继承 Recap 的二值优势条件化。**不是“Recap 注入 token、CLIFT 注入文本”**：Recap 本身也是 `Advantage: positive/negative` 文本 token，位置在子任务后、动作前。区别主要在标签估计：本篇成功/失败与完成时间奖励→逐轮更新值函数→优势阈值；CLIFT 偏好密集奖励模型训练一次后固定→相似起始状态片段的实际回报排名→正负标签。
+
+**CLIFT 仍需训练奖励模型 R，不训练本篇的值函数 V**；R 评价逐步质量，V 预测未来累计回报。检索省去逐轮值函数拟合，但依赖相近经验和视觉状态可比性；并无同基座/同奖励/同数据的直接对照证明它优于值函数。更丰富奖励和更换优势基准是两个变量，本篇原则上也可接偏好奖励。CLIFT 的闭源托管接口验证是额外贡献，策略更新仍由提供方执行 SFT。
 
 ## Related Concepts
 

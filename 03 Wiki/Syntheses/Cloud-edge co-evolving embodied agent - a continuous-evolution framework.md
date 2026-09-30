@@ -160,6 +160,8 @@
 
 ## 与知识库的关系 / Related
 
+- [[Chen et al. - CLIFT Turning Gemini Robotics On-Device into Humanoid Specialists via Non-Invasive Closed-Loop Iterative Fine-Tuning|CLIFT]] — 演进通道的受限接口实例：无需公开权重，仍可用自主 rollout、外部评价和文本优势标签驱动提供方 SFT。前提是微调服务与定制策略部署能力；不是只有推理 API 即可实现。
+
 - [[Home robot architecture - a hierarchical embodied agent]] — 上游:大脑/小脑/脊髓分层 + capability-vs-dependability;本框架是其"持续演进/学习平面"的展开。
 - [[Embodied Brain Models]] — 部署驱动框架、VLM-as-actor/encoder、两层耦合、世界模型轴。
 - [[Embodied Cerebellum Models]] — 多速率控制栈、脑启发机制、经典地板;T1/T2 的栖身处。
